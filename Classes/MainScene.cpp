@@ -1,4 +1,4 @@
-#include "MainScene.h"
+ï»¿#include "MainScene.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -51,7 +51,7 @@ bool MainScene::init()
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
     /////////////////////////////
-    // ¼ÓÔØÖ÷µØÍ¼
+    // åŠ è½½ä¸»åœ°å›¾
 
     std::string file = "mainmap.tmx";
     map = TMXTiledMap::create(file);
@@ -62,11 +62,11 @@ bool MainScene::init()
     }
     CCLOG("Map loaded successfully!");
 
-    // »ñÈ¡µØÍ¼³ß´ç
+    // èŽ·å–åœ°å›¾å°ºå¯¸
     float mapWidth = map->getMapSize().width * map->getTileSize().width;
     float mapHeight = map->getMapSize().height * map->getTileSize().height;
 
-    // ¼ÆËãËõ·Å±ÈÀý
+    // è®¡ç®—ç¼©æ”¾æ¯”ä¾‹
     float scaleX = visibleSize.width / mapWidth;
     float scaleY = visibleSize.height / mapHeight;
     float scale = std::min(scaleX, scaleY);
