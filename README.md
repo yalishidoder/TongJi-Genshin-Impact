@@ -1,5 +1,6 @@
 # TongJi-Genshin-Impact
 同济大学2024年程设期末项目
+基于cocos-2dx 3.17.2实现的类原神游戏项目，但画面由3d变为2d
 
 项目日志
 
