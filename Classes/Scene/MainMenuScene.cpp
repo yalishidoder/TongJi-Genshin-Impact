@@ -12,7 +12,7 @@
 
 USING_NS_CC;
 
-using namespace cocos2d::experimental; // 使用 AudioEngine 的命名空间
+using namespace cocos2d::experimental; // 使用 AudioEngine  的命名空间
 
 // 用于存储背景音乐的 ID
 static int backgroundMusicId = -1;

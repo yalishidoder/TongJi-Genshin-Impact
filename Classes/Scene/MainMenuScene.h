@@ -3,7 +3,7 @@
  * File Name:     MainMenuScene.h
  * File Function: 登录页面的实现的类声明
  * Author:        叶贤伟
- * Update Date:   2024.12。9
+ * Update Date:   2024.12.9
  ****************************************************************/
 
 #ifndef __MAIN_MENU_SCENE_H__
