@@ -27,17 +27,17 @@ bool MainScene::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     /////////////////////////////
-    // add a "close" icon to exit the progress. it's an autorelease object
+    // 添加一个“关闭”图标以退出进度。它是一个自动释放对象
     auto closeItem = MenuItemImage::create(
-        "CloseNormal.png",
-        "CloseSelected.png",
+        "Scene/MainScene/CloseNormal.png",
+        "Scene/MainScene/CloseSelected.png",
         CC_CALLBACK_1(MainScene::menuCloseCallback, this));
 
     if (closeItem == nullptr ||
         closeItem->getContentSize().width <= 0 ||
         closeItem->getContentSize().height <= 0)
     {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
+        problemLoading("'Scene/MainScene/CloseNormal.png' and 'Scene/MainScene/CloseSelected.png'");
     }
     else
     {
@@ -46,14 +46,14 @@ bool MainScene::init()
         closeItem->setPosition(Vec2(x, y));
     }
 
-    // create menu, it's an autorelease object
+    //创建菜单，它是一个自动释放对象
     auto menu = Menu::create(closeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
     /////////////////////////////
     // 加载主地图
 
-    std::string file = "mainmap.tmx";
+    std::string file = "Scene/MainScene/mainmap.tmx";
     map = TMXTiledMap::create(file);
 
     if (!map) {
@@ -77,7 +77,7 @@ bool MainScene::init()
     this->addChild(map);
 
 
-    // add a label shows "MainScene"
+    // 添加一个标签显示“MainScene”
 
     auto label = Label::createWithTTF("MainScene", "fonts/Marker Felt.ttf", 24);
     if (label == nullptr)
@@ -86,22 +86,22 @@ bool MainScene::init()
     }
     else
     {
-        // position the label on the center of the screen
+        //将标签放置在屏幕中央
         label->setPosition(Vec2(origin.x + visibleSize.width / 2,
             origin.y + visibleSize.height - label->getContentSize().height));
 
-        // add the label as a child to this layer
+        //添加标签作为子图层
         this->addChild(label, 1);
     }
 
-   
+
     return true;
 }
 
 
 void MainScene::menuCloseCallback(Ref* pSender)
 {
-    //Close the cocos2d-x game scene and quit the application
+    //关闭cocos2d-x游戏场景并退出应用程序
     Director::getInstance()->end();
 
     /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/

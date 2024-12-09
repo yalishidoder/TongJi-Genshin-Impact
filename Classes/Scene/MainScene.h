@@ -1,4 +1,5 @@
-﻿#ifndef __MAIN_SCENE_H__
+﻿
+#ifndef __MAIN_SCENE_H__
 #define __MAIN_SCENE_H__
 
 #include "cocos2d.h"
@@ -13,11 +14,11 @@ public:
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
 
-    // implement the "static create()" method manually
+    //手动实现“static create()”方法
     CREATE_FUNC(MainScene);
 private:
     cocos2d::TMXTiledMap* map;
 
 };
 
-#endif // __MainScene_SCENE_H__
+#endif // __MAIN_SCENE_H__
