@@ -2,6 +2,7 @@
 #define __DESERT_SCENE_H__
 
 #include "cocos2d.h"
+#include "Character/Hero/Hero.h"
 
 class DesertScene : public cocos2d::Scene
 {
@@ -17,12 +18,11 @@ public:
 	void returnToLastScene();
 
 	CREATE_FUNC(DesertScene);
+
+	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 private:
 	cocos2d::TMXTiledMap* desertmap;
-
-	cocos2d::Sprite* character;  // 在这里定义 character
-
-	bool moveUp, moveDown, moveLeft, moveRight;//按键状态
 
 	//地图传送点的信息储存
 	//std::vector<SceneSwitchPoint> sceneSwitchPoints;

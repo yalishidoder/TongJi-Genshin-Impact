@@ -1,6 +1,7 @@
 ﻿#include "MainScene.h"
 #include "DesertScene.h"
 #include "SimpleAudioEngine.h"
+#include "Character/Hero/Hero.h"
 
 USING_NS_CC;
 
@@ -101,17 +102,18 @@ bool MainScene::init()
             float y = chushengObject["y"].asFloat();
             CCLOG("Character spawn position: x = %.2f, y = %.2f", x, y);
             // 创建角色并放置在出生位置
-            character = Sprite::create("CloseSelected.png");  
-            if (character) {
-                character->setAnchorPoint(Vec2(0.5f, 0.5f));
+            auto hero = Character::create(Vec2(500,500));
+            if (hero) {
+                hero->setName("hero"); // 设置角色名称
+                hero->setAnchorPoint(Vec2(0.5f, 0.5f));
 
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + y * map->getScale(); // 地图左下角 + 出生点的 y 偏移
 
                 // 设置人物位置
-                character->setPosition(Vec2(adjustedX, adjustedY));
-                this->addChild(character);  // 将角色添加到场景中
+                hero->setPosition(Vec2(adjustedX, adjustedY));
+                this->addChild(hero);  // 将角色添加到场景中
             }
         }
     }
@@ -139,43 +141,15 @@ bool MainScene::init()
         }
     }
 
-    moveUp = moveDown = moveLeft = moveRight = false;
-    // 注册键盘事件监听器
-    auto keyboardListener = EventListenerKeyboard::create();
-    keyboardListener->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event) {
-        // 按键按下时设置移动状态
-        if (keyCode == EventKeyboard::KeyCode::KEY_W) {
-            moveUp = true;
-        }
-        else if (keyCode == EventKeyboard::KeyCode::KEY_S) {
-            moveDown = true;
-        }
-        else if (keyCode == EventKeyboard::KeyCode::KEY_A) {
-            moveLeft = true;
-        }
-        else if (keyCode == EventKeyboard::KeyCode::KEY_D) {
-            moveRight = true;
-        }
-        };
 
-    keyboardListener->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event) {
-        // 按键松开时停止相应的移动
-        if (keyCode == EventKeyboard::KeyCode::KEY_W) {
-            moveUp = false;
-        }
-        else if (keyCode == EventKeyboard::KeyCode::KEY_S) {
-            moveDown = false;
-        }
-        else if (keyCode == EventKeyboard::KeyCode::KEY_A) {
-            moveLeft = false;
-        }
-        else if (keyCode == EventKeyboard::KeyCode::KEY_D) {
-            moveRight = false;
-        }
-        };
 
+    // 添加键盘事件监听器
+    auto listener = cocos2d::EventListenerKeyboard::create();
+    listener->onKeyPressed = CC_CALLBACK_2(MainScene::onKeyPressed, this);
+    listener->onKeyReleased = CC_CALLBACK_2(MainScene::onKeyReleased, this);
+    
     // 将监听器添加到事件分发器
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     // 注册 update 函数，让它每一帧都被调用
     this->schedule([this](float dt) {
@@ -183,34 +157,97 @@ bool MainScene::init()
         }, "update_key");
     return true;
 }
+
+
 void MainScene::update(float dt)
 {
-    // 根据按键状态来更新角色的位置
-    if (moveUp) {
-        character->setPosition(character->getPosition() + Vec2(0, 2));
-    }
-    if (moveDown) {
-        character->setPosition(character->getPosition() + Vec2(0, -2));
-    }
-    if (moveLeft) {
-        character->setPosition(character->getPosition() + Vec2(-2, 0));
-    }
-    if (moveRight) {
-        character->setPosition(character->getPosition() + Vec2(2, 0));
+    Node::update(dt);
+
+
+    auto children = getChildren();
+    for (auto child : children) {
+        auto character = dynamic_cast<Character*>(child);
+        if (character) {
+            character->update(dt);
+        }
     }
 
-    // 假设 character 是角色对象
     //遍历每一个传送点信息
-    for (const auto& switchPoint : sceneSwitchPoints) {
-        //判断地图传送点和人物是否碰撞
-        if (character->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
-            // 触发切换地图
-            if (switchPoint.targetMap == "desert.tmx") {
-                Director::getInstance()->pushScene(DesertScene::createScene());
+    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    if (hero) {
+        for (const auto& switchPoint : sceneSwitchPoints) {
+            //判断地图传送点和人物是否碰撞
+            if (hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
+                // 触发切换地图
+                if (switchPoint.targetMap == "desert.tmx") {
+                    Director::getInstance()->pushScene(DesertScene::createScene());
+                }
             }
         }
     }
 }
+
+void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
+    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    if (hero) {
+        switch (keyCode) {
+        case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_W:
+        case cocos2d::EventKeyboard::KeyCode::KEY_W:
+            hero->m_moveUp = true;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_S:
+        case cocos2d::EventKeyboard::KeyCode::KEY_S:
+            hero->m_moveDown = true;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_A:
+        case cocos2d::EventKeyboard::KeyCode::KEY_A:
+            hero->m_moveLeft = true;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_D:
+        case cocos2d::EventKeyboard::KeyCode::KEY_D:
+            hero->m_moveRight = true;
+            break;
+        default:
+            break;
+        }
+    }
+
+}
+
+void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
+    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    if (hero) {
+        switch (keyCode) {
+        case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_W:
+        case cocos2d::EventKeyboard::KeyCode::KEY_W:
+            hero->m_moveUp = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_S:
+        case cocos2d::EventKeyboard::KeyCode::KEY_S:
+            hero->m_moveDown = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_A:
+        case cocos2d::EventKeyboard::KeyCode::KEY_A:
+            hero->m_moveLeft = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_D:
+        case cocos2d::EventKeyboard::KeyCode::KEY_D:
+            hero->m_moveRight = false;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 void MainScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application

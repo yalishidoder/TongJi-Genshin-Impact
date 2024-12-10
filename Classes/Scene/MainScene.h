@@ -21,6 +21,9 @@ public:
     
     void update(float dt);
 
+    void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
     void changeScene(const std::string& targetMap);
 
     void returnToMainScene();
@@ -29,8 +32,6 @@ public:
 
 private:
     cocos2d::TMXTiledMap* map;
-    cocos2d::Sprite* character;  // 在这里定义 character
-    bool moveUp, moveDown, moveLeft, moveRight;//按键状态
 
     //地图传送点的信息储存
     std::vector<SceneSwitchPoint> sceneSwitchPoints;

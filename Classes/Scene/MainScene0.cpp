@@ -1,12 +1,14 @@
-#include "DesertScene.h"
+ï»¿#include "MainScene.h"
 #include "SimpleAudioEngine.h"
+#include "Character/Hero/Hero.h"
 
 USING_NS_CC;
 
-Scene* DesertScene::createScene()
+Scene* MainScene::createScene()
 {
-    return DesertScene::create();
+    return MainScene::create();
 }
+
 // Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
 {
@@ -14,27 +16,29 @@ static void problemLoading(const char* filename)
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in MainSceneScene.cpp\n");
 }
 
-bool DesertScene::init()
+// on "init" you need to initialize your instance
+bool MainScene::init()
 {
     if (!Scene::init())
     {
         return false;
     }
+
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
     /////////////////////////////
-    // Ìí¼ÓÒ»¸öÍË³ö°´Å¥    this->addChild(menu, 1);
-    /////////////////////////////
+    // æ·»åŠ ä¸€ä¸ªâ€œå…³é—­â€å›¾æ ‡ä»¥é€€å‡ºè¿›åº¦ã€‚å®ƒæ˜¯ä¸€ä¸ªè‡ªåŠ¨é‡Šæ”¾å¯¹è±¡
     auto closeItem = MenuItemImage::create(
-        "CloseNormal.png",
-        "CloseSelected.png",
-        CC_CALLBACK_1(DesertScene::menuCloseCallback, this));
+        "Scene/MainScene/CloseNormal.png",
+        "Scene/MainScene/CloseSelected.png",
+        CC_CALLBACK_1(MainScene::menuCloseCallback, this));
 
     if (closeItem == nullptr ||
         closeItem->getContentSize().width <= 0 ||
         closeItem->getContentSize().height <= 0)
     {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
+        problemLoading("'Scene/MainScene/CloseNormal.png' and 'Scene/MainScene/CloseSelected.png'");
     }
     else
     {
@@ -43,100 +47,81 @@ bool DesertScene::init()
         closeItem->setPosition(Vec2(x, y));
     }
 
-    // create menu, it's an autorelease object
+    //åˆ›å»ºèœå•ï¼Œå®ƒæ˜¯ä¸€ä¸ªè‡ªåŠ¨é‡Šæ”¾å¯¹è±¡
     auto menu = Menu::create(closeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
-    /////////////////////
-    //¼ÓÔØÉ³Ä®µØÍ¼
-    ////////////////////
-    std::string file = "Scene/desertMap/desert.tmx";
-    desertmap = TMXTiledMap::create(file);
+    /////////////////////////////
+    // åŠ è½½ä¸»åœ°å›¾
 
-    if (!desertmap) {
+    std::string file = "Scene/MainScene/mainmap.tmx";
+    map = TMXTiledMap::create(file);
+
+    if (!map) {
         CCLOG("Failed to load TMX map: %s", file.c_str());
         return false;
     }
-    CCLOG("desertMap loaded successfully!");
-    desertmap->setScale(1.0f);
+    CCLOG("Map loaded successfully!");
 
-    desertmap->setAnchorPoint(Vec2(0.5f, 0.5f));
-    desertmap->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+    // èŽ·å–åœ°å›¾å°ºå¯¸
+    float mapWidth = map->getMapSize().width * map->getTileSize().width;
+    float mapHeight = map->getMapSize().height * map->getTileSize().height;
 
-    this->addChild(desertmap);
-    //////////////////////////
-    // µØÍ¼×óÏÂ½ÇÔÚÆÁÄ»ÉÏµÄÊµ¼ÊÎ»ÖÃ
-    float desertmapOriginX = desertmap->getPositionX() - (desertmap->getContentSize().width * desertmap->getScale() * desertmap->getAnchorPoint().x);
-    float desertmapOriginY = desertmap->getPositionY() - (desertmap->getContentSize().height * desertmap->getScale() * desertmap->getAnchorPoint().y);
-    /////////////////////////
+    // è®¡ç®—ç¼©æ”¾æ¯”ä¾‹
+    float scaleX = visibleSize.width / mapWidth;
+    float scaleY = visibleSize.height / mapHeight;
+    float scale = std::min(scaleX, scaleY);
+    map->setScale(scale);
 
-    ///////////////////////////
-    // Ìí¼ÓÒ»¸ö±êÇ©"Desert" 
-    //////////////////////////
-    auto label = Label::createWithTTF("Desert", "fonts/Marker Felt.ttf", 24);
+    map->setAnchorPoint(Vec2(0.5f, 0.5f));
+    map->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    this->addChild(map);
+
+
+    // æ·»åŠ ä¸€ä¸ªæ ‡ç­¾æ˜¾ç¤ºâ€œMainSceneâ€
+
+    auto label = Label::createWithTTF("MainScene", "fonts/Marker Felt.ttf", 24);
     if (label == nullptr)
     {
         problemLoading("'fonts/Marker Felt.ttf'");
     }
     else
     {
+        //å°†æ ‡ç­¾æ”¾ç½®åœ¨å±å¹•ä¸­å¤®
         label->setPosition(Vec2(origin.x + visibleSize.width / 2,
             origin.y + visibleSize.height - label->getContentSize().height));
+
+        //æ·»åŠ æ ‡ç­¾ä½œä¸ºå­å›¾å±‚
         this->addChild(label, 1);
     }
-    //////////////////
-    //¼ÓÔØ½ÇÉ«
-    //////////////////
-    auto objectGroup = desertmap->getObjectGroup("flag");
-    if (objectGroup) {
-        auto firstFlag = objectGroup->getObject("firstflag");
-        if (!firstFlag.empty()) {
-            float x = firstFlag["x"].asFloat();
-            float y = firstFlag["y"].asFloat();
-            CCLOG("Character spawn position: x = %.2f, y = %.2f", x, y);
-            // ´´½¨½ÇÉ«²¢·ÅÖÃÔÚ³öÉúÎ»ÖÃ
-            auto hero = Character::create(Vec2(500, 500));
-            if (hero) {
-                hero->setName("hero"); // ÉèÖÃ½ÇÉ«Ãû³Æ
-                hero->setAnchorPoint(Vec2(0.5f, 0.5f));
 
-                // ½«½ÇÉ«´«ËÍµ½ firstflag µÄÎ»ÖÃ
-                // ¼ÆËã³öfirstflagµÄÆÁÄ»×ø±ê
-                float adjustedX = desertmapOriginX + x * desertmap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-                float adjustedY = desertmapOriginY + y * desertmap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
-                
-                hero->setPosition(Vec2(adjustedX, adjustedY));
-                this->addChild(hero);  // ½«½ÇÉ«Ìí¼Óµ½³¡¾°ÖÐ
-            }
-            else {
-                CCLOG("Failed to load character");
-            }
-        }
-        else {
-            CCLOG("Failed to load object-firstflag");
-        }
+    // åˆ›å»ºè§’è‰²å®žä¾‹å¹¶åˆå§‹åŒ–ä½ç½®
+    auto hero = Character::create(Vec2(471,435));
+    if (1) {  // åˆå§‹ä½ç½®å¯è°ƒæ•´
+        hero->setName("hero"); // è®¾ç½®è§’è‰²åç§°
+        this->addChild(hero);
+        // ç§»åŠ¨è§’è‰²ç¤ºä¾‹
+        //hero->moveTo(Vec2(300, 300));
+
+
+        // è®¾ç½®å±žæ€§ç¤ºä¾‹
+        //hero->setHealth(80);
+        //hero->setAttackPower(15);
+        
+        // å¯ç”¨æ›´æ–°å‡½æ•°
+        this->scheduleUpdate();
+
+
+        // æ·»åŠ é”®ç›˜äº‹ä»¶ç›‘å¬å™¨
+        auto listener = cocos2d::EventListenerKeyboard::create();
+        listener->onKeyPressed = CC_CALLBACK_2(MainScene::onKeyPressed, this);
+        listener->onKeyReleased = CC_CALLBACK_2(MainScene::onKeyReleased, this);
+        _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
     }
-    else {
-        CCLOG("Failed to load objectGroup-flag");
-    }
-
-    // Ìí¼Ó¼üÅÌÊÂ¼þ¼àÌýÆ÷
-    auto listener = cocos2d::EventListenerKeyboard::create();
-    listener->onKeyPressed = CC_CALLBACK_2(DesertScene::onKeyPressed, this);
-    listener->onKeyReleased = CC_CALLBACK_2(DesertScene::onKeyReleased, this);
-
-    // ½«¼àÌýÆ÷Ìí¼Óµ½ÊÂ¼þ·Ö·¢Æ÷
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-
-    // ×¢²á update º¯Êý£¬ÈÃËüÃ¿Ò»Ö¡¶¼±»µ÷ÓÃ
-    this->schedule([this](float dt) {
-        this->update(dt);
-        }, "update_key");
-
     return true;
 }
-void DesertScene::update(float dt)
-{
+
+void MainScene::update(float dt) {
     Node::update(dt);
 
 
@@ -149,7 +134,7 @@ void DesertScene::update(float dt)
     }
 }
 
-void DesertScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
+void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
     auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
     if (hero) {
         switch (keyCode) {
@@ -179,7 +164,7 @@ void DesertScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
     }
 }
 
-void DesertScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
+void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
     auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
     if (hero) {
         switch (keyCode) {
@@ -209,15 +194,9 @@ void DesertScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d
     }
 }
 
-void DesertScene::returnToLastScene()
+void MainScene::menuCloseCallback(Ref* pSender)
 {
-    // Ê¹ÓÃ popScene ·µ»Øµ½Ö®Ç°µÄ³¡¾°
-    Director::getInstance()->popScene();
-}
-
-void DesertScene::menuCloseCallback(Ref* pSender)
-{
-    //Close the cocos2d-x game scene and quit the application
+    //å…³é—­cocos2d-xæ¸¸æˆåœºæ™¯å¹¶é€€å‡ºåº”ç”¨ç¨‹åº
     Director::getInstance()->end();
 
     /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
