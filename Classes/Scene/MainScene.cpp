@@ -1,4 +1,5 @@
 ﻿#include "MainScene.h"
+#include "DesertScene.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -25,7 +26,7 @@ bool MainScene::init()
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
+#if 1
     /////////////////////////////
     // 添加一个退出按钮    this->addChild(menu, 1);
     /////////////////////////////
@@ -38,7 +39,7 @@ bool MainScene::init()
         closeItem->getContentSize().width <= 0 ||
         closeItem->getContentSize().height <= 0)
     {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
+        problemLoading("'Scene/MainScene/CloseNormal.png' and 'Scene/MainScene/CloseSelected.png'");
     }
     else
     {
@@ -51,10 +52,11 @@ bool MainScene::init()
     auto menu = Menu::create(closeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+#endif
     ////////////////////////////
     // 加载主地图    this->addChild(map,0);
     ////////////////////////////
-    std::string file = "mainmap.tmx";
+    std::string file = "Scene/MainScene/mainmap.tmx";
     map = TMXTiledMap::create(file);
 
     if (!map) {
@@ -86,7 +88,7 @@ bool MainScene::init()
     {
         label->setPosition(Vec2(origin.x + visibleSize.width / 2,
             origin.y + visibleSize.height - label->getContentSize().height));
-        map->addChild(label, 1);
+        this->addChild(label, 1);
     }
     //////////////////////////
     //加载角色 add 0
@@ -99,10 +101,9 @@ bool MainScene::init()
             float y = chushengObject["y"].asFloat();
             CCLOG("Character spawn position: x = %.2f, y = %.2f", x, y);
             // 创建角色并放置在出生位置
-            character = Sprite::create("CloseSelected.png");  // 确保替换成你的角色图片路径
+            character = Sprite::create("CloseSelected.png");  
             if (character) {
                 character->setAnchorPoint(Vec2(0.5f, 0.5f));
-                // 地图左下角在屏幕上的实际位置
 
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
@@ -137,6 +138,7 @@ bool MainScene::init()
             sceneSwitchPoints.push_back({ switchPos, targetMap });
         }
     }
+
     moveUp = moveDown = moveLeft = moveRight = false;
     // 注册键盘事件监听器
     auto keyboardListener = EventListenerKeyboard::create();
@@ -181,7 +183,6 @@ bool MainScene::init()
         }, "update_key");
     return true;
 }
-#if 1
 void MainScene::update(float dt)
 {
     // 根据按键状态来更新角色的位置
@@ -204,96 +205,12 @@ void MainScene::update(float dt)
         //判断地图传送点和人物是否碰撞
         if (character->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
             // 触发切换地图
-            changeScene(switchPoint.targetMap);
-            CCLOG("targetMap: %s", switchPoint.targetMap.c_str());
+            if (switchPoint.targetMap == "desert.tmx") {
+                Director::getInstance()->pushScene(DesertScene::createScene());
+            }
         }
     }
 }
-void MainScene::changeScene(const std::string& targetMap)
-{
-    if (targetMap == "desert.tmx") {
-        // 确保角色从当前场景中移除，避免重复添加
-        character->removeFromParent();
-
-        auto newScene = Scene::create(); // 创建新场景
-        auto newMap = TMXTiledMap::create(targetMap);  // 加载目标地图
-        if (!newMap) {
-            CCLOG("Failed to load target map: %s", targetMap.c_str());
-            return;
-        }
-
-        auto visibleSize = Director::getInstance()->getVisibleSize();
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-        newMap->setScale(1.0f);
-        newMap->setAnchorPoint(Vec2(0.5f, 0.5f));
-        newMap->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-        newScene->addChild(newMap);
-
-        float newmapOriginX = newMap->getPositionX() - (newMap->getContentSize().width * newMap->getScale() * newMap->getAnchorPoint().x);
-        float newmapOriginY = newMap->getPositionY() - (newMap->getContentSize().height * newMap->getScale() * newMap->getAnchorPoint().y);
-
-        auto objectGroup = newMap->getObjectGroup("flag");
-        if (objectGroup) {
-            auto firstFlag = objectGroup->getObject("firstflag");
-            if (!firstFlag.empty()) {
-                float x = firstFlag["x"].asFloat();
-                float y = firstFlag["y"].asFloat();
-                // 将角色传送到 firstflag 的位置
-                float adjustedX = newmapOriginX + x * newMap->getScale(); // 地图左下角 + 出生点的 x 偏移
-                float adjustedY = newmapOriginY + y * newMap->getScale(); // 地图左下角 + 出生点的 y 偏移
-                character = Sprite::create("CloseSelected.png");  
-                character->setPosition(Vec2(adjustedX, adjustedY));
-            }
-        }
-        // 重新将角色添加到新场景中
-        newScene->addChild(character); 
-        
-        // 实现按键移动
-        // 注册新的键盘事件监听器
-        auto keyboardListener = EventListenerKeyboard::create();
-        keyboardListener->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event) {
-            if (keyCode == EventKeyboard::KeyCode::KEY_W) {
-                moveUp = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_S) {
-                moveDown = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_A) {
-                moveLeft = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_D) {
-                moveRight = true;
-            }
-            };
-
-        keyboardListener->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event) {
-            if (keyCode == EventKeyboard::KeyCode::KEY_W) {
-                moveUp = false;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_S) {
-                moveDown = false;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_A) {
-                moveLeft = false;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_D) {
-                moveRight = false;
-            }
-            };
-        _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, newScene);
-        newScene->schedule([this](float dt) {
-            this->update(dt);
-            }, "update_key");
-        Director::getInstance()->pushScene(newScene);
-    }
-}
-void MainScene::returnToMainScene()
-{
-    // 使用 popScene 返回到之前的场景（即主场景）
-    Director::getInstance()->popScene();
-}
-#endif
 void MainScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application

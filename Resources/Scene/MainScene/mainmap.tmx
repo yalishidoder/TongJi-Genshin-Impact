@@ -26,18 +26,22 @@
    eJzt1sEJACAMA8B+XcsxdFhX89cJCoK9myB5BBIBAAB0NcfrBDX2Jz2gk2W3AACQjn8MAABlLuZZAds=
   </data>
  </layer>
- <objectgroup id="10" name="forest">
+ <objectgroup id="10" name="SceneSwitchPoints">
   <object id="6" name="forest" x="358.435" y="577.958">
+   <properties>
+    <property name="targetMap" value="forest.tmx"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="2" name="desert" x="167.701" y="341.161">
+   <properties>
+    <property name="targetMap" value="desert.tmx"/>
+   </properties>
    <point/>
   </object>
  </objectgroup>
  <objectgroup id="7" name="chusheng">
-  <object id="1" name="chusheng" x="380.027" y="265.587">
-   <point/>
-  </object>
- </objectgroup>
- <objectgroup id="8" name="shamo">
-  <object id="2" name="desert" x="167.701" y="341.161">
+  <object id="1" name="initspot" x="380.027" y="265.587">
    <point/>
   </object>
  </objectgroup>
