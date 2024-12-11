@@ -1,5 +1,5 @@
-﻿#include "MainScene.h"
-#include "DesertScene.h"
+﻿#include "Scene/MainScene.h"
+#include "Scene/OtherScene.h"
 #include "SimpleAudioEngine.h"
 #include "Character/Hero/Hero.h"
 
@@ -179,9 +179,7 @@ void MainScene::update(float dt)
             //判断地图传送点和人物是否碰撞
             if (hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
                 // 触发切换地图
-                if (switchPoint.targetMap == "desert.tmx") {
-                    Director::getInstance()->pushScene(DesertScene::createScene());
-                }
+                    Director::getInstance()->pushScene(OtherScene::createScene(switchPoint.targetMap));
             }
         }
     }
