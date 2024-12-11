@@ -26,17 +26,6 @@
    eJzt1sEJACAMA8B+XcsxdFhX89cJCoK9myB5BBIBAAB0NcfrBDX2Jz2gk2W3AACQjn8MAABlLuZZAds=
   </data>
  </layer>
- <objectgroup id="11" name="fog_area">
-  <object id="36" name="desertfog" x="1.4395" y="195.052">
-   <properties>
-    <property name="points_fog" value="0 610,165 610,244 560,282 476,282 414,263 350,165 300,0 300"/>
-   </properties>
-   <polygon points="0,0 164.103,1.4395 243.995,43.9047 284.3,125.956 283.581,187.854 261.268,257.67 166.262,301.574 -1.4395,301.574"/>
-  </object>
-  <object id="40" name="forestfog" x="216.644" y="575.079">
-   <polygon points="0,0 -2.15924,220.963 290.058,220.243 292.218,-6.47773 272.784,-102.924 186.415,-137.472 100.045,-138.192 12.9557,-98.6055"/>
-  </object>
- </objectgroup>
  <objectgroup id="10" name="SceneSwitchPoints">
   <object id="6" name="forest" x="358.435" y="577.958">
    <properties>
