@@ -2,6 +2,7 @@
 #include "Scene/OtherScene.h"
 #include "SimpleAudioEngine.h"
 #include "Character/Hero/Hero.h"
+#include "Character/Enemy/Enemy.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
 
