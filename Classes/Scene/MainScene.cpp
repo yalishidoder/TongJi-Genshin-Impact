@@ -115,6 +115,26 @@ bool MainScene::init()
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
             }
+
+            //创建敌人
+            auto demon = Enemy::create(Vec2(450, 300));
+
+            if (demon) {
+                demon->setName("demon"); // 设置角色名称
+                demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                demon->setPlayer(hero);  //设置玩家
+                demon->setPatrolRange(300.0f, 300.0f);   //设置巡逻范围
+                demon->setRadius(200.0f);
+                // 计算出生点的屏幕坐标
+                float adjustedX = mapOriginX + 450.0f; // 地图左下角 + 出生点的 x 偏移
+                float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移
+
+                // 设置人物位置
+                demon->setPosition(Vec2(adjustedX, adjustedY));
+
+                this->addChild(demon);  // 将角色添加到场景中
+
+            }
         }
     }
     else {
@@ -184,8 +204,12 @@ void MainScene::update(float dt)
     auto children = getChildren();
     for (auto child : children) {
         auto character = dynamic_cast<Character*>(child);
+        auto enemy = dynamic_cast<Enemy*>(child);
         if (character) {
             character->update(dt);
+        }
+        if (enemy) {
+            enemy->update(dt);
         }
     }
 
