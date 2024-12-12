@@ -6,6 +6,7 @@
 struct SceneSwitchPoint {
     cocos2d::Vec2 position;    // 传送点位置
     std::string targetMap;    // 目标地图名称
+    cocos2d::Vec2 no_position;//拒绝传送后人物微调位置
     bool isActive = true; // 是否激活传送点
 };
 

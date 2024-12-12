@@ -2,8 +2,6 @@
 #include "Scene/OtherScene.h"
 #include "SimpleAudioEngine.h"
 #include "Character/Hero/Hero.h"
-#include "Character/Enemy/Enemy.h"
-#include "cocos2d.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
 
@@ -117,31 +115,11 @@ bool MainScene::init()
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
             }
-
-            auto demon = Enemy::create(Vec2(450, 300));
-            
-            if (demon) {
-                demon->setName("demon"); // 设置角色名称
-                demon->setAnchorPoint(Vec2(0.5f, 0.5f));
-                demon->setPlayer(hero);  //设置玩家
-                demon->setPatrolRange(300.0f, 300.0f);   //设置巡逻范围
-                demon->setRadius(200.0f);
-                // 计算出生点的屏幕坐标
-                float adjustedX = mapOriginX +450.0f; // 地图左下角 + 出生点的 x 偏移
-                float adjustedY = mapOriginY +300.0f; // 地图左下角 + 出生点的 y 偏移
-
-                // 设置人物位置
-                demon->setPosition(Vec2(adjustedX, adjustedY));
-
-                this->addChild(demon);  // 将角色添加到场景中
-
-            }
         }
     }
     else {
         CCLOG("Failed to load chchchch");
     }
-
     // 读取主场景中的地图传送点位置
     auto objectGroup = map->getObjectGroup("SceneSwitchPoints");
     if (objectGroup) {
@@ -159,7 +137,24 @@ bool MainScene::init()
             std::string targetMap = obj.asValueMap()["targetMap"].asString();
             // 输出传送点目的地调试信息
             CCLOG("targetMap: %s", targetMap.c_str());
-            sceneSwitchPoints.push_back({ switchPos, targetMap });
+
+
+            // 读取 no_position 属性并解析为 Vec2
+            std::string noPositionStr = obj.asValueMap()["no_position"].asString();
+            CCLOG("noPositionStr: %s", noPositionStr.c_str());
+            Vec2 noPosition;
+            std::istringstream noPosStream(noPositionStr);
+            noPosStream >> noPosition.x >> noPosition.y; // 使用空格解析出两个坐标值
+            CCLOG("before No Position: x = %.2f, y = %.2f", noPosition.x, noPosition.y);
+            //由于地图的位置原点的改变，需要将从tmx读出来的坐标进行调整
+            float adjustedX_no = mapOriginX + noPosition.x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
+            float adjustedY_no = mapOriginY + noPosition.y * map->getScale(); // 地图左下角 + 出生点的 y 偏移
+            noPosition.x = adjustedX_no;
+            noPosition.y = adjustedY_no;
+            // 输出拒绝传送后的位置调试信息
+            CCLOG("actual No Position: x = %.2f, y = %.2f", noPosition.x, noPosition.y);
+            // 存储到 sceneSwitchPoints
+            sceneSwitchPoints.push_back({ switchPos, targetMap, noPosition });
         }
     }
 
@@ -187,35 +182,22 @@ void MainScene::update(float dt)
 
 
     auto children = getChildren();
-    for (auto child : children)
-    {
+    for (auto child : children) {
         auto character = dynamic_cast<Character*>(child);
-        auto enemy= dynamic_cast<Enemy*>(child);
         if (character) {
             character->update(dt);
         }
-        if (enemy) {
-            enemy->update(dt);
-        }
-        /*if (Character* player = dynamic_cast<Character*>(child))
-        {
-            player->update(dt);
-        }
-        else if (Enemy* enemy = dynamic_cast<Enemy*>(child))
-        {
-            enemy->update(dt);
-        }*/
     }
 
     //遍历每一个传送点信息
     auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
     if (hero) {
         for (auto& switchPoint : sceneSwitchPoints) {
-            //判断地图传送点和人物是否碰撞
+            
              // 跳过未激活的传送点
             if (!switchPoint.isActive) continue;
 
-            // 判断是否有弹窗正在显示
+            // 判断是否有弹窗正在显示&&判断地图传送点和人物是否碰撞
             if (!isDialogActive && hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
                 isDialogActive = true;
 
@@ -241,9 +223,9 @@ void MainScene::update(float dt)
                 // Yes 按钮的回调
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
+                    CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
                     dialog->removeFromParent();
                     isDialogActive = false; // 恢复标志位
-                    switchPoint.isActive = false; // 禁用当前传送点
                     Director::getInstance()->pushScene(OtherScene::createScene(switchPoint.targetMap));
                     });
 
@@ -257,8 +239,8 @@ void MainScene::update(float dt)
                     }
 
                     // 将角色移出传送点范围
-                    float offset = 50.0f;
-                    hero->setPosition(hero->getPositionX() + offset, hero->getPositionY());
+                    //float offset = 50.0f;
+                    hero->setPosition(switchPoint.no_position.x, switchPoint.no_position.y);
                     CCLOG("Hero moved out of teleport area to position (%.2f, %.2f)", hero->getPositionX(), hero->getPositionY());
 
                     });
