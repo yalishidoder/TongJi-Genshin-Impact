@@ -1,8 +1,9 @@
 #ifndef __DESERT_SCENE_H__
 #define __DESERT_SCENE_H__
-
+#include "Scene/MainScene.h"
 #include "cocos2d.h"
 #include "Character/Hero/Hero.h"
+
 
 class OtherScene : public cocos2d::Scene
 {
@@ -22,9 +23,12 @@ public:
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 private:
 	cocos2d::TMXTiledMap* othermap;
-
+	std::string mapname;
 	//地图传送点的信息储存
-	//std::vector<SceneSwitchPoint> sceneSwitchPoints;
+	std::vector<SceneSwitchPoint> sceneSwitchPoints;
+
+	// 当前是否有弹窗
+	bool isDialogActive = false;
 
 };
 #endif // __OtherScene_SCENE_H__
