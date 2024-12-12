@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="26">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="30">
  <tileset firstgid="1" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
   <image source="springobjects.es-ES.png" width="384" height="624"/>
  </tileset>
@@ -23,7 +23,7 @@
  </layer>
  <layer id="3" name="flag" width="30" height="30">
   <data encoding="base64" compression="zlib">
-   eJzt0kEJAAAIADHB/iksaglB0C3BPS4C2FK5XQBz/Mwlfga+aCJoAfM=
+   eJxjYBgFo2AUDBRYzDzQLhgFowA7yGdiYChgIk0PNdJzO9DODhLtHQWjgBZgtHweBaNgFIwUAAA24QPp
   </data>
  </layer>
  <objectgroup id="6" name="gem">
@@ -96,6 +96,15 @@
    <point/>
   </object>
   <object id="4" name="thirdflag" x="233.5" y="307">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="SceneSwitchPoints">
+  <object id="27" name="MainScene" x="45.3441" y="221.107">
+   <properties>
+    <property name="no_position" value="70 259"/>
+    <property name="targetMap" value="mainmap.tmx"/>
+   </properties>
    <point/>
   </object>
  </objectgroup>

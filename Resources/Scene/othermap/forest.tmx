@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="4">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="14">
  <tileset firstgid="1" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
   <image source="springobjects.es-ES.png" width="384" height="624"/>
  </tileset>
@@ -17,9 +17,9 @@
    eJztw0ENAAAMA6GaOf8WZ2MPSKgtVVVVVVVVVVVVVVX19QNFVngu
   </data>
  </layer>
- <layer id="4" name="fountain" width="64" height="48">
+ <layer id="4" name="decorate" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJztz8sRglAURMGbhvoIRCQRlfxz4LNgcqDqsaC76uxnqgAAAACgn6VVrWlLe7t6TX+PoeqZXqkNV6/p753PY/qk6Yb/v/n8S/803/A/AAAAAAAA5xyr7Qh1
+   eJztmMEuA1EYRm+iwht07nS6UuENmLY7hFfQ9j1I2CG8AQk7hDcgYYfwRlS7cITVLGYh6Z2r/3eSs57/THJvcn/npo/3xLkPHOInjnCcVD1VOOreuQQ9ptjAzFc9VThWaF3FHNvYwa6hfiHE35lJnavhLM7hfFr1RGFZoLeFi7iEy8b61+hdxw3cxC1j/UIIIYSYfmLalwwzZsARjrMw34xpX+KbzIANzJphvhnTviSnuY0d7Abqj4ltmnvYx4HB/lAcGd4HXtJ+jbeG/4EQZRxwNg79zz1xjCfGzsr3HXH1e0/cGLwrnuh9xhd8xTdj/UIIIYQQQojq2OH9sYt7uF94i8S0v58UpzSf4TleFPpj2t9Pijt67vEBHwttMe3v/yMWzk8ZFs5PGZbPzxcd9kin
   </data>
  </layer>
  <layer id="5" name="fountain2" width="64" height="48">
@@ -32,16 +32,27 @@
    eJztmF1yo0AMhH0IfP8j8MBR9g1uAi+71FqVL196/AuJU7aqpogJM0xLaqmHw+ExG46Hw9IdDvO/MZ6uC67rvQl/L6ff9ew6n2vN3ceoZ2esv2jOT9u6l0nYiXHR/ifh74V/wTP0w4x5/RPh748fe13/Ho4fcVyw3xrD6TqHWK73R/iJ6w2Y+0z4mf+FxZxwvjLOxk8ePVOet6ziPyEvB+TEEvJ1UC5wrbHL3OBc5sG5399hCX/hmHX/mrUKf/Lbaqne1HtYd74L/3D8mueMbcWjnnUd8FoLMLXwF/biSK3HHuP3u4ZslSMDYnZpPfI+4WP/c21I77PP2SPZQ8ovzpN1PGq9apl5aJ9PipHj4fqfcon6wjWX/ZZ/Ezt9sgV+85Ecdh+v3/V/Dsdu7L7GkPuvGlG+odYyTs8vf2yBn7nFtRNG6z/6hLlp7Th1n+M3YTBHUr70GszLR41+577o8xRv66WkkRI/eGVu/5Qmspazfx2bEf55xP9JK/yEXqr6d239J8dbtTLp3VZOkBfUX8n3e/io4s8cTHysfZETrBM+F/F+ql3sezWX91zn2HO2tKQnXBNTj3J/YO0kbvYO654WftYk16Lv4AjPhO7RqRanaxr0l7E6/6i9iyfkyN742eu28Dl9mmJN/NbkPI/tlf+OJ3tdim9h8jiHv5X/LU6UT9yjtsZv7WdOk8vW7NQ2l/BTO/XCuujeCJ+wV+6Bn9isO1mHzIdrzrt8zxTwV66bE+xJnLs1/4kh8cCccJ1q6UGfT1nDnEPWX7Un3pu6/fK/8vzPhfiNigF9Qm6nfOB8x998Y04lTbo1/gX4mQP0R8WJNZm1w1fnKmNqDlX8mUvlv737Hbk2ntm/tZ+1XTrnGT/rKPHTB/bv3ub+x7rn/afzIGsauTo38LPXsU6w1nqezxR7Wa9cGLSPpO+sTa3dOCr+C/CnXtviDd+xJWaOWfE852/2acefNWzqvuKkr/icNR735HPCVvipS1yHLuF3T+d+a50xrG2+8Tm+k70/8WoL/Kl2X6M3/T0gnfkvfRegzmt9N7AO3QM/Y3KLpp8V01vfbT1Q5rM24791/s937p/agZx2DPm8z1FzAxO5dY7/1FTmSeEiR8fuc8w49x78k97LHplqWdIQqaYxL6kNzEljGrW+tYm1GmvPPfk7CkfScMbvGpNyb9CzxEj85eeEn7nJOuU9tjh4DX6vz+G48qy3aJ8Jv/tC0iXXWq2VMJCPt1j65pVqfetdrbNirZ2+zdyrAStHX9Xe+P/z51VtevH4V41/VXPvZ8+yvmJfZP/5zcaeTH1obUU96DPsb7ZZuJkHPPsm3Vy/3/a2t73tmewv2iq/Fg==
   </data>
  </layer>
+ <layer id="8" name="SceneSwitchPoints" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz8EJADAIBEEhladz8ZFPGlBwBu5/GwEAAAAAAAAAAADA757uB32q/W2rze3AXAmm8wKV
+  </data>
+ </layer>
+ <objectgroup id="9" name="SceneSwitchPoints">
+  <object id="4" name="MainScene" x="392" y="679">
+   <properties>
+    <property name="no_position" value="350 90"/>
+    <property name="targetMap" value="mainmap.tmx"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
  <layer id="6" name="flag" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJzt2bENACAMA7Cqb8IX8L/gAeZKxb4gGTIlAgD4wciImdUp6qzbfX/cHwAAAACA/nwBvgDe7MM+AACgiwMIgQTz
+   eJzt2UENACAMBMGmNsEF+A+4aNLOKLh7bwQAMMHKiJ3VK+qc//0O/g8AAAAAQH9agBYAAABAfw+8XgNN
   </data>
  </layer>
  <objectgroup id="7" name="flag">
   <object id="1" name="firstflag" x="22" y="521">
-   <point/>
-  </object>
-  <object id="2" name="secondflag" x="175" y="582">
    <point/>
   </object>
   <object id="3" name="tirdflag" x="975" y="137">
