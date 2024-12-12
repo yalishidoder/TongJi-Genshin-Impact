@@ -6,7 +6,15 @@
  * Update Date:   2024.12.10
  ****************************************************************/
 #include "cocos2d.h"
+#include "../Hero/Hero.h"
 
+//枚举敌人的状态
+enum class EnemyState 
+{
+    PATROL,   //巡逻
+    CHASE,    //追逐
+    RETURN    //返回出生点
+};
 
 class Enemy : public cocos2d::Sprite {
 public:
@@ -24,7 +32,7 @@ public:
 
 
     // 敌人更新方法，处理敌人的逻辑，如移动、攻击等
-    void update(float dt);
+    virtual void update(float delta)override;
 
 
     // 敌人移动相关方法
@@ -50,15 +58,41 @@ public:
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(cocos2d::Sprite* target);
 
+    //检测玩家是否在判定范围中
+    bool isAttacking;
+    void setPlayer(Character* player);
+    void setRadius(float radius);
+    bool isHeroExist(float dt);
+
+    //设置巡逻边界
+    void setPatrolRange(float X, float Y);
 
 private:
     int m_health;
     int m_attackPower;
     bool m_isAlive;
 
+    //玩家变量
+    Character* player;  
 
+    //敌人状态
+    EnemyState currentState;
+
+    //搜索半径
+    float radius; 
+
+    //巡逻范围
+    float rangedX, rangedY;
     float m_moveSpeed;
 
+    //巡逻方向
+    int dirX, dirY;
+
+    //敌人出生地
+    cocos2d::Vec2 spawnPoint;
+
+    //敌人的巡逻函数
+    void patrol(float delta);
 
     // 敌人的移动逻辑，可根据需要扩展，如追逐玩家等
     void moveLogic(float dt);

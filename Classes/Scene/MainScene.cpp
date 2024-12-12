@@ -2,6 +2,8 @@
 #include "Scene/OtherScene.h"
 #include "SimpleAudioEngine.h"
 #include "Character/Hero/Hero.h"
+#include "Character/Enemy/Enemy.h"
+#include "cocos2d.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
 
@@ -115,11 +117,31 @@ bool MainScene::init()
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
             }
+
+            auto demon = Enemy::create(Vec2(450, 300));
+            
+            if (demon) {
+                demon->setName("demon"); // 设置角色名称
+                demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                demon->setPlayer(hero);  //设置玩家
+                demon->setPatrolRange(300.0f, 300.0f);   //设置巡逻范围
+                demon->setRadius(200.0f);
+                // 计算出生点的屏幕坐标
+                float adjustedX = mapOriginX +450.0f; // 地图左下角 + 出生点的 x 偏移
+                float adjustedY = mapOriginY +300.0f; // 地图左下角 + 出生点的 y 偏移
+
+                // 设置人物位置
+                demon->setPosition(Vec2(adjustedX, adjustedY));
+
+                this->addChild(demon);  // 将角色添加到场景中
+
+            }
         }
     }
     else {
         CCLOG("Failed to load chchchch");
     }
+
     // 读取主场景中的地图传送点位置
     auto objectGroup = map->getObjectGroup("SceneSwitchPoints");
     if (objectGroup) {
@@ -165,11 +187,24 @@ void MainScene::update(float dt)
 
 
     auto children = getChildren();
-    for (auto child : children) {
+    for (auto child : children)
+    {
         auto character = dynamic_cast<Character*>(child);
+        auto enemy= dynamic_cast<Enemy*>(child);
         if (character) {
             character->update(dt);
         }
+        if (enemy) {
+            enemy->update(dt);
+        }
+        /*if (Character* player = dynamic_cast<Character*>(child))
+        {
+            player->update(dt);
+        }
+        else if (Enemy* enemy = dynamic_cast<Enemy*>(child))
+        {
+            enemy->update(dt);
+        }*/
     }
 
     //遍历每一个传送点信息
