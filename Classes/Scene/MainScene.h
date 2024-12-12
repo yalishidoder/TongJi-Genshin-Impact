@@ -6,6 +6,7 @@
 struct SceneSwitchPoint {
     cocos2d::Vec2 position;    // 传送点位置
     std::string targetMap;    // 目标地图名称
+    bool isActive = true; // 是否激活传送点
 };
 
 class MainScene : public cocos2d::Scene
@@ -24,9 +25,8 @@ public:
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
-    void changeScene(const std::string& targetMap);
+    void PointCenter(cocos2d::Vec2 positon);
 
-    void returnToMainScene();
 
     CREATE_FUNC(MainScene);
 
@@ -35,6 +35,9 @@ private:
 
     //地图传送点的信息储存
     std::vector<SceneSwitchPoint> sceneSwitchPoints;
+
+    // 当前是否有弹窗
+    bool isDialogActive = false; 
 };
 
 #endif // __MainScene_SCENE_H__
