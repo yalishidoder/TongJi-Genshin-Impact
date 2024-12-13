@@ -8,6 +8,126 @@
  </tileset>
  <tileset firstgid="5033" name="victorian-garden" tilewidth="16" tileheight="16" tilecount="4096" columns="32">
   <image source="victorian-garden.png" width="512" height="2048"/>
+  <tile id="518">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="519">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="520">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="521">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="522">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="523">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="550">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="551">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="552">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="553">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="554">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="555">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="582">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="583">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="584">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="585">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="586">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="587">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="614">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="615">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="616">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="617">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="618">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="619">
+   <properties>
+    <property name="walkable" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="9129" name="spring_outdoorsTileSheet.pt-BR" tilewidth="16" tileheight="16" tilecount="1975" columns="25">
   <image source="spring_outdoorsTileSheet.pt-BR.png" width="400" height="1264"/>
