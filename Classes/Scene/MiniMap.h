@@ -41,27 +41,27 @@ public:
 
 private:
     // 主地图
-    cocos2d::TMXTiledMap* map_;
+    TMXTiledMap* map_;
     // 主地图文件名
     std::string file_;
     // 屏幕大小
-    cocos2d::Size visibleSize_;
+    Size visibleSize_;
     // 主地图的场景节点
-    cocos2d::Scene* scene_;
+    Scene* scene_;
     // 小地图节点
-    cocos2d::Node* miniMap_;
+    Node* miniMap_;
     // 小地图缩放比例
     float miniMapScale_;
     // 小地图圆形边框半径
     float miniMapRadius_;
     // 小地图中心位置
-    cocos2d::Vec2 miniMapCenter_;
+    Vec2 miniMapCenter_;
     // 小地图的裁剪节点
-    cocos2d::ClippingNode* clipper_;
+    ClippingNode* clipper_;
     // 小地图的边框
-    cocos2d::DrawNode* miniMapBorder_;
+    DrawNode* miniMapBorder_;
     // 小地图的背景
-    cocos2d::TMXTiledMap * miniMapBackground_;
+    TMXTiledMap * miniMapBackground_;
     // 小地图的主角
     Character* hero_;
     // 小地图的敌人
