@@ -21,7 +21,7 @@ public:
 
     // implement the "static create()" method manually
     
-    void update(float dt);
+    void update(float dt) override;
 
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
