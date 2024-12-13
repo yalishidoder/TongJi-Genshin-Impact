@@ -4,12 +4,15 @@
 #include "Character/Hero/Hero.h"
 #include "Character/Enemy/Enemy.h"
 #include "ui/CocosGUI.h"
+
 USING_NS_CC;
 
 Scene* MainScene::createScene()
 {
     return MainScene::create();
 }
+
+
 
 // Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
@@ -67,7 +70,7 @@ bool MainScene::init()
     }
     CCLOG("Map loaded successfully!");
     map->setScale(1.0f);
-
+    map->setName("map");
     map->setAnchorPoint(Vec2(0.5f, 0.5f));
     map->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 
@@ -179,6 +182,111 @@ bool MainScene::init()
         }
     }
 
+    /////////////////////////////
+ // 添加小地图
+ /////////////////////////////
+    auto miniMap = Node::create(); // 创建小地图节点
+    if (miniMap == nullptr)
+    {
+        CCLOG("Failed to create minimap");
+    }
+    
+    float miniMapScale = 0.45f;     // 小地图缩放比例，根据实际地图大小调整
+    float miniMapRadius = 100.0f; // 小地图圆形边框半径
+    Vec2 miniMapCenter = Vec2(miniMapRadius + 10, visibleSize.height - miniMapRadius - 10); // 小地图中心位置
+
+    // 创建裁剪节点用于实现圆形遮罩
+    auto clipper = ClippingNode::create();
+    if (clipper == nullptr)
+    {
+       CCLOG("Failed to create clipper");
+    }
+    clipper->setPosition(Vec2::ZERO); // 设置裁剪节点位置
+    clipper->setAlphaThreshold(0.5f); // 不透明部分保留，透明部分裁剪
+
+    // 创建圆形遮罩
+    auto stencil = DrawNode::create();
+    if (stencil == nullptr)
+    {
+        CCLOG("Failed to create stencil");
+    }
+    stencil->drawSolidCircle(miniMapCenter, miniMapRadius, CC_DEGREES_TO_RADIANS(360), 100, Color4F::WHITE);
+    clipper->setStencil(stencil);
+
+    // 缩小主地图并添加到裁剪节点中
+    auto miniMapBackground = TMXTiledMap::create(file);
+    if (miniMapBackground == nullptr)
+    {
+        CCLOG("Failed to create minimap background");
+    }
+        miniMapBackground->setScale(map->getScale() * miniMapScale);
+        miniMapBackground->setAnchorPoint(Vec2(0, 0));
+        miniMapBackground->setPosition(Vec2(miniMapCenter.x - miniMapBackground->getContentSize().width * miniMapScale / 2,
+            miniMapCenter.y - miniMapBackground->getContentSize().height * miniMapScale / 2));
+        clipper->addChild(miniMapBackground);
+
+    this->addChild(clipper, 4); // 添加裁剪节点到场景中
+
+    // 绘制小地图边框
+    auto miniMapBorder = DrawNode::create();
+    if (miniMapBorder == nullptr)
+    {
+        CCLOG("Failed to create minimap border");
+    }
+    miniMapBorder->drawCircle(miniMapCenter, miniMapRadius, CC_DEGREES_TO_RADIANS(360), 100, false, Color4F::WHITE);
+    miniMapBorder->drawSolidCircle(miniMapCenter, miniMapRadius, CC_DEGREES_TO_RADIANS(360), 100, Color4F(0, 0, 0, 1)); // 半透明背景
+    this->addChild(miniMapBorder, 3); // 添加边框到场景中
+
+    // 同步主地图角色到小地图
+    auto heroMarker = DrawNode::create(); // 英雄位置标记
+    if (heroMarker == nullptr)
+    {
+        CCLOG("Failed to create hero marker");
+    }
+    heroMarker->drawDot(Vec2::ZERO, 3.0f, Color4F::GREEN);
+    clipper->addChild(heroMarker);
+
+    auto demonMarker = DrawNode::create(); // 敌人位置标记
+    if (demonMarker == nullptr)
+    {
+        CCLOG("Failed to create demon marker");
+    }
+    demonMarker->drawDot(Vec2::ZERO, 3.0f, Color4F::RED);
+    clipper->addChild(demonMarker);
+
+    /////////////////////////////
+    // 更新函数：同步小地图上的角色位置和视图区域
+    /////////////////////////////
+    this->schedule([this, miniMapScale, miniMapCenter, miniMapBackground, heroMarker, demonMarker](float dt) {
+        // 获取主地图上的英雄和敌人
+        auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+        auto demon = dynamic_cast<Enemy*>(this->getChildByName("demon"));
+        Vec2 offset,miniHeroPos,miniDemonPos;
+        if (hero) {
+            // 英雄在主地图中的位置
+            Vec2 heroPos = hero->getPosition();
+
+            // 计算小地图英雄位置
+             miniHeroPos = (heroPos - map->getPosition() + Vec2(map->getContentSize().width / 2, map->getContentSize().height / 2)) * miniMapScale;
+            heroMarker->setPosition(miniMapCenter - miniHeroPos + heroPos * miniMapScale);
+
+            // 更新小地图视图位置，使英雄保持在小地图中央
+             offset = miniMapCenter - miniHeroPos;
+            miniMapBackground->setPosition(offset);
+
+            
+        }
+
+        if (demon) {
+            // 敌人在主地图中的位置
+            Vec2 demonPos = demon->getPosition();
+
+            // 计算小地图敌人位置
+             miniDemonPos = (demonPos - map->getPosition() + Vec2(map->getContentSize().width / 2, map->getContentSize().height / 2)) * miniMapScale;
+            demonMarker->setPosition(miniMapCenter - miniHeroPos+demonPos * miniMapScale);
+        }
+        }, "update_minimap_key");
+
 
 
     // 添加键盘事件监听器
@@ -193,8 +301,11 @@ bool MainScene::init()
     this->schedule([this](float dt) {
         this->update(dt);
         }, "update_key");
+
+
     return true;
 }
+
 
 
 void MainScene::update(float dt)
@@ -217,6 +328,7 @@ void MainScene::update(float dt)
     //遍历每一个传送点信息
     auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
     if (hero) {
+
         for (auto& switchPoint : sceneSwitchPoints) {
             
              // 跳过未激活的传送点
