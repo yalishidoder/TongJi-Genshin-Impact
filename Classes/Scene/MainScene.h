@@ -10,6 +10,11 @@ struct SceneSwitchPoint {
     bool isActive = true; // 是否激活传送点
 };
 
+struct PositionSwitchPoint {
+    cocos2d::Vec2 position;    // 传送点位置
+    bool isActive = false;
+};
+
 class MainScene : public cocos2d::Scene
 {
 public:
@@ -19,26 +24,31 @@ public:
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
 
-    // implement the "static create()" method manually
-    
-    void update(float dt) override;
+    void update(float dt);
 
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
     void PointCenter(cocos2d::Vec2 positon);
 
+    void showSelectionPopup();
 
+    void hidePopup();
     CREATE_FUNC(MainScene);
 
 private:
     cocos2d::TMXTiledMap* map;
 
-    //地图传送点的信息储存
+    //地图切换点的信息储存
     std::vector<SceneSwitchPoint> sceneSwitchPoints;
-
-    // 当前是否有弹窗
-    bool isDialogActive = false; 
+    //位置传送点的信息储存
+    std::vector<PositionSwitchPoint> positionSwitchPoints;
+    //当前是否有地图切换点弹窗
+    bool isDialogActive = false;
+    //当前是否有位置传送点弹窗    
+    bool isPopupVisible = false;  
+   //记录 E 键是否被按下
+    bool isKeyPressedE = false;
 };
 
 #endif // __MainScene_SCENE_H__

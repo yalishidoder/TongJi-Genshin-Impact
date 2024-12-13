@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="14">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="18">
  <tileset firstgid="1" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
   <image source="springobjects.es-ES.png" width="384" height="624"/>
  </tileset>
@@ -175,7 +175,20 @@
   <object id="1" name="firstflag" x="22" y="521">
    <point/>
   </object>
-  <object id="3" name="tirdflag" x="975" y="137">
+ </objectgroup>
+ <layer id="10" name="flag2_PositionSwitchPoints" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt2EEKACAIBECj//+5a50LAncGvLvqySoAoLsxz0qzZ07Nn7x/AAAAAAB6SP5x+/PfZ0+fnfv53QEAALyzAFHMAFE=
+  </data>
+ </layer>
+ <objectgroup id="11" name="PositionSwitchPoints">
+  <object id="14" name="spot" x="138" y="582">
+   <point/>
+  </object>
+  <object id="15" name="spot" x="992" y="135">
+   <point/>
+  </object>
+  <object id="16" name="spot" x="902" y="535">
    <point/>
   </object>
  </objectgroup>

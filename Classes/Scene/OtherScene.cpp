@@ -167,7 +167,22 @@ bool OtherScene::init(const std::string& mapFile)
             sceneSwitchPoints.push_back({ switchPos, targetMap, noPosition });
         }
     }
-
+    //** 读取场景中的位置传送点位置
+    auto objectGroup_PositionSwitchPoints = othermap->getObjectGroup("PositionSwitchPoints");
+    if (objectGroup_PositionSwitchPoints) {
+        for (auto& obj : objectGroup_PositionSwitchPoints->getObjects()) {
+            Vec2 switchPos(obj.asValueMap()["x"].asFloat(), obj.asValueMap()["y"].asFloat());
+            //由于地图的位置原点的改变，需要将从tmx读出来的坐标进行调整
+            float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // 地图左下角 + 出生点的 x 偏移
+            float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // 地图左下角 + 出生点的 y 偏移
+            switchPos.x = adjustedX;
+            switchPos.y = adjustedY;
+            //输出传送点位置
+            CCLOG("PositionSwitchPoints: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
+            // 存储到 sceneSwitchPoints
+            positionSwitchPoints.push_back({ switchPos });
+        }
+    }
 
  //////////////////////////////
  // 添加小地图
@@ -203,7 +218,9 @@ void OtherScene::update(float dt)
             character->update(dt);
         }
     }
-    //遍历每一个传送点信息
+    //////////////////////
+    //人物碰到地图切换点
+    //////////////////////
     auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
     if (hero) {
         for (auto& switchPoint : sceneSwitchPoints) {
@@ -264,6 +281,46 @@ void OtherScene::update(float dt)
             }
         }
     }
+    ////////////////////
+    //人物碰到位置传送点
+    ////////////////////
+    auto player = dynamic_cast<Character*>(this->getChildByName("hero"));
+    if (player) {
+        // 设置触发范围半径
+        float triggerRadius = 50.0f;
+        Vec2 currentPosition = player->getPosition();  // 获取角色当前位置
+        bool isInRange = false;
+        // 检测角色是否进入任何一个spot的范围
+        for (auto& spot : positionSwitchPoints) {
+            if (currentPosition.distance(spot.position) < triggerRadius) {
+                isInRange = true;
+
+                // 如果传送点未解锁，解锁该传送点
+                if (!spot.isActive) {
+                    spot.isActive = true;  // 解锁
+                }
+
+                break;
+            }
+        }
+        // 如果角色进入范围并按下了 E 键
+        if (isInRange && isKeyPressedE) {
+            if (!isPopupVisible) {
+                // 如果弹窗未显示，则显示弹窗
+                showSelectionPopup();
+                isPopupVisible = true;  // 设置弹窗为可见
+            }
+        }
+        else if (isPopupVisible && !isKeyPressedE) {
+            // 如果弹窗已显示且玩家没有按下E键，则继续监听E键关闭弹窗
+            if (isKeyPressedE) {
+                hidePopup();  // 隐藏弹窗
+                isPopupVisible = false;  // 设置弹窗为不可见
+            }
+        }
+
+
+    }
 }
 
 void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
@@ -293,6 +350,12 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
             default:
                 break;
         }
+    }
+    switch (keyCode) {
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_E:
+        case cocos2d::EventKeyboard::KeyCode::KEY_E:
+            isKeyPressedE = true;
+            break;
     }
 }
 
@@ -324,6 +387,54 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
                 break;
         }
     }
+    switch (keyCode) {
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_E:
+        case cocos2d::EventKeyboard::KeyCode::KEY_E:
+            isKeyPressedE = false;
+            break;
+    }
+}
+
+void OtherScene::showSelectionPopup()
+{
+
+    auto player = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto popupLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // 半透明黑色背景
+    this->addChild(popupLayer, 10);  // 将图层添加到场景，并设置显示优先级
+    // 遍历所有spot，生成按钮
+    for (const auto& spot : positionSwitchPoints) {
+        // 只有isActive为true时，才显示按钮
+        if (spot.isActive) {
+            // 创建按钮，使用图片作为按钮的背景
+            auto button = cocos2d::MenuItemImage::create(
+                "CloseNormal.png",  // 普通状态的按钮图片
+                "CloseSelected.png",  // 按下状态的按钮图片
+                [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                    player->setPosition(spot.position);  // 传送角色
+                    popupLayer->removeFromParent();  // 隐藏弹窗
+                    isPopupVisible = false;  // 设置弹窗为不可见
+                }
+            );
+
+            // 设置按钮位置
+            button->setPosition(spot.position);  // 将按钮位置设置为传送点的位置
+
+            // 创建菜单并将按钮添加到菜单
+            auto menu = cocos2d::Menu::create(button, nullptr);
+            menu->setPosition(cocos2d::Vec2::ZERO);  // 将菜单的原点设置为(0, 0)
+            popupLayer->addChild(menu);  // 将菜单添加到popupLayer
+        }
+    }
+
+    // 显示弹窗
+    isPopupVisible = true;
+}
+
+void OtherScene::hidePopup()
+{
+    // 隐藏弹窗
+    this->removeChildByName("popupLayer");
+    isPopupVisible = false;
 }
 
 void OtherScene::returnToLastScene()

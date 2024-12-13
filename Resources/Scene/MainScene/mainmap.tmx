@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="20" nextobjectid="5">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="24" nextobjectid="8">
  <tileset firstgid="1" name="victorian-garden" tilewidth="16" tileheight="16" tilecount="4096" columns="32">
   <image source="victorian-garden.png" width="512" height="2048"/>
  </tileset>
@@ -76,6 +76,16 @@
    eJzt0zEKwDAIBdAcI8fN0UvWEkyGgtS8Bw46+QVb+7fRz2ZVyX82u4n82Rvkkj97g+/MLLtizd2gvvcv3/bb8sd9dfLHPQAAAAAAAABU9wCQyBX5
   </data>
  </layer>
+ <objectgroup id="13" name="chusheng">
+  <object id="4" name="initspot" x="32" y="166">
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="17" name="flag1" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt2MEJg0AQBdCtxB6EtWBLiLdYg6kiFpIFWchhRW8q8x58mH/810kJAIBIxty+o5hz+waAu3v1KU0l3bCl9iiWsvXzt7/2s955y1N9y9a13+9Hnr4fAAAAAO4o+t8t+n4AuMoPMmIYDQ==
+  </data>
+ </layer>
  <objectgroup id="12" name="SceneSwitchPoints">
   <object id="1" name="forest" x="29.3333" y="310">
    <properties>
@@ -99,19 +109,25 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="13" name="chusheng">
-  <object id="4" name="initspot" x="32" y="166">
-   <point/>
-  </object>
- </objectgroup>
- <layer id="17" name="flag1" width="64" height="48">
-  <data encoding="base64" compression="zlib">
-   eJzt2MEJg0AQBdCtxB6EtWBLiLdYg6kiFpIFWchhRW8q8x58mH/810kJAIBIxty+o5hz+waAu3v1KU0l3bCl9iiWsvXzt7/2s955y1N9y9a13+9Hnr4fAAAAAO4o+t8t+n4AuMoPMmIYDQ==
-  </data>
- </layer>
  <layer id="18" name="flag2" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJzt2KERACAMA0C26nqwBWyLBDSCO/qvGlkRk1IAAAAA4F8t1l3jzBmM7d8eZwYAAADgTsa9aWdvIjP913+AVyZX4wqz
+  </data>
+ </layer>
+ <objectgroup id="20" name="PositionSwitchPoints">
+  <object id="5" name="spot" x="214" y="198">
+   <point/>
+  </object>
+  <object id="6" name="spot" x="998" y="373">
+   <point/>
+  </object>
+  <object id="7" name="spot" x="521" y="728">
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="23" name="flag3" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt2LENACAMAzCu4Qb+vwwxsDJSUGype7NFaQ0AADjpo/qDOiv7vlTJ2QEAfpXc4XT47OwAAAAAcEvyDmeHzc7+ggmhngWD
   </data>
  </layer>
 </map>
