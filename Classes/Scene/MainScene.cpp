@@ -121,16 +121,16 @@ bool MainScene::init()
             }
 
             //创建敌人
-            auto demon = Enemy::create(Vec2(450, 300));
+            auto demon = Enemy::create(Vec2(250, 300));
 
             if (demon) {
                 demon->setName("demon"); // 设置角色名称
                 demon->setAnchorPoint(Vec2(0.5f, 0.5f));
                 demon->setPlayer(hero);  //设置玩家
-                demon->setPatrolRange(300.0f, 300.0f);   //设置巡逻范围
+                demon->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
                 demon->setRadius(200.0f);
                 // 计算出生点的屏幕坐标
-                float adjustedX = mapOriginX + 450.0f; // 地图左下角 + 出生点的 x 偏移
+                float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移
 
                 // 设置人物位置

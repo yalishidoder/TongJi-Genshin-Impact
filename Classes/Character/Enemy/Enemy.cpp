@@ -8,6 +8,9 @@
 #include "cocos2d.h"
 #include "Enemy.h"
 #include "../Hero/Hero.h"
+#include "Scene/MainScene.h"
+#include "Scene/OtherScene.h"
+
 #include <cmath>
 
 Enemy::Enemy()
@@ -75,7 +78,7 @@ void Enemy::update(float delta)
     if (isHeroExist(delta))
     {
         //aiLogic();
-        moveLogic(delta);
+        //moveLogic(delta);
         //attackLogic();
     }
 }
@@ -86,62 +89,53 @@ void Enemy::patrol(float delta)
     // 巡逻逻辑，例如沿着路径移动或随机移动
     // 示例：简单地左右移动
     //后续可以添加向上下巡逻的功能
-    if (this->getPositionX() >= spawnPoint.x + rangedX)
-    {
-        dirX = -1;
-    }
-    else if (this->getPositionX() <= spawnPoint.x - rangedX)
-    {
-        dirX = 1;
-    }
-    if (0) {
-        if (!m_currentAnimate || m_animationCache->getAnimation("walk_up_enemy") != m_currentAnimate->getAnimation()) {
+   
+    cocos2d::Vec2 moveDirection = cocos2d::Vec2(dirX * m_moveSpeed * delta, 0);
+    cocos2d::Vec2 targetPosition = getPosition() + moveDirection;
+    // 获取当前场景进行碰撞检测
+    cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+    bool collision = false;
+    if (currentScene) {
+        //读取是否碰撞
+        if (dynamic_cast<MainScene*>(currentScene)) {
+            MainScene* scene = dynamic_cast<MainScene*>(currentScene);
+            collision = scene->checkCollision(targetPosition);
+        }
+        else if (dynamic_cast<OtherScene*>(currentScene)) {
+            OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
+            collision = scene->checkCollision(targetPosition);
+        }
+        CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
+            targetPosition.x, targetPosition.y, collision ? "True" : "False");
 
-            playAnimation("walk_up_enemy");
+        //大于右边界,则规定向左移动
+        if (this->getPositionX() >= spawnPoint.x + rangedX)
+        {
+            dirX = -1;
+        }
+        //小于左边界，则规定向右移动
+        else if (this->getPositionX() <= spawnPoint.x - rangedX)
+        {
+            dirX = 1;
+        }
+
+        // 如果没有碰撞，执行移动
+        if (!collision) {
+            moveBy(moveDirection);
+            CCLOG("enermy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
         }
         else {
-            // 停止向上行走动画
-            if (m_currentAnimate && m_animationCache->getAnimation("walk_up_enemy") == m_currentAnimate->getAnimation()) {
-                stopAnimation();
+            // 有碰撞，反向移动
+            if (dirX == 1) {
+                // 向右移动碰到墙壁，反向向左
+                dirX = -1;
+            }
+            else if (dirX == -1) {
+                // 向左移动碰到墙壁，反向向右
+                dirX = 1;
             }
         }
     }
-
-    if (0) {
-        if (!m_currentAnimate || m_animationCache->getAnimation("walk_down_enemy") != m_currentAnimate->getAnimation()) {
-
-            playAnimation("walk_down_enemy");
-        }
-        else {
-            // 停止向下行走动画
-            if (m_currentAnimate && m_animationCache->getAnimation("walk_down_enemy") == m_currentAnimate->getAnimation()) {
-                stopAnimation();
-            }
-        }
-    }
-
-    if (dirX==1) {
-        if (!m_currentAnimate || m_animationCache->getAnimation("walk_right_enemy") != m_currentAnimate->getAnimation()) {
-
-            playAnimation("walk_right_enemy");
-        }
-        
-    }
-
-    if (dirX==-1) {
-        if (!m_currentAnimate || m_animationCache->getAnimation("walk_left_enemy") != m_currentAnimate->getAnimation()) {
-
-            playAnimation("walk_left_enemy");
-        }
-        else {
-            // 停止向右行走动画
-            if (m_currentAnimate && m_animationCache->getAnimation("walk_left_enemy") == m_currentAnimate->getAnimation()) {
-                stopAnimation();
-            }
-        }
-    }
-    // 更新位置
-    this->setPositionX(this->getPosition().x + dirX * m_moveSpeed * delta);
 }
 
 void Enemy::moveTo(const cocos2d::Vec2& targetPosition) {
@@ -154,7 +148,7 @@ void Enemy::moveTo(const cocos2d::Vec2& targetPosition) {
 
 void Enemy::moveBy(const cocos2d::Vec2& offset) {
     auto moveAction = cocos2d::MoveBy::create(
-        1.0f,  // 移动时间，可调整
+        0.01f,  // 移动时间，可调整
         offset);
     runAction(moveAction);
 }
@@ -248,7 +242,37 @@ bool Enemy::isHeroExist(float dt)
                     {
                         directionToPlayer.normalize();
                         cocos2d::Vec2 movement = directionToPlayer * m_moveSpeed * dt;
-                        this->setPosition(this->getPosition() + movement);
+                        // 输出追击前的敌人位置
+                        CCLOG("Enemy position before move: (%.2f, %.2f)", this->getPositionX(), this->getPositionY());
+                        // 计算敌人的目标位置
+                        cocos2d::Vec2 targetPosition = this->getPosition() + movement;
+
+                        // 获取当前场景进行碰撞检测
+                        cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+                        bool collision = false;
+                        //检测是否碰撞
+                        if (currentScene) {
+                            if (dynamic_cast<MainScene*>(currentScene)) {
+                                MainScene* scene = dynamic_cast<MainScene*>(currentScene);
+                                collision = scene->checkCollision(targetPosition);
+                            }
+                            else if (dynamic_cast<OtherScene*>(currentScene)) {
+                                OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
+                                collision = scene->checkCollision(targetPosition);
+                            }
+                        }
+                        // 如果没有碰到墙壁，继续追击
+                        if (!collision) {
+                            this->setPosition(this->getPosition() + movement);
+                            CCLOG("enermy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+
+                        }
+                        else {
+                            // 碰到墙壁，返回出生点
+                            currentState = EnemyState::RETURN;
+                            CCLOG("enermy touch the wall");
+                            // 可选：碰墙后音效
+                        }
 
                         float angle = std::atan2(directionToPlayer.y, directionToPlayer.x) * (180.0f / M_PI);
                         //this->setRotation(-angle);
