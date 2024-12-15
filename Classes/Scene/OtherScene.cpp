@@ -395,6 +395,41 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
     }
 }
 
+bool OtherScene::checkCollision(cocos2d::Vec2 position)
+{
+
+    // 获取瓦片层（假设墙壁层的名字为 "WallLayer"）
+    TMXLayer* wallLayer = othermap->getLayer("WallLayer");
+
+    // 获取目标位置的瓦片ID
+    Vec2 tileCoord = tileCoordForPosition(position);
+    int tileGID = wallLayer->getTileGIDAt(tileCoord);
+
+    // 如果瓦片ID大于0，表示该位置有墙壁
+    if (tileGID != 0) {
+        return true;  // 碰到墙壁
+    }
+    return false;  // 没有碰到墙壁
+}
+cocos2d::Vec2 OtherScene::tileCoordForPosition(Vec2 position)
+{
+    float x = position.x;
+    float y = position.y;
+
+    // 假设每个瓦片的大小是 16x16
+    int tileWidth = 16;  // 每个瓦片的宽度
+    int tileHeight = 16; // 每个瓦片的高度
+
+    // 计算瓦片坐标
+    int tileX = (int)(x / tileWidth);
+    int tileY = (int)((othermap->getMapSize().height * tileHeight - y) / tileHeight);
+
+    // 输出瓦片坐标
+    CCLOG("Converting position (%.2f, %.2f) to tile coordinates: (%.2f, %.2f)", x, y, tileX, tileY);
+
+    return Vec2(tileX, tileY);
+}
+
 void OtherScene::showSelectionPopup()
 {
 

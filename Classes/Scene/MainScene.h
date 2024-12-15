@@ -12,7 +12,7 @@ struct SceneSwitchPoint {
 
 struct PositionSwitchPoint {
     cocos2d::Vec2 position;    // 传送点位置
-    bool isActive = false;
+    bool isActive = true;
 };
 
 class MainScene : public cocos2d::Scene
@@ -33,6 +33,10 @@ public:
 
     void showSelectionPopup();
 
+    //检查位置是否发生碰撞
+    bool checkCollision(cocos2d::Vec2 position);
+    //窗口到瓦片地图坐标转化
+    cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
     void hidePopup();
     CREATE_FUNC(MainScene);
 

@@ -20,7 +20,11 @@ public:
 
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-
+	
+	//检查位置是否发生碰撞
+	bool checkCollision(cocos2d::Vec2 position);
+	//窗口到瓦片地图坐标转化
+	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 
 	void showSelectionPopup();
 

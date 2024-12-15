@@ -7,6 +7,9 @@
  ****************************************************************/
 
 #include "Hero.h"
+#include "Scene/MainScene.h"
+#include "Scene/OtherScene.h"
+
 
 Character::Character()
     : m_health(100)         // 初始生命值
@@ -64,7 +67,7 @@ bool Character::init(const cocos2d::Vec2& initPosition) {
 // 移动到指定位置
 void Character::moveTo(const cocos2d::Vec2& targetPosition) {
     auto moveAction = cocos2d::MoveTo::create(
-        1.0f,  // 移动时间，可根据实际情况调整
+        0.5f,  // 移动时间，可根据实际情况调整
         targetPosition);
     runAction(moveAction);
 }
@@ -72,7 +75,7 @@ void Character::moveTo(const cocos2d::Vec2& targetPosition) {
 // 按照偏移量移动
 void Character::moveBy(const cocos2d::Vec2& offset) {
     auto moveAction = cocos2d::MoveBy::create(
-        0.1f,  // 移动时间，可调整
+        0.01f,  // 移动时间，可调整
         offset);
     runAction(moveAction);
 }
@@ -131,6 +134,7 @@ bool Character::checkCollision(Character* otherCharacter) {
     return thisBoundingBox.intersectsRect(otherBoundingBox);
 }
 
+
 void Character::update(float dt) {
     m_moveDirection = cocos2d::Vec2::ZERO;
 
@@ -147,10 +151,109 @@ void Character::update(float dt) {
     if (m_moveRight) {
         m_moveDirection.x += m_speed * dt;
     }
-
-
+//回退版
+#if 1
+    // 如果有移动方向，则先计算目标位置
     if (m_moveDirection != cocos2d::Vec2::ZERO) {
-        moveBy(m_moveDirection);
+        // 计算目标位置
+        cocos2d::Vec2 targetPosition = getPosition() + m_moveDirection;
+        cocos2d::Vec2 beforePosition = getPosition();
+        // 输出调试日志：角色的当前坐标、目标坐标
+        CCLOG("Character update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
+            getPosition().x, getPosition().y, targetPosition.x, targetPosition.y);
+
+        // 获取当前场景
+        cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+        if (currentScene) {
+            // 检查目标位置是否碰到墙壁
+            bool collision = false;
+            // 判断场景类型，并调用不同的碰撞检测方法
+            if (dynamic_cast<MainScene*>(currentScene)) {
+                // 如果是 MainScene，使用 MainScene 的碰撞检测
+                MainScene* scene = dynamic_cast<MainScene*>(currentScene);
+                collision = scene->checkCollision(targetPosition);
+            }
+            else if (dynamic_cast<OtherScene*>(currentScene)) {
+                // 如果是 OtherScene，使用 OtherScene 的碰撞检测
+                OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
+                collision = scene->checkCollision(targetPosition);
+            }
+            CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
+                targetPosition.x, targetPosition.y, collision ? "True" : "False");
+
+            if (!collision) {
+                // 如果没有碰到墙壁，执行移动
+                moveBy(m_moveDirection);
+                CCLOG("Character moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+            }
+            else {
+                // 如果碰到墙壁，则退回一点，避免角色卡住
+                cocos2d::Vec2 adjustedPosition = getPosition();
+                const float ajt = 1;//退回的多少
+                if (m_moveUp && collision) adjustedPosition.y -= ajt * m_speed * dt;
+                if (m_moveDown && collision) adjustedPosition.y += ajt* m_speed * dt;
+                if (m_moveLeft && collision) adjustedPosition.x += ajt * m_speed * dt;
+                if (m_moveRight && collision) adjustedPosition.x -= ajt * m_speed * dt;
+
+                // 输出退回后的新位置
+                CCLOG("Character adjusted position due to collision: (%.2f, %.2f)", adjustedPosition.x, adjustedPosition.y);
+                setPosition(adjustedPosition);
+            }
+        }
+        else {
+            CCLOG("MainScene not found");
+        }
     }
+#endif
+
+//不回退版，但如果角色一帧移动过多，则会超出过多，导致人物卡住（已解决）
+#if 0
+    // 如果有移动方向，则先计算目标位置
+    if (m_moveDirection != cocos2d::Vec2::ZERO) {
+        // 计算目标位置
+        cocos2d::Vec2 targetPosition = getPosition() + m_moveDirection;
+
+        // 输出调试日志：角色的当前坐标、目标坐标
+        CCLOG("Character update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
+            getPosition().x, getPosition().y, targetPosition.x, targetPosition.y);
+
+        // 获取当前运行的场景
+        cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+        if (currentScene) {
+            // 检查目标位置是否碰到墙壁
+            bool collision = false;
+
+            // 判断场景类型并调用不同的碰撞检测方法
+            if (dynamic_cast<MainScene*>(currentScene)) {
+                MainScene* scene = dynamic_cast<MainScene*>(currentScene);
+                collision = scene->checkCollision(targetPosition);
+            }
+            else if (dynamic_cast<OtherScene*>(currentScene)) {
+                OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
+                collision = scene->checkCollision(targetPosition);
+            }
+
+            CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
+                targetPosition.x, targetPosition.y, collision ? "True" : "False");
+
+            // 如果没有碰撞，执行移动
+            if (!collision) {
+                moveBy(m_moveDirection);
+                CCLOG("Character moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+            }
+            else {
+                // 如果碰撞发生，停止角色移动（不进行反向调整）
+                CCLOG("Collision detected, stopping character move.");
+                // 不改变角色的位置，让它停留在原地
+                setPosition(getPosition());
+            }
+        }
+        else {
+            CCLOG("MainScene not found");
+        }
+    }
+#endif
+
+
 }
 
