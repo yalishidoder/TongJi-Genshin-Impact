@@ -16,6 +16,8 @@ Enemy::Enemy()
     , m_isAlive(true)
     , m_moveSpeed(50.0f)  // 初始移动速度
     , isAttacking(false)  //是否发起进攻
+    , m_animationCache(cocos2d::AnimationCache::getInstance())
+    , m_currentAnimate(nullptr)
     , currentState(EnemyState::PATROL)   //初始状态为巡逻
     ,dirX(1) ,dirY(1)     //初始巡逻方向设为正方向
 {
@@ -34,14 +36,18 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
 
     // 设置敌人初始位置
     setPosition(initPosition);
-
+    setScale(0.8f);
     spawnPoint = initPosition;
 
     // 可以在这里加载敌人的初始外观纹理等
     // 例如：setTexture("enemy_default.png");
     
-    setTexture("Character/Enemy/test.png");
-
+    setTexture("Character/Enemy/Animation/hitman/WALK_DOWN_0.png");
+    m_animationCache = cocos2d::AnimationCache::getInstance();
+    m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_enemy");
+    m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_enemy");
+    m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_enemy");
+    m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_enemy");
     return true;
 }
 
@@ -69,7 +75,7 @@ void Enemy::update(float delta)
     if (isHeroExist(delta))
     {
         //aiLogic();
-        //moveLogic(dt);
+        moveLogic(delta);
         //attackLogic();
     }
 }
@@ -88,7 +94,52 @@ void Enemy::patrol(float delta)
     {
         dirX = 1;
     }
-    
+    if (0) {
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_up_enemy") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_up_enemy");
+        }
+        else {
+            // 停止向上行走动画
+            if (m_currentAnimate && m_animationCache->getAnimation("walk_up_enemy") == m_currentAnimate->getAnimation()) {
+                stopAnimation();
+            }
+        }
+    }
+
+    if (0) {
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_down_enemy") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_down_enemy");
+        }
+        else {
+            // 停止向下行走动画
+            if (m_currentAnimate && m_animationCache->getAnimation("walk_down_enemy") == m_currentAnimate->getAnimation()) {
+                stopAnimation();
+            }
+        }
+    }
+
+    if (dirX==1) {
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_right_enemy") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_right_enemy");
+        }
+        
+    }
+
+    if (dirX==-1) {
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_left_enemy") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_left_enemy");
+        }
+        else {
+            // 停止向右行走动画
+            if (m_currentAnimate && m_animationCache->getAnimation("walk_left_enemy") == m_currentAnimate->getAnimation()) {
+                stopAnimation();
+            }
+        }
+    }
     // 更新位置
     this->setPositionX(this->getPosition().x + dirX * m_moveSpeed * delta);
 }
@@ -193,18 +244,31 @@ bool Enemy::isHeroExist(float dt)
                 else
                 {
                     // 继续追踪玩家
-                    if (distanceToPlayer > 1e-5f)
+                    if (distanceToPlayer > 10)
                     {
                         directionToPlayer.normalize();
                         cocos2d::Vec2 movement = directionToPlayer * m_moveSpeed * dt;
                         this->setPosition(this->getPosition() + movement);
 
                         float angle = std::atan2(directionToPlayer.y, directionToPlayer.x) * (180.0f / M_PI);
-                        this->setRotation(-angle);
+                        //this->setRotation(-angle);
                     }
+                    else
+                        currentState = EnemyState::STAY;
                 }
                 break;
-
+            case EnemyState::STAY:
+                // 停止的逻辑
+                if (distanceToPlayer > 10)
+                {
+                    // 切换到巡逻状态
+                    currentState = EnemyState::PATROL;
+                }
+                else
+                {
+                    //ATTACK
+                }
+                break;
             case EnemyState::RETURN:
                 // 返回出生点的逻辑
                 cocos2d::Vec2 directionToSpawn = spawnPoint - enemyPos;
@@ -217,7 +281,7 @@ bool Enemy::isHeroExist(float dt)
                     this->setPosition(this->getPosition() + movement);
 
                     float angle = std::atan2(directionToSpawn.y, directionToSpawn.x) * (180.0f / M_PI);
-                    this->setRotation(angle);
+                    //this->setRotation(angle);
 
                     // 如果玩家进入检测范围，优先切换到追踪状态
                     if (distanceToPlayer <= radius)
@@ -246,13 +310,12 @@ void Enemy::moveLogic(float dt) {
     float randomY = CCRANDOM_MINUS1_1();
     moveDirection.x = randomX * m_moveSpeed * dt;
     moveDirection.y = randomY * m_moveSpeed * dt;
-
-
+    
+    
     if (moveDirection != cocos2d::Vec2::ZERO) {
         moveBy(moveDirection);
     }
 }
-
 
 void Enemy::attackLogic() {
     // 简单的攻击逻辑，可根据需要扩展为更复杂的攻击判断和触发条件
@@ -266,4 +329,124 @@ void Enemy::aiLogic() {
     // 这里可以实现更复杂的 AI 逻辑，例如巡逻、追逐玩家、躲避玩家等
     // 暂时为空，可根据游戏需求添加
 
+}
+
+// 创建向上行走动画
+cocos2d::Animation* Enemy::createWalkUpAnimation() {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_UP.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_UP.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("Character/Enemy/Animation/WALK_UP_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    return animation;
+}
+
+// 创建向下行走动画
+cocos2d::Animation* Enemy::createWalkDownAnimation() {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_DOWN.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_DOWN.png");
+    
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("Character/Enemy/Animation/WALK_DOWN_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    return animation;
+}
+
+// 创建向左行走动画
+cocos2d::Animation* Enemy::createWalkLeftAnimation() {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_LEFT.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_LEFT.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("Character/Enemy/Animation/WALK_LEFT_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    return animation;
+}
+
+// 创建向右行走动画
+cocos2d::Animation* Enemy::createWalkRightAnimation() {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_RIGHT.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_RIGHT.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("Character/Enemy/Animation/WALK_RIGHT_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+// 播放指定名称的动画
+void Enemy::playAnimation(const std::string& animationName) {
+    auto animation = m_animationCache->getAnimation(animationName);
+    if (animation) {
+        m_currentAnimate = cocos2d::Animate::create(animation);
+        runAction(m_currentAnimate);
+
+    }
+}
+
+// 停止当前动画
+void Enemy::stopAnimation() {
+    //stopAllActionsByTag(100);  // 这里用100作为动画相关action的标签，可自定义
+    stopAllActions();
+    CC_SAFE_RELEASE_NULL(m_currentAnimate);
+}
+
+// 添加动画到缓存
+void Enemy::addAnimation(const std::string& animationName, const cocos2d::Animation& animation) {
+    // 创建一个新的 Animation 对象，将传入的 animation 复制到新对象中
+    auto newAnimation = Animation::create();
+    newAnimation->setDelayPerUnit(animation.getDelayPerUnit());
+    newAnimation->setLoops(animation.getLoops());
+    newAnimation->setRestoreOriginalFrame(animation.getRestoreOriginalFrame());
+    for (const auto& frame : animation.getFrames()) {
+        // 从 AnimationFrame 中提取 SpriteFrame 并添加
+        SpriteFrame* spriteFrame = frame->getSpriteFrame();
+        if (spriteFrame) {
+            newAnimation->addSpriteFrame(spriteFrame);
+        }
+    }
+    m_animationCache->addAnimation(newAnimation, animationName);
 }

@@ -13,7 +13,8 @@ enum class EnemyState
 {
     PATROL,   //巡逻
     CHASE,    //追逐
-    RETURN    //返回出生点
+    RETURN,   //返回出生点
+    STAY      //停止
 };
 
 class Enemy : public cocos2d::Sprite {
@@ -104,4 +105,16 @@ private:
 
     // 敌人的 AI 逻辑，可根据需要扩展
     void aiLogic();
+
+    cocos2d::AnimationCache* m_animationCache;
+    cocos2d::Animate* m_currentAnimate;
+
+    // 敌人动画相关方法
+    void playAnimation(const std::string& animationName);
+    void stopAnimation();
+    void addAnimation(const std::string& animationName, const cocos2d::Animation& animation);
+    cocos2d::Animation* createWalkUpAnimation();
+    cocos2d::Animation* createWalkDownAnimation();
+    cocos2d::Animation* createWalkLeftAnimation();
+    cocos2d::Animation* createWalkRightAnimation();
 };

@@ -107,7 +107,7 @@ bool OtherScene::init(const std::string& mapFile)
             auto hero = Character::create(Vec2(500, 500));
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
-                hero->setAnchorPoint(Vec2(0.5f, 0.5f));
+                hero->setAnchorPoint(Vec2(0.5f, 0.15));
 
                 // 将角色传送到 firstflag 的位置
                 // 计算出firstflag的屏幕坐标

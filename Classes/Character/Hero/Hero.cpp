@@ -10,13 +10,13 @@
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 
-
 Character::Character()
     : m_health(100)         // 初始生命值
     , m_sleepiness(100)     // 初始睡意值
     , m_attackPower(10)     // 初始攻击力
     , m_heroism(1000)       // 初始英雄度
-    , m_speed(100.0f)       // 初始速度
+    , m_speed(200.0f)       // 初始速度
+    , m_ismale(0)       // 初始性别
     , m_isAlive(true)
     , m_animationCache(cocos2d::AnimationCache::getInstance())
     , m_currentAnimate(nullptr)
@@ -48,26 +48,32 @@ bool Character::init(const cocos2d::Vec2& initPosition) {
     }
     // 设置角色的初始位置
     //setPosition(initPosition);
-
+    
     // 加载角色的初始纹理
-    setTexture("Character/Hero/test.png"); // 使用 "test.png" 作为角色的测试纹理
-    setScale(1.0f); // 可以根据需要调整角色的缩放比例，默认设置为 1.0
+    
+    if (!m_ismale) {
+        setTexture("Character/Hero/Animation/female/WALK_UP/WALK_UP_1.png");
+    }
+    else {
+        setTexture("Character/Hero/Animation/male/male_sheet/WALK_UP_1.png");
+    }
+    setScale(0.8f); // 可以根据需要调整角色的缩放比例，默认设置为 1.0
 
     // 初始化角色的动画缓存
-    //m_animationCache = cocos2d::AnimationCache::getInstance();
-    //m_animationCache->addAnimation(createIdleAnimation(), "idle_animation");
-    //m_animationCache->addAnimation(createRunAnimation(), "run_animation");
-    //m_animationCache->addAnimation(createAttackAnimation(), "attack_animation");
-    //m_animationCache->addAnimation(createHurtAnimation(), "hurt_animation");
-    //m_animationCache->addAnimation(createDieAnimation(), "die_animation");
+    m_animationCache = cocos2d::AnimationCache::getInstance();
+    m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_hero");
+    m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_hero");
+    m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
+    m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_hero");
 
     return true;
 }
 
+
 // 移动到指定位置
 void Character::moveTo(const cocos2d::Vec2& targetPosition) {
     auto moveAction = cocos2d::MoveTo::create(
-        0.5f,  // 移动时间，可根据实际情况调整
+        1.0f,  // 移动时间，可根据实际情况调整
         targetPosition);
     runAction(moveAction);
 }
@@ -80,25 +86,150 @@ void Character::moveBy(const cocos2d::Vec2& offset) {
     runAction(moveAction);
 }
 
+// 创建向上行走动画
+cocos2d::Animation* Character::createWalkUpAnimation() {
+    if (!m_ismale) {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_UP.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_UP.png");
+    }
+    else {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_UP.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_UP.png");
+    }
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("WALK_UP_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    return animation;
+}
+
+// 创建向下行走动画
+cocos2d::Animation* Character::createWalkDownAnimation() {
+    if (!m_ismale) {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_DOWN.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_DOWN.png");
+    }
+    else {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_DOWN.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_DOWN.png");
+    }
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+    
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("WALK_DOWN_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    return animation;
+}
+
+// 创建向左行走动画
+cocos2d::Animation* Character::createWalkLeftAnimation() {
+    if (!m_ismale) {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_LEFT.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_LEFT.png");
+    }
+    else {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_LEFT.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_LEFT.png");
+    }
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("WALK_LEFT_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    return animation;
+}
+
+// 创建向右行走动画
+cocos2d::Animation* Character::createWalkRightAnimation() {
+    if (!m_ismale) {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_RIGHT.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_RIGHT.png");
+    }
+    else {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_RIGHT.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/WALK_RIGHT.png");
+    }
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 2; i <= 8; ++i) {
+        std::string frameName = StringUtils::format("WALK_RIGHT_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
 // 播放指定名称的动画
 void Character::playAnimation(const std::string& animationName) {
     auto animation = m_animationCache->getAnimation(animationName);
     if (animation) {
         m_currentAnimate = cocos2d::Animate::create(animation);
         runAction(m_currentAnimate);
+        
     }
 }
 
 // 停止当前动画
 void Character::stopAnimation() {
-    stopAllActionsByTag(100);  // 这里用100作为动画相关action的标签，可自定义
+    //stopAllActionsByTag(100);  // 这里用100作为动画相关action的标签，可自定义
+    stopAllActions();
     CC_SAFE_RELEASE_NULL(m_currentAnimate);
 }
 
 // 添加动画到缓存
 void Character::addAnimation(const std::string& animationName, const cocos2d::Animation& animation) {
-    //m_animationCache->addAnimation(animation, animationName);
+    // 创建一个新的 Animation 对象，将传入的 animation 复制到新对象中
+    auto newAnimation = Animation::create();
+    newAnimation->setDelayPerUnit(animation.getDelayPerUnit());
+    newAnimation->setLoops(animation.getLoops());
+    newAnimation->setRestoreOriginalFrame(animation.getRestoreOriginalFrame());
+    for (const auto& frame : animation.getFrames()) {
+        // 从 AnimationFrame 中提取 SpriteFrame 并添加
+        SpriteFrame* spriteFrame = frame->getSpriteFrame();
+        if (spriteFrame) {
+            newAnimation->addSpriteFrame(spriteFrame);
+        }
+    }
+    m_animationCache->addAnimation(newAnimation, animationName);
 }
+
+
 
 // 设置生命值
 void Character::setHealth(int health) {
@@ -111,6 +242,16 @@ void Character::setHealth(int health) {
 // 获取生命值
 int Character::getHealth() {
     return m_health;
+}
+
+// 获取性别
+bool Character::getGender() {
+    return m_ismale;
+}
+
+// 设置性别
+void Character::setGender(bool is_male) {
+    m_ismale = is_male;
 }
 
 // 设置攻击力
@@ -134,25 +275,76 @@ bool Character::checkCollision(Character* otherCharacter) {
     return thisBoundingBox.intersectsRect(otherBoundingBox);
 }
 
-
 void Character::update(float dt) {
     m_moveDirection = cocos2d::Vec2::ZERO;
 
 
     if (m_moveUp) {
         m_moveDirection.y += m_speed * dt;
+        // 播放向上行走动画并设置为循环播放
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_up_hero") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_up_hero");
+        }
     }
+    else {
+        // 停止向上行走动画
+        if (m_currentAnimate && m_animationCache->getAnimation("walk_up_hero") == m_currentAnimate->getAnimation()) {
+            stopAnimation();
+        }
+    }
+
+
     if (m_moveDown) {
         m_moveDirection.y -= m_speed * dt;
+        // 播放向下行走动画并设置为循环播放
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_down_hero") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_down_hero");
+        }
     }
+    else {
+        // 停止向下行走动画
+        if (m_currentAnimate && m_animationCache->getAnimation("walk_down_hero") == m_currentAnimate->getAnimation()) {
+            stopAnimation();
+        }
+    }
+
+
     if (m_moveLeft) {
         m_moveDirection.x -= m_speed * dt;
+        // 播放向左行走动画并设置为循环播放
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_left_hero") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_left_hero");
+        }
     }
+    else {
+        // 停止向左行走动画
+        if (m_currentAnimate && m_animationCache->getAnimation("walk_left_hero") == m_currentAnimate->getAnimation()) {
+            stopAnimation();
+        }
+    }
+
+
     if (m_moveRight) {
         m_moveDirection.x += m_speed * dt;
+        // 播放向右行走动画并设置为循环播放
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_right_hero") != m_currentAnimate->getAnimation()) {
+
+            playAnimation("walk_right_hero");
+        }
     }
-//回退版
-#if 1
+    else {
+        // 停止向右行走动画
+        if (m_currentAnimate && m_animationCache->getAnimation("walk_right_hero") == m_currentAnimate->getAnimation()) {
+            stopAnimation();
+        }
+    }
+
+
+    //回退版
+#if 0
     // 如果有移动方向，则先计算目标位置
     if (m_moveDirection != cocos2d::Vec2::ZERO) {
         // 计算目标位置
@@ -191,7 +383,7 @@ void Character::update(float dt) {
                 cocos2d::Vec2 adjustedPosition = getPosition();
                 const float ajt = 1;//退回的多少
                 if (m_moveUp && collision) adjustedPosition.y -= ajt * m_speed * dt;
-                if (m_moveDown && collision) adjustedPosition.y += ajt* m_speed * dt;
+                if (m_moveDown && collision) adjustedPosition.y += ajt * m_speed * dt;
                 if (m_moveLeft && collision) adjustedPosition.x += ajt * m_speed * dt;
                 if (m_moveRight && collision) adjustedPosition.x -= ajt * m_speed * dt;
 
@@ -206,8 +398,8 @@ void Character::update(float dt) {
     }
 #endif
 
-//不回退版，但如果角色一帧移动过多，则会超出过多，导致人物卡住（已解决）
-#if 0
+    //不回退版，但如果角色一帧移动过多，则会超出过多，导致人物卡住（已解决）
+#if 1
     // 如果有移动方向，则先计算目标位置
     if (m_moveDirection != cocos2d::Vec2::ZERO) {
         // 计算目标位置
@@ -253,7 +445,6 @@ void Character::update(float dt) {
         }
     }
 #endif
-
 
 }
 

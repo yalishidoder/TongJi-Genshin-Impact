@@ -72,12 +72,12 @@ bool MainMenuScene::init()
             origin.y + visibleSize.height - logo->getContentSize().height / 2 - 20)); // 距顶部50像素
         this->addChild(logo, 1); // 设置Logo层级为 1，确保它显示在背景之上
     }
-    else 
+    else
     {
         CCLOG("Error: Could not load logo image");
     }
 
-     // 创建“进入游戏”按钮，并设置到画面底部
+    // 创建“进入游戏”按钮，并设置到画面底部
     auto startGameButton = MenuItemImage::create(
         "Scene/MainMenuScene/GameBegin1.png",
         "Scene/MainMenuScene/GameBegin2.png",
@@ -85,14 +85,15 @@ bool MainMenuScene::init()
             // 停止背景音乐
             AudioEngine::stop(backgroundMusicId);
             // 切换到游戏场景
-            Director::getInstance()->replaceScene(TransitionFade::create(1.0,   MainScene::createScene()));
+            Director::getInstance()->replaceScene(TransitionFade::create(1.0, MainScene::createScene()));
         });
+
 
     if (startGameButton == nullptr ||
         startGameButton->getContentSize().width <= 0 ||
         startGameButton->getContentSize().height <= 0)
     {
-       CCLOG("'CloseNormal.png' and 'CloseSelected.png'");
+        CCLOG("'CloseNormal.png' and 'CloseSelected.png'");
     }
 
     else {
@@ -101,14 +102,14 @@ bool MainMenuScene::init()
         // 设置按钮的位置
         startGameButton->setPosition(Vec2(
             origin.x + visibleSize.width / 2,  // 水平居中
-            origin.y + startGameButton->getContentSize().height / 3-13)); // 距底部高度为按钮一半
+            origin.y + startGameButton->getContentSize().height / 3 - 13)); // 距底部高度为按钮一半
     }
 
     // 创建“退出游戏”按钮，并设置到画面右侧
     auto exitButton = MenuItemImage::create(
         "Scene/MainMenuScene/CloseNormal.png",
         "Scene/MainMenuScene/CloseSelected.png",
-        [](Ref* sender) 
+        [](Ref* sender)
         {
             // 停止背景音乐
             AudioEngine::stop(backgroundMusicId);
@@ -123,7 +124,7 @@ bool MainMenuScene::init()
         CCLOG("'CloseNormal.png' and 'CloseSelected.png'");
     }
 
-    else 
+    else
     {
         // 缩放按钮大小
         exitButton->setScale(0.8);
@@ -158,8 +159,9 @@ bool MainMenuScene::init()
         // 设置位置
         musicToggleButton->setPosition(Vec2(
             origin.x + visibleSize.width - 150,  // 距右侧宽度-150像素
-            origin.y +  170)); // 按钮靠顶部
+            origin.y + 170)); // 按钮靠顶部
     }
+
 
     // 创建菜单
     auto menu = Menu::create(startGameButton, exitButton, musicToggleButton, nullptr);

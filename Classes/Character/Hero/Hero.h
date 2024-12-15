@@ -12,6 +12,7 @@
 #include "cocos2d.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/Switcher.h"
+USING_NS_CC;
 
 class Character : public cocos2d::Sprite {
 public:
@@ -34,12 +35,20 @@ public:
     void playAnimation(const std::string& animationName);
     void stopAnimation();
     void addAnimation(const std::string& animationName, const cocos2d::Animation& animation);
+    cocos2d::Animation* Character::createWalkUpAnimation();
+    cocos2d::Animation* Character::createWalkDownAnimation();
+    cocos2d::Animation* Character::createWalkLeftAnimation();
+    cocos2d::Animation* Character::createWalkRightAnimation();
+
+
 
     // 角色属性相关方法，比如设置和获取生命值、攻击力等
     void setHealth(int health);
     int getHealth();
     void setAttackPower(int attackPower);
     int getAttackPower();
+    bool getGender();
+    void setGender(bool is_male);
 
     // 角色状态相关，例如是否存活等判断
     bool isAlive();
@@ -69,7 +78,7 @@ private:
     int m_health;
     int m_attackPower;
     int m_heroism;
-    
+    bool m_ismale;
 
     cocos2d::AnimationCache* m_animationCache;
     cocos2d::Animate* m_currentAnimate;

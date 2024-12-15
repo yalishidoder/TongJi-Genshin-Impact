@@ -109,7 +109,7 @@ bool MainScene::init()
             auto hero = Character::create(Vec2(500, 500));
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
-                hero->setAnchorPoint(Vec2(0.5f, 0.5f));
+                hero->setAnchorPoint(Vec2(0.5f, 0.15));
 
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
