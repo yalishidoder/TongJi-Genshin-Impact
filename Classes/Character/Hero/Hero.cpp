@@ -6,17 +6,22 @@
  * Update Date:   2024.12.10
  ****************************************************************/
 
+#include <cmath>
 #include "Hero.h"
+#include "Character/CharacterBase.h"
+#include "Weapon/RangedWeapon/Ammunition/Bullet.h"
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 
-Character::Character()
-    : m_health(100)         // 初始生命值
-    , m_sleepiness(100)     // 初始睡意值
-    , m_attackPower(10)     // 初始攻击力
+
+Hero::Hero()
+    : m_sleepiness(100)     // 初始睡意值
     , m_heroism(1000)       // 初始英雄度
     , m_speed(200.0f)       // 初始速度
     , m_ismale(0)       // 初始性别
+    , MaxLevel(100)         // 等级上限
+    , m_exp(0)              // 初始经验值
+    , m_expToLevelUp(100)   // 初始升级所需要的经验
     , m_isAlive(true)
     , m_animationCache(cocos2d::AnimationCache::getInstance())
     , m_currentAnimate(nullptr)
@@ -27,22 +32,22 @@ Character::Character()
     , m_moveRight(false) {
 }
 
-Character::~Character() {
+Hero::~Hero() {
     CC_SAFE_RELEASE_NULL(m_animationCache);
     CC_SAFE_RELEASE_NULL(m_currentAnimate);
 }
 
-Character* Character::create(const cocos2d::Vec2& initPosition) {
-    auto character = new (std::nothrow) Character();
-    if (character && character->init(initPosition)) {
-        character->autorelease();
-        return character;
+Hero* Hero::create(const cocos2d::Vec2& initPosition) {
+    auto hero = new (std::nothrow) Hero();
+    if (hero && hero->init(initPosition)) {
+        hero->autorelease();
+        return hero;
     }
-    CC_SAFE_DELETE(character);
+    CC_SAFE_DELETE(hero);
     return nullptr;
 }
 
-bool Character::init(const cocos2d::Vec2& initPosition) {
+bool Hero::init(const cocos2d::Vec2& initPosition) {
     if (!Sprite::init()) {
         return false;
     }
@@ -71,7 +76,7 @@ bool Character::init(const cocos2d::Vec2& initPosition) {
 
 
 // 移动到指定位置
-void Character::moveTo(const cocos2d::Vec2& targetPosition) {
+void Hero::moveTo(const cocos2d::Vec2& targetPosition) {
     auto moveAction = cocos2d::MoveTo::create(
         1.0f,  // 移动时间，可根据实际情况调整
         targetPosition);
@@ -79,7 +84,7 @@ void Character::moveTo(const cocos2d::Vec2& targetPosition) {
 }
 
 // 按照偏移量移动
-void Character::moveBy(const cocos2d::Vec2& offset) {
+void Hero::moveBy(const cocos2d::Vec2& offset) {
     auto moveAction = cocos2d::MoveBy::create(
         0.01f,  // 移动时间，可调整
         offset);
@@ -87,7 +92,7 @@ void Character::moveBy(const cocos2d::Vec2& offset) {
 }
 
 // 创建向上行走动画
-cocos2d::Animation* Character::createWalkUpAnimation() {
+cocos2d::Animation* Hero::createWalkUpAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_UP.plist");
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_UP.png");
@@ -114,7 +119,7 @@ cocos2d::Animation* Character::createWalkUpAnimation() {
 }
 
 // 创建向下行走动画
-cocos2d::Animation* Character::createWalkDownAnimation() {
+cocos2d::Animation* Hero::createWalkDownAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_DOWN.plist");
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_DOWN.png");
@@ -141,7 +146,7 @@ cocos2d::Animation* Character::createWalkDownAnimation() {
 }
 
 // 创建向左行走动画
-cocos2d::Animation* Character::createWalkLeftAnimation() {
+cocos2d::Animation* Hero::createWalkLeftAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_LEFT.plist");
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_LEFT.png");
@@ -168,7 +173,7 @@ cocos2d::Animation* Character::createWalkLeftAnimation() {
 }
 
 // 创建向右行走动画
-cocos2d::Animation* Character::createWalkRightAnimation() {
+cocos2d::Animation* Hero::createWalkRightAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_RIGHT.plist");
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_RIGHT.png");
@@ -196,7 +201,7 @@ cocos2d::Animation* Character::createWalkRightAnimation() {
 }
 
 // 播放指定名称的动画
-void Character::playAnimation(const std::string& animationName) {
+void Hero::playAnimation(const std::string& animationName) {
     auto animation = m_animationCache->getAnimation(animationName);
     if (animation) {
         m_currentAnimate = cocos2d::Animate::create(animation);
@@ -206,14 +211,14 @@ void Character::playAnimation(const std::string& animationName) {
 }
 
 // 停止当前动画
-void Character::stopAnimation() {
+void Hero::stopAnimation() {
     //stopAllActionsByTag(100);  // 这里用100作为动画相关action的标签，可自定义
     stopAllActions();
     CC_SAFE_RELEASE_NULL(m_currentAnimate);
 }
 
 // 添加动画到缓存
-void Character::addAnimation(const std::string& animationName, const cocos2d::Animation& animation) {
+void Hero::addAnimation(const std::string& animationName, const cocos2d::Animation& animation) {
     // 创建一个新的 Animation 对象，将传入的 animation 复制到新对象中
     auto newAnimation = Animation::create();
     newAnimation->setDelayPerUnit(animation.getDelayPerUnit());
@@ -231,51 +236,111 @@ void Character::addAnimation(const std::string& animationName, const cocos2d::An
 
 
 
-// 设置生命值
-void Character::setHealth(int health) {
-    m_health = health;
-    if (m_health <= 0) {
-        m_isAlive = false;
+void Hero::attack()
+{
+    //要与武器模块挂钩
+}
+
+void Hero::attackWithMouse(const Vec2& position)
+{
+    // 创建子弹
+    auto bullet = Bullet::create();
+    if (bullet) {
+        // 设置锚点
+        bullet->setAnchorPoint(Vec2(0.5f, 0.5f));
+
+        // 设置子弹的位置为英雄的位置
+        bullet->setPosition(getPosition());
+        // 计算子弹的移动方向
+        Vec2 direction = position - getPosition();
+        float distanceToClick = direction.length();
+
+        // 设置最小移动距离
+        const float minDistance = 50.0f;
+        if (distanceToClick < minDistance) {
+            direction = Vec2(minDistance, 0);
+            distanceToClick = minDistance;
+        }
+
+        // 在攻击范围内
+        if (distanceToClick <= 1000.0f) {
+            float angle = std::atan2(direction.y, direction.x) * (180.0f / M_PI);
+            bullet->setRotation(-angle);
+            // 计算速度
+            float speed = 100.0f;
+            float time = distanceToClick / speed;
+
+            // 移动子弹到点击位置
+            auto moveAction = MoveTo::create(time, position);
+            auto removeAction = RemoveSelf::create();
+            bullet->runAction(Sequence::create(moveAction, removeAction, nullptr));
+            // 添加子弹到主场景
+            this->getParent()->addChild(bullet);
+            CCLOG("Angle: %f", angle);
+        }
+        CCLOG("Hero position: %f, %f", getPosition().x, getPosition().y);
+        CCLOG("Click position: %f, %f", position.x, position.y);
+
     }
 }
 
-// 获取生命值
-int Character::getHealth() {
-    return m_health;
-}
-
 // 获取性别
-bool Character::getGender() {
+bool Hero::getGender() {
     return m_ismale;
 }
 
 // 设置性别
-void Character::setGender(bool is_male) {
+void Hero::setGender(bool is_male) {
     m_ismale = is_male;
 }
 
-// 设置攻击力
-void Character::setAttackPower(int attackPower) {
-    m_attackPower = attackPower;
+
+//获取经验值
+void Hero::addExp(int exp)
+{
+    m_exp += exp;
+    while (m_exp >= m_expToLevelUp) {
+        // 玩家升级
+        LevelUp();
+        // 更新升级所需的经验值
+        m_expToLevelUp = calculateExpToLevelUp();
+    }
 }
 
-// 获取攻击力
-int Character::getAttackPower() {
-    return m_attackPower;
+//计算升级所需要的经验值
+int Hero::calculateExpToLevelUp()const
+{
+    return 50 * pow(1.2, m_level); // 经验需求指数增长
 }
 
-bool Character::isAlive() {
+//角色升级的逻辑
+void Hero::LevelUp()
+{
+    if (m_level <= MaxLevel) {
+        setLevel(getLevel() + 1);
+        //增加自身的属性值，与装备分开计算
+        //后续需要更改
+        setMaxHealth(getMaxHealth() + 10);
+        setAttackPower(getAttackPower() + 2);
+        m_heroism += 1;
+    }
+    else   //达到等级上限
+        m_exp = 999999999;
+}
+
+bool Hero::isAlive()const 
+{
     return m_isAlive;
 }
 
-bool Character::checkCollision(Character* otherCharacter) {
+bool Hero::checkCollision(Hero* otherHero) {
     // 获取角色的边界框
     auto thisBoundingBox = getBoundingBox();
-    auto otherBoundingBox = otherCharacter->getBoundingBox();
+    auto otherBoundingBox = otherHero->getBoundingBox();
     return thisBoundingBox.intersectsRect(otherBoundingBox);
 }
 
-void Character::update(float dt) {
+void Hero::update(float dt) {
     m_moveDirection = cocos2d::Vec2::ZERO;
 
 
@@ -351,7 +416,7 @@ void Character::update(float dt) {
         cocos2d::Vec2 targetPosition = getPosition() + m_moveDirection;
         cocos2d::Vec2 beforePosition = getPosition();
         // 输出调试日志：角色的当前坐标、目标坐标
-        CCLOG("Character update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
+        CCLOG("Hero update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
             getPosition().x, getPosition().y, targetPosition.x, targetPosition.y);
 
         // 获取当前场景
@@ -376,7 +441,7 @@ void Character::update(float dt) {
             if (!collision) {
                 // 如果没有碰到墙壁，执行移动
                 moveBy(m_moveDirection);
-                CCLOG("Character moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+                CCLOG("Hero moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
             }
             else {
                 // 如果碰到墙壁，则退回一点，避免角色卡住
@@ -388,7 +453,7 @@ void Character::update(float dt) {
                 if (m_moveRight && collision) adjustedPosition.x -= ajt * m_speed * dt;
 
                 // 输出退回后的新位置
-                CCLOG("Character adjusted position due to collision: (%.2f, %.2f)", adjustedPosition.x, adjustedPosition.y);
+                CCLOG("Hero adjusted position due to collision: (%.2f, %.2f)", adjustedPosition.x, adjustedPosition.y);
                 setPosition(adjustedPosition);
             }
         }
@@ -406,7 +471,7 @@ void Character::update(float dt) {
         cocos2d::Vec2 targetPosition = getPosition() + m_moveDirection;
 
         // 输出调试日志：角色的当前坐标、目标坐标
-        CCLOG("Character update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
+        CCLOG("Hero update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
             getPosition().x, getPosition().y, targetPosition.x, targetPosition.y);
 
         // 获取当前运行的场景
@@ -431,11 +496,11 @@ void Character::update(float dt) {
             // 如果没有碰撞，执行移动
             if (!collision) {
                 moveBy(m_moveDirection);
-                CCLOG("Character moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+                CCLOG("Hero moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
             }
             else {
                 // 如果碰撞发生，停止角色移动（不进行反向调整）
-                CCLOG("Collision detected, stopping character move.");
+                CCLOG("Collision detected, stopping Hero move.");
                 // 不改变角色的位置，让它停留在原地
                 setPosition(getPosition());
             }

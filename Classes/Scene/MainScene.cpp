@@ -104,9 +104,9 @@ bool MainScene::init()
         if (!chushengObject.empty()) {
             float x = chushengObject["x"].asFloat();
             float y = chushengObject["y"].asFloat();
-            CCLOG("Character spawn position: x = %.2f, y = %.2f", x, y);
+            CCLOG("Hero spawn position: x = %.2f, y = %.2f", x, y);
             // 创建角色并放置在出生位置
-            auto hero = Character::create(Vec2(500, 500));
+            auto hero = Hero::create(Vec2(500, 500));
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
                 hero->setAnchorPoint(Vec2(0.5f, 0.15));
@@ -117,9 +117,33 @@ bool MainScene::init()
 
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
-                this->addChild(hero);  // 将角色添加到场景中
+                this->addChild(hero);  // 将角色添加到场景中 
             }
 
+            // 创建血条背景
+            auto healthBg = Sprite::create("Character/Hero/health_bg.png");
+            if (healthBg) {
+                healthBg->setName("healthBg"); // 设置名字
+                healthBg->setPosition(Vec2(500, 50));
+                this->addChild(healthBg);
+            }
+            
+            // 创建血条填充
+            auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
+            if (healthFill) {
+                healthFill->setName("healthFill"); // 设置名字
+                healthFill->setPosition(Vec2(500, 50));
+                this->addChild(healthFill);
+            }
+
+            // 创建等级Label
+            auto levelLabel = Label::createWithTTF("Lv 1", "fonts/Marker Felt.ttf", 24);
+            if (levelLabel) {
+                levelLabel->setName("levelLabel"); // 设置名字
+                levelLabel->setPosition(Vec2(500, 100));
+                this->addChild(levelLabel);
+            }
+           
             //创建敌人
             auto demon = Enemy::create(Vec2(250, 300));
 
@@ -212,6 +236,14 @@ bool MainScene::init()
     // 将监听器添加到事件分发器
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
+    // 添加鼠标事件监听器
+    auto mouseListener = cocos2d::EventListenerMouse::create();
+    mouseListener->onMouseDown = CC_CALLBACK_1(MainScene::onMouseDown, this);
+
+    // 将监听器添加到事件分发器
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+    
+    
     // 注册 update 函数，让它每一帧都被调用
     this->schedule([this](float dt) {
         this->update(dt);
@@ -230,10 +262,26 @@ void MainScene::update(float dt)
 
     auto children = getChildren();
     for (auto child : children) {
-        auto character = dynamic_cast<Character*>(child);
+        auto character = dynamic_cast<Hero*>(child);
         auto enemy = dynamic_cast<Enemy*>(child);
         if (character) {
             character->update(dt);
+            if (character) {
+                //更新角色相关的ui
+                // 
+                // 更新血条
+                float healthRatio = character->CharacterBase::getHealth() / float(character->CharacterBase::getMaxHealth());
+                auto healthFill = dynamic_cast<Sprite*>(this->getChildByName("healthFill"));
+                if (healthFill)
+                    healthFill->setScaleX(healthRatio);
+
+                // 更新等级Label
+                auto levelLabel = dynamic_cast<Label*>(this->getChildByName("levelLabel"));
+                if (levelLabel)
+                    levelLabel->setString(StringUtils::format("Lv %d", character->CharacterBase::getLevel()));
+                // 输出当前角色等级
+                CCLOG("hero level : %d", character->CharacterBase::getLevel());
+            }
         }
         if (enemy) {
             enemy->update(dt);
@@ -243,7 +291,7 @@ void MainScene::update(float dt)
     //////////////////////
     //人物碰到地图切换点
     //////////////////////
-    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         for (auto& switchPoint : sceneSwitchPoints) {
             
@@ -303,7 +351,7 @@ void MainScene::update(float dt)
     ////////////////////
     //人物碰到位置传送点
     ////////////////////
-    auto player = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (player) {
         // 设置触发范围半径
         float triggerRadius = 50.0f;
@@ -343,7 +391,7 @@ void MainScene::update(float dt)
 }
 
 void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
-    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         switch (keyCode) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
@@ -379,7 +427,7 @@ void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
 }
 
 void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
-    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         switch (keyCode) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
@@ -414,9 +462,25 @@ void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
     }
 }
 
+void MainScene::onMouseDown(cocos2d::EventMouse* event)
+{
+    auto mouseEvent = dynamic_cast<EventMouse*>(event);
+    if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
+        // 将鼠标位置转换到场景坐标系
+        // 目前测试这样也不行 
+        Vec2 mousePos = this->convertToNodeSpace(mouseEvent->getLocation());
+        // mouseEvent->getLocation() 也会有偏移
+        // 触发普通攻击
+        auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero) {
+            hero->attackWithMouse(mouseEvent->getLocation());
+        }
+    }
+}
+
 void MainScene::showSelectionPopup()
 {
-    auto player = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
     auto popupLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // 半透明黑色背景
     this->addChild(popupLayer, 10);  // 将图层添加到场景，并设置显示优先级
     // 遍历所有spot，生成按钮

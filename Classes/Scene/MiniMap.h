@@ -63,7 +63,7 @@ private:
     // 小地图的背景
     TMXTiledMap * miniMapBackground_;
     // 小地图的主角
-    Character* hero_;
+    Hero* hero_;
     // 小地图的敌人
     Enemy* demon_;
     // 小地图的主角标记节点

@@ -29,6 +29,8 @@ public:
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
+    void onMouseDown(cocos2d::EventMouse* event);
+
     void PointCenter(cocos2d::Vec2 positon);
 
     void showSelectionPopup();

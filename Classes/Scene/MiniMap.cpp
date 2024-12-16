@@ -134,7 +134,7 @@ void MiniMap::update(float dt ) {
     }
 
     // 获取英雄节点
-    auto hero = dynamic_cast<Character*>(scene_->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(scene_->getChildByName("hero"));
     if (!hero) {
         CCLOG("Hero node not found in the scene");
         return;

@@ -104,7 +104,7 @@ bool OtherScene::init(const std::string& mapFile)
             float y = firstFlag["y"].asFloat();
             CCLOG("Character spawn position: x = %.2f, y = %.2f", x, y);
             // 创建角色并放置在出生位置
-            auto hero = Character::create(Vec2(500, 500));
+            auto hero = Hero::create(Vec2(500, 500));
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
                 hero->setAnchorPoint(Vec2(0.5f, 0.15));
@@ -213,7 +213,7 @@ void OtherScene::update(float dt)
 
     auto children = getChildren();
     for (auto child : children) {
-        auto character = dynamic_cast<Character*>(child);
+        auto character = dynamic_cast<Hero*>(child);
         if (character) {
             character->update(dt);
         }
@@ -221,7 +221,7 @@ void OtherScene::update(float dt)
     //////////////////////
     //人物碰到地图切换点
     //////////////////////
-    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         for (auto& switchPoint : sceneSwitchPoints) {
             //判断地图传送点和人物是否碰撞
@@ -284,7 +284,7 @@ void OtherScene::update(float dt)
     ////////////////////
     //人物碰到位置传送点
     ////////////////////
-    auto player = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (player) {
         // 设置触发范围半径
         float triggerRadius = 50.0f;
@@ -324,7 +324,7 @@ void OtherScene::update(float dt)
 }
 
 void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
-    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         switch (keyCode) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
@@ -360,7 +360,7 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
 }
 
 void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
-    auto hero = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         switch (keyCode) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
@@ -433,7 +433,7 @@ cocos2d::Vec2 OtherScene::tileCoordForPosition(Vec2 position)
 void OtherScene::showSelectionPopup()
 {
 
-    auto player = dynamic_cast<Character*>(this->getChildByName("hero"));
+    auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
     auto popupLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // 半透明黑色背景
     this->addChild(popupLayer, 10);  // 将图层添加到场景，并设置显示优先级
     // 遍历所有spot，生成按钮

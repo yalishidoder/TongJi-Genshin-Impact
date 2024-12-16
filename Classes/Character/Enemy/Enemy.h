@@ -6,6 +6,7 @@
  * Update Date:   2024.12.10
  ****************************************************************/
 #include "cocos2d.h"
+#include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
 
 //枚举敌人的状态
@@ -17,7 +18,7 @@ enum class EnemyState
     STAY      //停止
 };
 
-class Enemy : public cocos2d::Sprite {
+class Enemy : public CharacterBase {
 public:
     // 构造函数与析构函数
     Enemy();
@@ -25,7 +26,7 @@ public:
 
 
     // 敌人初始化方法，可传入初始位置等参数
-    bool init(const cocos2d::Vec2& initPosition);
+    virtual bool init(const cocos2d::Vec2& initPosition)override;
 
 
     // create 方法用于创建并初始化敌人实例
@@ -35,33 +36,18 @@ public:
     // 敌人更新方法，处理敌人的逻辑，如移动、攻击等
     virtual void update(float delta)override;
 
-
-    // 敌人移动相关方法
-    void moveTo(const cocos2d::Vec2& targetPosition);
-    void moveBy(const cocos2d::Vec2& offset);
-
+    // 获取存活状态
+    bool isAlive() const;
 
     // 敌人攻击方法
-    void attack();
-
-
-    // 敌人属性相关方法，比如设置和获取生命值、攻击力等
-    void setHealth(int health);
-    int getHealth();
-    void setAttackPower(int attackPower);
-    int getAttackPower();
-
-
-    // 敌人状态相关，例如是否存活等判断
-    bool isAlive();
-
+    virtual void attack()override;
 
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(cocos2d::Sprite* target);
 
     //检测玩家是否在判定范围中
     bool isAttacking;
-    void setPlayer(Character* player);
+    void setPlayer(Hero* player);
     void setRadius(float radius);
     bool isHeroExist(float dt);
 
@@ -70,11 +56,12 @@ public:
 
 private:
     int m_health;
+    int m_full_health;
     int m_attackPower;
     bool m_isAlive;
 
     //玩家变量
-    Character* player;  
+    Hero* player;  
 
     //敌人状态
     EnemyState currentState;

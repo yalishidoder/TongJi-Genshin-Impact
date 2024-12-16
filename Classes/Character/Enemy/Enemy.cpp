@@ -7,6 +7,7 @@
  ****************************************************************/
 #include "cocos2d.h"
 #include "Enemy.h"
+#include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
@@ -14,9 +15,7 @@
 #include <cmath>
 
 Enemy::Enemy()
-    : m_health(50)  // 初始生命值
-    , m_attackPower(5)  // 初始攻击力
-    , m_isAlive(true)
+    : m_isAlive(true)
     , m_moveSpeed(50.0f)  // 初始移动速度
     , isAttacking(false)  //是否发起进攻
     , m_animationCache(cocos2d::AnimationCache::getInstance())
@@ -24,6 +23,8 @@ Enemy::Enemy()
     , currentState(EnemyState::PATROL)   //初始状态为巡逻
     ,dirX(1) ,dirY(1)     //初始巡逻方向设为正方向
 {
+    setMaxHealth(50);
+    setAttackPower(5);
 }
 
 
@@ -55,7 +56,7 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
 }
 
 
-Enemy* Enemy::create(const cocos2d::Vec2& initPosition) {
+Enemy* Enemy::create(const cocos2d::Vec2& initPosition)  {
     auto enemy = new (std::nothrow) Enemy();
     if (enemy && enemy->init(initPosition)) {
         enemy->autorelease();
@@ -63,6 +64,11 @@ Enemy* Enemy::create(const cocos2d::Vec2& initPosition) {
     }
     CC_SAFE_DELETE(enemy);
     return nullptr;
+}
+
+bool Enemy::isAlive() const
+{
+    return m_isAlive;
 }
 
 void Enemy::setPatrolRange(float X, float Y)
@@ -138,20 +144,6 @@ void Enemy::patrol(float delta)
     }
 }
 
-void Enemy::moveTo(const cocos2d::Vec2& targetPosition) {
-    auto moveAction = cocos2d::MoveTo::create(
-        1.0f,  // 移动时间，可根据实际情况调整
-        targetPosition);
-    runAction(moveAction);
-}
-
-
-void Enemy::moveBy(const cocos2d::Vec2& offset) {
-    auto moveAction = cocos2d::MoveBy::create(
-        0.01f,  // 移动时间，可调整
-        offset);
-    runAction(moveAction);
-}
 
 
 void Enemy::attack() {
@@ -160,42 +152,13 @@ void Enemy::attack() {
     CCLOG("Enemy attacks with power %d", m_attackPower);
 }
 
-
-void Enemy::setHealth(int health) {
-    m_health = health;
-    if (m_health <= 0) {
-        m_isAlive = false;
-    }
-}
-
-
-int Enemy::getHealth() {
-    return m_health;
-}
-
-
-void Enemy::setAttackPower(int attackPower) {
-    m_attackPower = attackPower;
-}
-
-
-int Enemy::getAttackPower() {
-    return m_attackPower;
-}
-
-
-bool Enemy::isAlive() {
-    return m_isAlive;
-}
-
-
 bool Enemy::checkCollision(cocos2d::Sprite* target) {
     auto thisBoundingBox = getBoundingBox();
     auto targetBoundingBox = target->getBoundingBox();
     return thisBoundingBox.intersectsRect(targetBoundingBox);
 }
 
-void Enemy::setPlayer(Character* player)
+void Enemy::setPlayer(Hero* player)
 {
     this->player = player;
 }
