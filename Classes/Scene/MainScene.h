@@ -34,7 +34,7 @@ public:
     void PointCenter(cocos2d::Vec2 positon);
 
     void showSelectionPopup();
-
+    cocos2d::Vec2 TranslatePos(cocos2d::Vec2 origin);
     //检查位置是否发生碰撞
     bool checkCollision(cocos2d::Vec2 position);
     //窗口到瓦片地图坐标转化

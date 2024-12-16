@@ -10,6 +10,7 @@
 #include "Hero.h"
 #include "Character/CharacterBase.h"
 #include "Weapon/RangedWeapon/Ammunition/Bullet.h"
+#include "Weapon/MeleeWeapon/Bayonet.h"
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 
@@ -51,18 +52,14 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     if (!Sprite::init()) {
         return false;
     }
-    // 设置角色的初始位置
-    //setPosition(initPosition);
-    
     // 加载角色的初始纹理
-    
-    if (!m_ismale) {
-        setTexture("Character/Hero/Animation/female/WALK_UP/WALK_UP_1.png");
+    if (!this->getGender()) {
+        this->setTexture("Character/Hero/Animation/female/female_default.png");
     }
     else {
-        setTexture("Character/Hero/Animation/male/male_sheet/WALK_UP_1.png");
+        this->setTexture("Character/Hero/Animation/male/male_default.png");
     }
-    setScale(0.8f); // 可以根据需要调整角色的缩放比例，默认设置为 1.0
+    setScale(0.8f); // 调整角色的缩放比例，默认设置为 1.0
 
     // 初始化角色的动画缓存
     m_animationCache = cocos2d::AnimationCache::getInstance();
@@ -241,11 +238,31 @@ void Hero::attack()
     //要与武器模块挂钩
 }
 
-void Hero::attackWithMouse(const Vec2& position)
+void Hero::attackWithBullet(const Vec2& position)
 {
     // 创建子弹
-    auto bullet = Bullet::create();
+    auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO,this->getLevel());
     if (bullet) {
+
+        // 加载子弹图形资源
+        switch (this->getElement()) {
+        case(CharacterElement::FIRE):
+            bullet->setTexture("Weapon/Ammunition/bullet_fire.png");
+            break;
+        case(CharacterElement::ICE):
+            bullet->setTexture("Weapon/Ammunition/bullet_ice.png");
+            break;
+        case(CharacterElement::WATER):
+            bullet->setTexture("Weapon/Ammunition/bullet_water.png");
+            break;
+        case(CharacterElement::ROCK):
+            bullet->setTexture("Weapon/Ammunition/bullet_rock.png");
+            break;
+        default:
+            bullet->setTexture("Weapon/Ammunition/bullet_default.png");
+            break;
+        }
+
         // 设置锚点
         bullet->setAnchorPoint(Vec2(0.5f, 0.5f));
 
@@ -256,7 +273,7 @@ void Hero::attackWithMouse(const Vec2& position)
         float distanceToClick = direction.length();
 
         // 设置最小移动距离
-        const float minDistance = 50.0f;
+        const float minDistance = 10.0f;
         if (distanceToClick < minDistance) {
             direction = Vec2(minDistance, 0);
             distanceToClick = minDistance;
@@ -267,7 +284,7 @@ void Hero::attackWithMouse(const Vec2& position)
             float angle = std::atan2(direction.y, direction.x) * (180.0f / M_PI);
             bullet->setRotation(-angle);
             // 计算速度
-            float speed = 100.0f;
+            float speed = 100.0f * (log10(bullet->getLevel())+3);
             float time = distanceToClick / speed;
 
             // 移动子弹到点击位置
@@ -282,6 +299,19 @@ void Hero::attackWithMouse(const Vec2& position)
         CCLOG("Click position: %f, %f", position.x, position.y);
 
     }
+}
+
+void Hero::attackWithBayonet()
+{
+    // 创建刺刀
+    auto bayonet = Bayonet::create("Weapon/bayonet.png");
+    // 设置锚点
+    bayonet->setAnchorPoint(Vec2(0.5f, 0.5f));
+
+    // 设置子弹的位置为英雄的位置
+    bayonet->setPosition(getPosition());
+    bayonet->attack();
+    this->getParent()->addChild(bayonet);
 }
 
 // 获取性别
@@ -322,7 +352,7 @@ void Hero::LevelUp()
         //后续需要更改
         setMaxHealth(getMaxHealth() + 10);
         setAttackPower(getAttackPower() + 2);
-        m_heroism += 1;
+        m_heroism += 100;
     }
     else   //达到等级上限
         m_exp = 999999999;
@@ -513,3 +543,8 @@ void Hero::update(float dt) {
 
 }
 
+//获取角色元素属性
+CharacterElement Hero::getElement() 
+{
+    return element;
+}

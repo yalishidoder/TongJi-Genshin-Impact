@@ -10,12 +10,12 @@ public:
     ~Bullet();
 
     // 创建子弹的工厂方法
-    static Bullet* create(const cocos2d::Vec2& position = cocos2d::Vec2::ZERO, const cocos2d::Vec2& velocity = cocos2d::Vec2::ZERO);
+    static Bullet* create(const cocos2d::Vec2& position = cocos2d::Vec2::ZERO, const cocos2d::Vec2& velocity = cocos2d::Vec2::ZERO, const int level = 1);
 
     // 初始化子弹
-    bool init(const cocos2d::Vec2& position, const cocos2d::Vec2& velocity);
+    bool init(const cocos2d::Vec2& position, const cocos2d::Vec2& velocity, const int level);
 
-    // 更新子弹位置
+    // 更新子弹状态
     void update(float delta);
 
     // 设置子弹速度
@@ -30,8 +30,17 @@ public:
     // 获取子弹生命周期
     float getLifeTime() const;
 
-    // 子弹碰撞检测
+    // 设置子弹等级
+    void setLevel(int level);
+
+    // 获取子弹等级
+    int getLevel() const;
+
+    // 子弹碰撞相关
+    void checkAndHandleCollision();
+    bool checkCollision(cocos2d::Node* target);
     void onCollisionWithEnemy(cocos2d::Node* enemy);
+    
 
 protected:
     // 子弹速度
@@ -42,6 +51,11 @@ protected:
 
     // 子弹剩余寿命
     float _remainingLife;
+
+    // 子弹等级
+    int _level;
+
+    
 };
 
 #endif // __BULLET_H__

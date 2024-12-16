@@ -27,17 +27,19 @@ public:
 
     // 敌人初始化方法，可传入初始位置等参数
     virtual bool init(const cocos2d::Vec2& initPosition)override;
-
+    void setInitData(int level);
 
     // create 方法用于创建并初始化敌人实例
     static Enemy* create(const cocos2d::Vec2& initPosition);
 
-
     // 敌人更新方法，处理敌人的逻辑，如移动、攻击等
     virtual void update(float delta)override;
+    void takeDamage(float damage);
+    void updateDamageLabel(int damage);
 
-    // 获取存活状态
+    // 存活状态相关
     bool isAlive() const;
+    void setDeath();
 
     // 敌人攻击方法
     virtual void attack()override;
@@ -48,12 +50,15 @@ public:
     //检测玩家是否在判定范围中
     bool isAttacking;
     void setPlayer(Hero* player);
+    Hero* getPlayer();
     void setRadius(float radius);
     bool isHeroExist(float dt);
 
     //设置巡逻边界
     void setPatrolRange(float X, float Y);
 
+    // 伤害标签
+    cocos2d::Label* damageLabel;
 private:
     int m_health;
     int m_full_health;
@@ -95,6 +100,8 @@ private:
 
     cocos2d::AnimationCache* m_animationCache;
     cocos2d::Animate* m_currentAnimate;
+
+    
 
     // 敌人动画相关方法
     void playAnimation(const std::string& animationName);

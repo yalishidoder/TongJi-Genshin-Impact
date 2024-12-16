@@ -35,7 +35,8 @@ public:
 
     // 攻击方法
     virtual void attack()override;
-    void attackWithMouse(const Vec2& position);
+    void attackWithBullet(const Vec2& position);
+    void attackWithBayonet();
 
     // 角色动画相关方法
     void playAnimation(const std::string& animationName);
@@ -49,6 +50,7 @@ public:
     // 角色属性相关方法，比如设置和获取生命值、攻击力等
     bool getGender();
     void setGender(bool is_male);
+    CharacterElement getElement();
 
     // 角色等级与经验相关
     void addExp(int exp);

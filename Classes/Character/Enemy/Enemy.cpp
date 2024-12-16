@@ -23,8 +23,9 @@ Enemy::Enemy()
     , currentState(EnemyState::PATROL)   //初始状态为巡逻
     ,dirX(1) ,dirY(1)     //初始巡逻方向设为正方向
 {
-    setMaxHealth(50);
+    setMaxHealth(100);
     setAttackPower(5);
+
 }
 
 
@@ -45,7 +46,14 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
 
     // 可以在这里加载敌人的初始外观纹理等
     // 例如：setTexture("enemy_default.png");
-    
+    damageLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 24);
+    cocos2d::Vec2 labelPos = this->getAnchorPoint();
+    labelPos.x += 30;
+    labelPos.y += 60;
+    damageLabel->setPosition(labelPos);
+    this->addChild(damageLabel);
+    damageLabel->setVisible(false);
+
     setTexture("Character/Enemy/Animation/hitman/WALK_DOWN_0.png");
     m_animationCache = cocos2d::AnimationCache::getInstance();
     m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_enemy");
@@ -65,7 +73,10 @@ Enemy* Enemy::create(const cocos2d::Vec2& initPosition)  {
     CC_SAFE_DELETE(enemy);
     return nullptr;
 }
-
+Hero* Enemy::getPlayer()
+{
+    return player;
+}
 bool Enemy::isAlive() const
 {
     return m_isAlive;
@@ -75,6 +86,20 @@ void Enemy::setPatrolRange(float X, float Y)
 {
     this->rangedX = X;
     this->rangedY = Y;
+}
+
+void Enemy::setInitData(int level)
+{
+    this->setLevel(level);
+    this->setMaxHealth(std::pow(1.2,(level + 1))*100);
+    this->setHealth(this->getMaxHealth());
+    this->setAttackPower(std::pow(1.2,level + 1)*50);
+}
+
+void Enemy::setDeath() 
+{
+    this->m_isAlive = 0;
+    this->removeFromParentAndCleanup(true);
 }
 
 void Enemy::update(float delta) 
@@ -87,6 +112,95 @@ void Enemy::update(float delta)
         //moveLogic(delta);
         //attackLogic();
     }
+}
+
+void Enemy::takeDamage(float damage)
+{
+    // 减少敌人的生命值
+    float health = this->getHealth() - damage;
+    Hero* player = this->getPlayer();
+
+    switch (player->getElement())//元素附加伤害
+    {
+    case(CharacterElement::FIRE):
+        CCLOG("BURN!");
+        //火效果
+        break;
+    case(CharacterElement::ICE):
+        CCLOG("FREEZE!");
+        //冰效果
+        break;
+    case(CharacterElement::WATER):
+        CCLOG("BE WATER MY FRIEND");
+        //冰效果
+        break;
+    case(CharacterElement::ROCK):
+        CCLOG("YOU SHALL NOT PASS!");
+        //岩效果
+        break;
+    default:
+        break;
+    }
+    
+    const int player_lv = player->getLevel();
+    const int enemy_lv = this->getLevel();
+    const int lv_gap = (enemy_lv - player_lv) < 5 ? std::pow(1.2, enemy_lv - player_lv + 1) : enemy_lv - player_lv;    // 等级差弥补
+
+    // 更新伤害数字显示
+    updateDamageLabel(damage);
+    player->addExp(log10(damage + 10) * lv_gap / 10 + 10);  // 伤害经验
+
+    // 检查敌人是否死亡    
+    if (health < 0) {
+        player->addExp(std::pow(1.2, lv_gap) * 5 + 50);  // 击杀等级经验
+        this->setDeath();
+    }
+    else
+        this->setHealth(health);
+    
+   
+}
+
+// 更新伤害数字显示
+void Enemy::updateDamageLabel(int damage)
+{
+
+    damageLabel->setString('-'+std::to_string(damage));
+    damageLabel->setVisible(true);
+    // 初始颜色
+    cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
+    damageLabel->setTextColor(initialColor);
+
+    // 闪烁颜色
+    cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
+    float blinkInterval = 0.05f;
+    int blinkTimes = 1;
+
+    // 闪烁动作
+    cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
+        cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
+        cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
+        nullptr
+    ), blinkTimes);
+
+    // 目标颜色
+    cocos2d::Color3B targetColor = cocos2d::Color3B::RED;
+
+    // 颜色渐变动作
+    cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
+
+    // 最终隐藏动作
+    cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
+        blinkAction,
+        colorAction,
+        cocos2d::CallFunc::create([=]() {
+            damageLabel->setVisible(false);
+            }),
+        nullptr
+    );
+
+    // 运行动作
+    damageLabel->runAction(hideAction);
 }
 
 

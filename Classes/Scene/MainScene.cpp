@@ -153,6 +153,7 @@ bool MainScene::init()
                 demon->setPlayer(hero);  //设置玩家
                 demon->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
                 demon->setRadius(200.0f);
+                demon->setInitData(10); //根据敌人等级初始化数据
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移
@@ -465,17 +466,28 @@ void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
 void MainScene::onMouseDown(cocos2d::EventMouse* event)
 {
     auto mouseEvent = dynamic_cast<EventMouse*>(event);
-    if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
-        // 将鼠标位置转换到场景坐标系
-        // 目前测试这样也不行 
-        Vec2 mousePos = this->convertToNodeSpace(mouseEvent->getLocation());
-        // mouseEvent->getLocation() 也会有偏移
-        // 触发普通攻击
+    if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT ) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         if (hero) {
-            hero->attackWithMouse(mouseEvent->getLocation());
+            hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
         }
     }
+    else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
+        auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero) {
+            hero->attackWithBayonet();
+        }
+    }
+}
+
+cocos2d::Vec2 MainScene::TranslatePos(cocos2d::Vec2 origin) {
+    cocos2d::Vec2 res;
+    //auto map = dynamic_cast<TMXTiledMap*>(this->getChildByName("map"));
+    float mapOriginX = map->getPositionX() - (map->getContentSize().width * map->getScale() * map->getAnchorPoint().x);
+    float mapOriginY = map->getPositionY() - (map->getContentSize().height * map->getScale() * map->getAnchorPoint().y);
+    res.x =  - mapOriginX + origin.x ; // 地图左下角 x 偏移修正
+    res.y = -origin.y + 768;           // 地图左下角 y 偏移修正
+    return res;
 }
 
 void MainScene::showSelectionPopup()
