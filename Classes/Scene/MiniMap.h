@@ -12,6 +12,8 @@
 #include "cocos2d.h"
 #include "Character/Hero/Hero.h"
 #include "Character/Enemy/Enemy.h"
+#include "ui/CocosGUI.h"
+
 USING_NS_CC;
 
 class MiniMap : public cocos2d::Node {
@@ -32,12 +34,20 @@ public:
     void setCharacter();
 
 
-
     /*
         同步小地图上的角色位置
         参数：无
     */
     void update(float dt);
+
+    void onMouseDown(EventMouse* event); // 鼠标点击事件处理函数
+    void expandMiniMap();                          // 放大小地图功能
+    void closeExpandedMiniMap();                   // 关闭放大的小地图
+    void onMouseScroll(EventMouse* event);
+    // 监听鼠标移动事件，实现拖动
+    void onMouseMove(EventMouse* event);
+    void onMouseUp(EventMouse* event);
+
 
 private:
     // 主地图
@@ -70,6 +80,27 @@ private:
     DrawNode* heroMarker_;
     // 小地图的敌人标记节点
     DrawNode* demonMarker_;
+
+    // 小地图的背景
+    TMXTiledMap* miniMapBackground_2_;
+    // 小地图是否被放大
+    bool isExpanded_;      
+    // 阴影遮罩层
+    LayerColor* shadowLayer_;    
+    // 关闭按钮
+    cocos2d::ui::Button* closeButton_;
+    // 方形窗口
+    Node* expandedWindow_;   
+    // 地图缩放等级
+    float zoomLevel_;       
+    // 是否正在拖动
+    bool isDragging_ = false;   
+    // 鼠标按下时的位置
+    Vec2 dragStartPos_;    
+    // 鼠标按下时的地图位置
+    Vec2 dragStartMapPos_;       
+
+    
 };
 
 #endif // MINIMAP_H
