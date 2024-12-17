@@ -351,6 +351,8 @@ void Hero::LevelUp()
         //增加自身的属性值，与装备分开计算
         //后续需要更改
         setMaxHealth(getMaxHealth() + 10);
+        // 升级时自动恢复生命值
+        setHealth(getMaxHealth());
         setAttackPower(getAttackPower() + 2);
         m_heroism += 100;
     }

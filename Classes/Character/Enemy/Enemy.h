@@ -41,6 +41,9 @@ public:
     bool isAlive() const;
     void setDeath();
 
+    //获取角色元素属性
+    CharacterElement getElement();
+
     // 敌人攻击方法
     virtual void attack()override;
 

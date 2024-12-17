@@ -110,7 +110,8 @@ bool MainScene::init()
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
                 hero->setAnchorPoint(Vec2(0.5f, 0.15));
-
+                // 设置元素力
+                hero->setElement(CharacterElement::ICE);
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + y * map->getScale(); // 地图左下角 + 出生点的 y 偏移
@@ -154,6 +155,7 @@ bool MainScene::init()
                 demon->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
                 demon->setRadius(200.0f);
                 demon->setInitData(10); //根据敌人等级初始化数据
+                demon->setElement(CharacterElement::FIRE);   // 初始化属性
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移

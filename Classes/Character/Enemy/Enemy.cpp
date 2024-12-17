@@ -114,10 +114,15 @@ void Enemy::update(float delta)
     }
 }
 
+// 简单的元素反应逻辑
+// 同元素无伤 
+// 火冰融化 水火蒸发 倍率依照原神的规则
+// 特殊的：岩元素触碰到其余元素会生成元素盾，这里可以简化成岩元素始终减伤20%
+// 水冰相遇会冻结 但只在冰攻击附带水元素的角色的情况下
+// 在冻结的情况下，受到岩元素攻击会碎冰
+
 void Enemy::takeDamage(float damage)
 {
-    // 减少敌人的生命值
-    float health = this->getHealth() - damage;
     Hero* player = this->getPlayer();
 
     switch (player->getElement())//元素附加伤害
@@ -125,23 +130,73 @@ void Enemy::takeDamage(float damage)
     case(CharacterElement::FIRE):
         CCLOG("BURN!");
         //火效果
+        switch (this->getElement())
+        {
+            case(CharacterElement::ICE):
+                damage *= 2.0f;
+                break;
+            case(CharacterElement::WATER):
+                damage *= 1.5f;
+                break;
+            case(CharacterElement::ROCK):
+                damage *= 0.8f;
+                break;
+            default:
+                break;
+        }
         break;
     case(CharacterElement::ICE):
         CCLOG("FREEZE!");
         //冰效果
+        switch (this->getElement())
+        {
+            case(CharacterElement::FIRE):
+                damage *= 1.5f;
+                break;
+            case(CharacterElement::WATER):
+                // freeze()
+                break;
+            case(CharacterElement::ROCK):
+                damage *= 0.8f;
+                break;
+            default:
+                break;
+        }
         break;
     case(CharacterElement::WATER):
         CCLOG("BE WATER MY FRIEND");
-        //冰效果
+        //水效果
+        switch (this->getElement())
+        {
+            case(CharacterElement::FIRE):
+                damage *= 2.0f;
+                break;
+            case(CharacterElement::ICE):
+                // freeze()
+                break;
+            case(CharacterElement::ROCK):
+                damage *= 0.8f;
+                break;
+            default:
+                break;
+        }
         break;
     case(CharacterElement::ROCK):
         CCLOG("YOU SHALL NOT PASS!");
         //岩效果
+        //if(freeze())
+        //   damage *= 3;
         break;
     default:
         break;
     }
     
+    if (this->getElement() == player->getElement())
+        damage = 0;
+
+    // 减少敌人的生命值
+    float health = this->getHealth() - damage;
+
     const int player_lv = player->getLevel();
     const int enemy_lv = this->getLevel();
     const int lv_gap = (enemy_lv - player_lv) < 5 ? std::pow(1.2, enemy_lv - player_lv + 1) : enemy_lv - player_lv;    // 等级差弥补
@@ -203,6 +258,11 @@ void Enemy::updateDamageLabel(int damage)
     damageLabel->runAction(hideAction);
 }
 
+// 获取敌人元素
+CharacterElement Enemy::getElement()
+{
+        return element;
+}
 
 void Enemy::patrol(float delta)
 {

@@ -46,6 +46,9 @@ public:
     virtual int getLevel()const;
     virtual void setLevel(int level);
 
+    // 设置角色元素
+    virtual void setElement(CharacterElement Elementpower);
+
     // 回到出生点恢复生命值 
     virtual void Recover();
 protected:
@@ -60,6 +63,7 @@ protected:
     int m_level;
     int MaxLevel;
 
+    // 元素
     CharacterElement element;
 
     // 出生点

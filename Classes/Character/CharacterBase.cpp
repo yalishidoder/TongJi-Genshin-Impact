@@ -82,3 +82,8 @@ int CharacterBase::getLevel()const
     return m_level;
 }
 
+void CharacterBase::setElement(CharacterElement Elementpower)
+{
+    element = Elementpower;
+}
+
