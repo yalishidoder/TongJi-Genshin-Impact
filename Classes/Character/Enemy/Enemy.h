@@ -9,8 +9,8 @@
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
 
-//枚举敌人的状态
-enum class EnemyState 
+ //枚举敌人的状态
+enum class EnemyState
 {
     PATROL,   //巡逻
     CHASE,    //追逐
@@ -69,13 +69,13 @@ private:
     bool m_isAlive;
 
     //玩家变量
-    Hero* player;  
+    Hero* player;
 
     //敌人状态
     EnemyState currentState;
 
     //搜索半径
-    float radius; 
+    float radius;
 
     //巡逻范围
     float rangedX, rangedY;
@@ -104,7 +104,7 @@ private:
     cocos2d::AnimationCache* m_animationCache;
     cocos2d::Animate* m_currentAnimate;
 
-    
+
 
     // 敌人动画相关方法
     void playAnimation(const std::string& animationName);

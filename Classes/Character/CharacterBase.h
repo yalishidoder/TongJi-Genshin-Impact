@@ -12,7 +12,7 @@ enum class CharacterElement
     ROCK    //岩
 };
 
-class CharacterBase : public cocos2d::Sprite 
+class CharacterBase : public cocos2d::Sprite
 {
 public:
     // 构造函数与析构函数

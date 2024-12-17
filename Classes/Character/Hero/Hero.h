@@ -62,7 +62,7 @@ public:
 
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(Hero* otherHero);
-        
+
     cocos2d::Vec2 m_moveDirection;
     bool m_moveUp;
     bool m_moveDown;

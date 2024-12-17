@@ -109,9 +109,11 @@ bool MainScene::init()
             auto hero = Hero::create(Vec2(500, 500));
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
-                hero->setAnchorPoint(Vec2(0.5f, 0.15));
+                hero->setAnchorPoint(Vec2(0.5f, 0.15f));
+
                 // 设置元素力
                 hero->setElement(CharacterElement::ICE);
+
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + y * map->getScale(); // 地图左下角 + 出生点的 y 偏移
@@ -126,6 +128,7 @@ bool MainScene::init()
             if (healthBg) {
                 healthBg->setName("healthBg"); // 设置名字
                 healthBg->setPosition(Vec2(500, 50));
+                healthBg->setOpacity(128);
                 this->addChild(healthBg);
             }
             
@@ -134,6 +137,7 @@ bool MainScene::init()
             if (healthFill) {
                 healthFill->setName("healthFill"); // 设置名字
                 healthFill->setPosition(Vec2(500, 50));
+                healthFill->setOpacity(128);
                 this->addChild(healthFill);
             }
 
@@ -154,7 +158,7 @@ bool MainScene::init()
                 demon->setPlayer(hero);  //设置玩家
                 demon->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
                 demon->setRadius(200.0f);
-                demon->setInitData(10); //根据敌人等级初始化数据
+                demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
                 demon->setElement(CharacterElement::FIRE);   // 初始化属性
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
@@ -260,6 +264,14 @@ bool MainScene::init()
 
 void MainScene::update(float dt)
 {
+    if ((isPopupVisible || isDialogActive)) {
+        auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        hero->m_moveUp = false;
+        hero->m_moveDown = false;
+        hero->m_moveLeft = false;
+        hero->m_moveRight = false;
+        return;
+    }
     Node::update(dt);
 
 
@@ -396,7 +408,7 @@ void MainScene::update(float dt)
 void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
-        switch (keyCode) {
+        switch (keyCode ) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
             case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_W:
             case cocos2d::EventKeyboard::KeyCode::KEY_W:
@@ -468,7 +480,9 @@ void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
 void MainScene::onMouseDown(cocos2d::EventMouse* event)
 {
     auto mouseEvent = dynamic_cast<EventMouse*>(event);
-    if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT ) {
+    if (isPopupVisible || isDialogActive)
+        return;
+    if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         if (hero) {
             hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
@@ -477,7 +491,7 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         if (hero) {
-            hero->attackWithBayonet();
+            //hero->attackWithBayonet();
         }
     }
 }

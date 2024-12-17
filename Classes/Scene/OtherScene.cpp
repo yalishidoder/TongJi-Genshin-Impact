@@ -208,6 +208,14 @@ bool OtherScene::init(const std::string& mapFile)
 
 void OtherScene::update(float dt)
 {
+    if ((isPopupVisible || isDialogActive)) {
+        auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        hero->m_moveUp = false;
+        hero->m_moveDown = false;
+        hero->m_moveLeft = false;
+        hero->m_moveRight = false;
+        return;
+    }
     Node::update(dt);
 
 

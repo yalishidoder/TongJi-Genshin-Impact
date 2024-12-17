@@ -86,4 +86,3 @@ void CharacterBase::setElement(CharacterElement Elementpower)
 {
     element = Elementpower;
 }
-

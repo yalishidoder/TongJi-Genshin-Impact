@@ -132,17 +132,17 @@ void Enemy::takeDamage(float damage)
         //火效果
         switch (this->getElement())
         {
-            case(CharacterElement::ICE):
-                damage *= 2.0f;
-                break;
-            case(CharacterElement::WATER):
-                damage *= 1.5f;
-                break;
-            case(CharacterElement::ROCK):
-                damage *= 0.8f;
-                break;
-            default:
-                break;
+        case(CharacterElement::ICE):
+            damage *= 2.0f;
+            break;
+        case(CharacterElement::WATER):
+            damage *= 1.5f;
+            break;
+        case(CharacterElement::ROCK):
+            damage *= 0.8f;
+            break;
+        default:
+            break;
         }
         break;
     case(CharacterElement::ICE):
@@ -150,17 +150,17 @@ void Enemy::takeDamage(float damage)
         //冰效果
         switch (this->getElement())
         {
-            case(CharacterElement::FIRE):
-                damage *= 1.5f;
-                break;
-            case(CharacterElement::WATER):
-                // freeze()
-                break;
-            case(CharacterElement::ROCK):
-                damage *= 0.8f;
-                break;
-            default:
-                break;
+        case(CharacterElement::FIRE):
+            damage *= 1.5f;
+            break;
+        case(CharacterElement::WATER):
+            // freeze()
+            break;
+        case(CharacterElement::ROCK):
+            damage *= 0.8f;
+            break;
+        default:
+            break;
         }
         break;
     case(CharacterElement::WATER):
@@ -168,17 +168,17 @@ void Enemy::takeDamage(float damage)
         //水效果
         switch (this->getElement())
         {
-            case(CharacterElement::FIRE):
-                damage *= 2.0f;
-                break;
-            case(CharacterElement::ICE):
-                // freeze()
-                break;
-            case(CharacterElement::ROCK):
-                damage *= 0.8f;
-                break;
-            default:
-                break;
+        case(CharacterElement::FIRE):
+            damage *= 2.0f;
+            break;
+        case(CharacterElement::ICE):
+            // freeze()
+            break;
+        case(CharacterElement::ROCK):
+            damage *= 0.8f;
+            break;
+        default:
+            break;
         }
         break;
     case(CharacterElement::ROCK):
@@ -190,7 +190,7 @@ void Enemy::takeDamage(float damage)
     default:
         break;
     }
-    
+
     if (this->getElement() == player->getElement())
         damage = 0;
 
@@ -212,8 +212,8 @@ void Enemy::takeDamage(float damage)
     }
     else
         this->setHealth(health);
-    
-   
+
+
 }
 
 // 更新伤害数字显示
@@ -261,7 +261,7 @@ void Enemy::updateDamageLabel(int damage)
 // 获取敌人元素
 CharacterElement Enemy::getElement()
 {
-        return element;
+    return element;
 }
 
 void Enemy::patrol(float delta)
