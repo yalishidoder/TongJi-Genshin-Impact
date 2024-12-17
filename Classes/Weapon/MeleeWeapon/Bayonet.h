@@ -24,6 +24,14 @@ public:
     bool checkCollision(cocos2d::Node* target);
     void onCollisionWithEnemy(cocos2d::Node* enemy);
 
+    // ¸üÐÂBayonetµÄÐý×ª½Ç¶È
+    void updateRotation();
+    void setMousePosition(const cocos2d::Vec2& position);
+#if 0
+    cocos2d::Animation* createSwingAnimation();
+    void addAnimation(const std::string& animationName, const cocos2d::Animation& animation);
+    void playAnimation(const std::string& animationName);
+#endif
 protected:
     // ´Ìµ¶µÄ¹¥»÷·¶Î§
     float attackRange;
@@ -34,7 +42,12 @@ protected:
     // Ê£ÓàµÄ¹¥»÷ÀäÈ´Ê±¼ä
     float remainingCooldown;
     // »Ó¿³¶¯»­
-    cocos2d::Animation* swingAnimation;
+    cocos2d::AnimationCache* m_animationCache;
+    float m_rotationAngle;
+    cocos2d::Vec2 m_mousePosition;
+
+    bool isIdle;
+    bool nextDir;
 };
 
 #endif

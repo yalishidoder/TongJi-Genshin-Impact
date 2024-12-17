@@ -157,6 +157,6 @@ bool Bullet::checkCollision(cocos2d::Node* target) {
     float distance = this->getPosition().distance(target->getPosition());
     float radius1 = this->getContentSize().width / 2;
     float radius2 = target->getContentSize().width / 2;
-    return distance < (radius1 + radius2);
+    return distance < (radius1 + radius2 - 5);
 }
 #endif

@@ -14,6 +14,7 @@
 #include "Character/CharacterBase.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/Switcher.h"
+#include "Weapon/MeleeWeapon/Bayonet.h"
 USING_NS_CC;
 
 class Hero : public CharacterBase {
@@ -75,6 +76,7 @@ public:
     void switchToNextWeapon();
     void switchToPreviousWeapon();
     Weapon* getCurrentWeapon();
+    void onMouseMove(cocos2d::EventMouse* event);
 
 private:
     bool m_isAlive;
@@ -96,6 +98,8 @@ private:
     cocos2d::AnimationCache* m_animationCache;
     cocos2d::Animate* m_currentAnimate;
 
-    WeaponSwitcher* m_weaponSwitcher;
+    WeaponSwitcher* m_weaponSwitcher; 
+    Bayonet* m_bayonet;
+
 };
 #endif

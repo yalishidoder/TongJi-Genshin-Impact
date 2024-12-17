@@ -170,6 +170,26 @@ bool MainScene::init()
                 this->addChild(demon);  // 将角色添加到场景中
 
             }
+            auto demon2 = Enemy::create(Vec2(250, 300));
+
+            if (demon2) {
+                demon2->setName("demon"); // 设置角色名称
+                demon2->setAnchorPoint(Vec2(0.5f, 0.5f));
+                demon2->setPlayer(hero);  //设置玩家
+                demon2->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
+                demon2->setRadius(200.0f);
+                demon2->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                demon2->setElement(CharacterElement::FIRE);   // 初始化属性
+                // 计算出生点的屏幕坐标
+                float adjustedX = mapOriginX + 550.0f; // 地图左下角 + 出生点的 x 偏移
+                float adjustedY = mapOriginY + 500.0f; // 地图左下角 + 出生点的 y 偏移
+
+                // 设置人物位置
+                demon2->setPosition(Vec2(adjustedX, adjustedY));
+
+                this->addChild(demon2);  // 将角色添加到场景中
+
+            }
         }
     }
     else {
@@ -246,10 +266,11 @@ bool MainScene::init()
     // 添加鼠标事件监听器
     auto mouseListener = cocos2d::EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(MainScene::onMouseDown, this);
-
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    mouseListener->onMouseMove = CC_CALLBACK_1(Hero::onMouseMove, hero);
+    
     // 将监听器添加到事件分发器
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-    
     
     // 注册 update 函数，让它每一帧都被调用
     this->schedule([this](float dt) {
@@ -491,7 +512,7 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         if (hero) {
-            //hero->attackWithBayonet();
+            hero->attackWithBayonet();
         }
     }
 }
@@ -505,6 +526,7 @@ cocos2d::Vec2 MainScene::TranslatePos(cocos2d::Vec2 origin) {
     res.y = -origin.y + 768;           // 地图左下角 y 偏移修正
     return res;
 }
+
 
 void MainScene::showSelectionPopup()
 {

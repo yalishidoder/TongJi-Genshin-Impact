@@ -30,6 +30,7 @@ Hero::Hero()
     , m_moveUp(false)
     , m_moveDown(false)
     , m_moveLeft(false)
+    , m_bayonet(nullptr)
     , m_moveRight(false) {
 }
 
@@ -303,15 +304,25 @@ void Hero::attackWithBullet(const Vec2& position)
 
 void Hero::attackWithBayonet()
 {
-    // 创建刺刀
-    auto bayonet = Bayonet::create("Weapon/bayonet.png");
-    // 设置锚点
-    bayonet->setAnchorPoint(Vec2(0.5f, 0.5f));
-
-    // 设置子弹的位置为英雄的位置
-    bayonet->setPosition(getPosition());
-    bayonet->attack();
-    this->getParent()->addChild(bayonet);
+    if (!m_bayonet)
+    {
+        // 创建Bayonet实例
+        m_bayonet = Bayonet::create("Weapon/bayonet.png");
+        if (m_bayonet)
+        {
+            m_bayonet->setName("bayonet");
+            m_bayonet->setAnchorPoint(Vec2(-0.1f, 0.5f));
+            Vec2 handpos = getPosition();
+            handpos.y += 10;
+            m_bayonet->setPosition(handpos);
+            getParent()->addChild(m_bayonet);
+        }
+    }
+    else
+    {
+        
+        m_bayonet->attack();
+    }
 }
 
 // 获取性别
@@ -373,8 +384,11 @@ bool Hero::checkCollision(Hero* otherHero) {
 }
 
 void Hero::update(float dt) {
-    m_moveDirection = cocos2d::Vec2::ZERO;
 
+    if(m_bayonet)
+        m_bayonet->update(dt);
+
+    m_moveDirection = cocos2d::Vec2::ZERO;
 
     if (m_moveUp) {
         m_moveDirection.y += m_speed * dt;
@@ -549,4 +563,13 @@ void Hero::update(float dt) {
 CharacterElement Hero::getElement() 
 {
     return element;
+}
+
+void Hero::onMouseMove(cocos2d::EventMouse* event) {
+    auto mouseEvent = static_cast<cocos2d::EventMouse*>(event);
+    if (m_bayonet) {
+        Vec2 mousePos = mouseEvent->getLocation();
+        mousePos.y = 768 - mousePos.y;
+        m_bayonet->setMousePosition(mousePos);
+    }
 }
