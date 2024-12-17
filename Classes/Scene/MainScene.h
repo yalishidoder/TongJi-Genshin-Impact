@@ -12,7 +12,7 @@ struct SceneSwitchPoint {
 
 struct PositionSwitchPoint {
     cocos2d::Vec2 position;    // 传送点位置
-    bool isActive = true;
+    bool isActive = false;
 };
 
 class MainScene : public cocos2d::Scene

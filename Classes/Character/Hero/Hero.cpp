@@ -36,7 +36,6 @@ Hero::Hero()
 
 Hero::~Hero() {
     CC_SAFE_RELEASE_NULL(m_animationCache);
-    CC_SAFE_RELEASE_NULL(m_currentAnimate);
 }
 
 Hero* Hero::create(const cocos2d::Vec2& initPosition) {

@@ -3,6 +3,7 @@
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "Scene/MiniMap.h"
+#include "Scene/MapManager.h"
 
 
 USING_NS_CC;
@@ -248,6 +249,14 @@ bool MainScene::init()
             positionSwitchPoints.push_back({ switchPos });
         }
     }
+
+    // 从 MapManager 加载存档的传送点状态
+    auto savedSwitchPoints = MapManager::getInstance()->getMainSceneSwitchPoints();
+    for (size_t i = 0; i < savedSwitchPoints.size(); ++i) {
+        if (i < positionSwitchPoints.size()) {
+            positionSwitchPoints[i].isActive = savedSwitchPoints[i].isActive;
+        }
+    }
     /////////////////////////////
     // 添加小地图
     /////////////////////////////
@@ -401,6 +410,8 @@ void MainScene::update(float dt)
                 // 如果传送点未解锁，解锁该传送点
                 if (!spot.isActive) {
                     spot.isActive = true;  // 解锁
+                    // 更新 MapManager 中的传送点状态
+                    MapManager::getInstance()->saveMainSceneSwitchPoints(positionSwitchPoints);
                 }
 
                 break;
@@ -539,8 +550,8 @@ void MainScene::showSelectionPopup()
         if (spot.isActive) {
             // 创建按钮，使用图片作为按钮的背景
             auto button = cocos2d::MenuItemImage::create(
-                "CloseNormal.png",  // 普通状态的按钮图片
-                "CloseSelected.png",  // 按下状态的按钮图片
+                "Transfer_switch/Transfer_normal.png",  // 普通状态的按钮图片
+                "Transfer_switch/Transfer_selected.png",  // 按下状态的按钮图片
                 [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
                     player->setPosition(spot.position);  // 传送角色
                     popupLayer->removeFromParent();  // 隐藏弹窗

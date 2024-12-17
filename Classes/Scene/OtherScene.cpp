@@ -3,6 +3,7 @@
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "MiniMap.h"
+#include "Scene/MapManager.h"
 
 USING_NS_CC;
 
@@ -183,7 +184,16 @@ bool OtherScene::init(const std::string& mapFile)
             positionSwitchPoints.push_back({ switchPos });
         }
     }
-
+    // 从 MapManager 加载存档的传送点状态
+    if (mapname == "forest.tmx") {
+        auto savedSwitchPoints = MapManager::getInstance()->getforestSwitchPoints();
+        for (size_t i = 0; i < savedSwitchPoints.size(); ++i) {
+            if (i < positionSwitchPoints.size()) {
+                positionSwitchPoints[i].isActive = savedSwitchPoints[i].isActive;
+            }
+        }
+        positionSwitchPoints[2].isActive = true;
+    }
  //////////////////////////////
  // 添加小地图
  /////////////////////////////
@@ -306,6 +316,9 @@ void OtherScene::update(float dt)
                 // 如果传送点未解锁，解锁该传送点
                 if (!spot.isActive) {
                     spot.isActive = true;  // 解锁
+                    if (mapname == "forest.tmx") {
+                        MapManager::getInstance()->saveforestSwitchPoints(positionSwitchPoints);
+                    }
                 }
 
                 break;
@@ -449,16 +462,19 @@ void OtherScene::showSelectionPopup()
         // 只有isActive为true时，才显示按钮
         if (spot.isActive) {
             // 创建按钮，使用图片作为按钮的背景
-            auto button = cocos2d::MenuItemImage::create(
-                "CloseNormal.png",  // 普通状态的按钮图片
-                "CloseSelected.png",  // 按下状态的按钮图片
-                [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
-                    player->setPosition(spot.position);  // 传送角色
-                    popupLayer->removeFromParent();  // 隐藏弹窗
-                    isPopupVisible = false;  // 设置弹窗为不可见
-                }
-            );
-
+            auto button=cocos2d::MenuItemImage::create();
+            if (mapname == "forest.tmx") {
+                auto button_forest = cocos2d::MenuItemImage::create(
+                    "Transfer_switch/Transfer_normal_forest.png",  // 普通状态的按钮图片
+                    "Transfer_switch/Transfer_selected_forest.png",  // 按下状态的按钮图片
+                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                        player->setPosition(spot.position);  // 传送角色
+                        popupLayer->removeFromParent();  // 隐藏弹窗
+                        isPopupVisible = false;  // 设置弹窗为不可见
+                    }
+                );
+                button = button_forest;
+            }
             // 设置按钮位置
             button->setPosition(spot.position);  // 将按钮位置设置为传送点的位置
 
