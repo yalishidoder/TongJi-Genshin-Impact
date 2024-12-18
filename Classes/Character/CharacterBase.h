@@ -2,6 +2,7 @@
 #define __CHARACTER_BASE_H__
 
 #include "cocos2d.h"
+#include <string>
 
 // 角色的属性
 enum class CharacterElement
@@ -21,6 +22,10 @@ public:
 
     // 初始化方法
     virtual bool init(const cocos2d::Vec2& initPosition) = 0;
+
+    // 获取和设置名字
+    virtual void setCharacterName(const std::string& Name);
+    virtual std::string getCharacterName();
 
     // 角色更新方法
     virtual void update(float delta) = 0;
@@ -52,6 +57,9 @@ public:
     // 回到出生点恢复生命值 
     virtual void Recover();
 protected:
+
+    std::string m_name;
+
     // 生命值
     int m_health;
     int m_full_health;

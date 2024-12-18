@@ -1,4 +1,5 @@
 #include "CharacterBase.h"
+#include <string>
 
 CharacterBase::CharacterBase()
     : m_health(100)
@@ -10,6 +11,18 @@ CharacterBase::CharacterBase()
 
 CharacterBase::~CharacterBase() 
 {
+}
+
+// 设置角色的特定名字
+void CharacterBase::setCharacterName(const std::string& Name)
+{
+    m_name = Name;
+}
+
+// 获取角色的特定名字
+std::string CharacterBase::getCharacterName()
+{
+    return m_name;
 }
 
 void CharacterBase::moveTo(const cocos2d::Vec2& targetPosition) 

@@ -110,6 +110,7 @@ bool MainScene::init()
             auto hero = Hero::create(Vec2(500, 500));
             if (hero) {
                 hero->setName("hero"); // 设置角色名称
+                hero->setCharacterName("CaiXuKun");
                 hero->setAnchorPoint(Vec2(0.5f, 0.15f));
 
                 // 设置元素力
@@ -122,6 +123,16 @@ bool MainScene::init()
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中 
+
+                // 创建玩家面板
+                m_playerPanel = PlayerPanel::create();
+                if (m_playerPanel) {
+                    m_playerPanel->setName("m_playerPanel");
+                    m_playerPanel->setPosition(cocos2d::Vec2(250, 100));
+                    m_playerPanel->setVisible(false);
+                    m_playerPanel->setHero(hero);
+                    this->addChild(m_playerPanel, 11);
+                }
             }
 
             // 创建血条背景
@@ -149,7 +160,7 @@ bool MainScene::init()
                 levelLabel->setPosition(Vec2(500, 100));
                 this->addChild(levelLabel);
             }
-           
+
             //创建敌人
             auto demon = Enemy::create(Vec2(250, 300));
 
@@ -294,7 +305,7 @@ bool MainScene::init()
 
 void MainScene::update(float dt)
 {
-    if ((isPopupVisible || isDialogActive)) {
+    if ((isPopupVisible || isDialogActive || isPanelVisible)) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         hero->m_moveUp = false;
         hero->m_moveDown = false;
@@ -432,8 +443,14 @@ void MainScene::update(float dt)
                 isPopupVisible = false;  // 设置弹窗为不可见
             }
         }
+    }
 
-
+    // 玩家面板的显示
+    auto protagonist = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (protagonist) {
+        if (isKeyPressedP) {
+            operatemyPanel();
+        }
     }
 }
 
@@ -470,6 +487,14 @@ void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
         case cocos2d::EventKeyboard::KeyCode::KEY_E:
             isKeyPressedE = true;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_P:
+        case cocos2d::EventKeyboard::KeyCode::KEY_P:
+            isKeyPressedP = true;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
+        case cocos2d::EventKeyboard::KeyCode::KEY_B:
+            isKeyPressedB = true;
+            break;
     }
 }
 
@@ -505,6 +530,14 @@ void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_E:
         case cocos2d::EventKeyboard::KeyCode::KEY_E:
             isKeyPressedE = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_P:
+        case cocos2d::EventKeyboard::KeyCode::KEY_P:
+            isKeyPressedP = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
+        case cocos2d::EventKeyboard::KeyCode::KEY_B:
+            isKeyPressedB = false;
             break;
     }
 }
@@ -611,12 +644,50 @@ cocos2d::Vec2 MainScene::tileCoordForPosition(Vec2 position)
 }
 void MainScene::hidePopup()
 {
-    // 隐藏弹窗
     this->removeChildByName("popupLayer");
     isPopupVisible = false;
 
 }
 
+void MainScene::showmyPanel()
+{
+    auto PanelLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // 半透明黑色背景
+    PanelLayer->setName("PanelLayer");
+    this->addChild(PanelLayer, 10);
+}
+
+void MainScene::hidemyPanel()
+{
+    this->removeChildByName("PanelLayer");
+    m_playerPanel->setVisible(!m_playerPanel->isVisible());
+    isPanelVisible = (m_playerPanel->isVisible());
+}
+
+void MainScene::operatemyPanel()
+{   
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (hero) {
+        if (m_playerPanel) {
+            m_playerPanel->setVisible(!m_playerPanel->isVisible());
+            isPanelVisible = (m_playerPanel->isVisible());
+
+            showmyPanel();
+
+            // 创建关闭按钮
+            auto closeButton_ = cocos2d::ui::Button::create("CloseNormal.png");
+            closeButton_->setPosition(Vec2(m_playerPanel->getContentSize().width - 20, m_playerPanel->getContentSize().height - 20));
+            closeButton_->addClickEventListener([=](Ref* sender)
+                {
+                    this->hidemyPanel();
+                });
+            m_playerPanel->addChild(closeButton_);
+
+            CCLOG("Panel visibility set to: %d", m_playerPanel->isVisible());
+        }
+        else
+            CCLOG("m_playerPanel is null!");
+    }
+}
 
 void MainScene::menuCloseCallback(Ref* pSender)
 {

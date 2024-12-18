@@ -15,6 +15,8 @@
 #include "Weapon/Weapon.h"
 #include "Weapon/Switcher.h"
 #include "Weapon/MeleeWeapon/Bayonet.h"
+#include "Inventory/Inventory.h"
+
 USING_NS_CC;
 
 class Hero : public CharacterBase {
@@ -33,6 +35,17 @@ public:
     void moveTo(const cocos2d::Vec2& targetPosition);
     void moveBy(const cocos2d::Vec2& offset);
     virtual void Hero::update(float dt)override;
+
+    // 更新升级显示
+    void updateLevelUpLabel();
+
+    // 背包相关
+    void setInventory(Inventory* inventory);
+    Inventory* getInventory() const;
+
+    // 武器
+    void equipWeapon(Weapon* weapon);
+    Weapon* getEquippedWeapon() const;
 
     // 攻击方法
     virtual void attack()override;
@@ -78,8 +91,12 @@ public:
     Weapon* getCurrentWeapon();
     void onMouseMove(cocos2d::EventMouse* event);
 
+    // 升级标签
+    cocos2d::Label* levelupLabel;
+
 private:
     bool m_isAlive;
+    bool Upgrading;                // 正在升级的标志
 
     float m_speed;
 
@@ -98,8 +115,10 @@ private:
     cocos2d::AnimationCache* m_animationCache;
     cocos2d::Animate* m_currentAnimate;
 
-    WeaponSwitcher* m_weaponSwitcher; 
-    Bayonet* m_bayonet;
+    Inventory* m_inventory;
+    Weapon* m_equippedWeapon;
 
+    WeaponSwitcher* m_weaponSwitcher;
+    Bayonet* m_bayonet;
 };
 #endif

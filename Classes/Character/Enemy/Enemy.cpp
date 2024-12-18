@@ -73,10 +73,12 @@ Enemy* Enemy::create(const cocos2d::Vec2& initPosition)  {
     CC_SAFE_DELETE(enemy);
     return nullptr;
 }
+
 Hero* Enemy::getPlayer()
 {
     return player;
 }
+
 bool Enemy::isAlive() const
 {
     return m_isAlive;
@@ -212,8 +214,6 @@ void Enemy::takeDamage(float damage)
     }
     else
         this->setHealth(health);
-
-
 }
 
 // 更新伤害数字显示
@@ -264,62 +264,6 @@ CharacterElement Enemy::getElement()
     return element;
 }
 
-void Enemy::patrol(float delta)
-{
-    // 巡逻逻辑，例如沿着路径移动或随机移动
-    // 示例：简单地左右移动
-    //后续可以添加向上下巡逻的功能
-   
-    cocos2d::Vec2 moveDirection = cocos2d::Vec2(dirX * m_moveSpeed * delta, 0);
-    cocos2d::Vec2 targetPosition = getPosition() + moveDirection;
-    // 获取当前场景进行碰撞检测
-    cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
-    bool collision = false;
-    if (currentScene) {
-        //读取是否碰撞
-        if (dynamic_cast<MainScene*>(currentScene)) {
-            MainScene* scene = dynamic_cast<MainScene*>(currentScene);
-            collision = scene->checkCollision(targetPosition);
-        }
-        else if (dynamic_cast<OtherScene*>(currentScene)) {
-            OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
-            collision = scene->checkCollision(targetPosition);
-        }
-        CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
-            targetPosition.x, targetPosition.y, collision ? "True" : "False");
-
-        //大于右边界,则规定向左移动
-        if (this->getPositionX() >= spawnPoint.x + rangedX)
-        {
-            dirX = -1;
-        }
-        //小于左边界，则规定向右移动
-        else if (this->getPositionX() <= spawnPoint.x - rangedX)
-        {
-            dirX = 1;
-        }
-
-        // 如果没有碰撞，执行移动
-        if (!collision) {
-            moveBy(moveDirection);
-            CCLOG("enermy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
-        }
-        else {
-            // 有碰撞，反向移动
-            if (dirX == 1) {
-                // 向右移动碰到墙壁，反向向左
-                dirX = -1;
-            }
-            else if (dirX == -1) {
-                // 向左移动碰到墙壁，反向向右
-                dirX = 1;
-            }
-        }
-    }
-}
-
-
-
 void Enemy::attack() {
     // 敌人的攻击逻辑，可根据需要扩展，例如发射子弹、近战攻击等
     // 这里仅作示例，可添加具体的攻击实现
@@ -342,7 +286,6 @@ void Enemy::setRadius(float radius = 100.0f)
     this->radius = radius;
 }
 
-//判定范围内是否存在玩家
 bool Enemy::isHeroExist(float dt)
 {
     if (player)
@@ -355,113 +298,190 @@ bool Enemy::isHeroExist(float dt)
         switch (currentState)
         {
             case EnemyState::PATROL:
-                // 执行巡逻逻辑
-                patrol(dt);
-                // 检测玩家是否进入检测范围
-                if (distanceToPlayer <= radius)
-                {
-                    // 切换到追踪状态
-                    currentState = EnemyState::CHASE;
-                }
+                patrolLogic(dt, distanceToPlayer);
                 break;
 
             case EnemyState::CHASE:
-                // 追踪玩家的逻辑
-                if (distanceToPlayer > radius)
-                {
-                    // 切换到返回状态
-                    currentState = EnemyState::RETURN;
-                }
-                else
-                {
-                    // 继续追踪玩家
-                    if (distanceToPlayer > 10)
-                    {
-                        directionToPlayer.normalize();
-                        cocos2d::Vec2 movement = directionToPlayer * m_moveSpeed * dt;
-                        // 输出追击前的敌人位置
-                        CCLOG("Enemy position before move: (%.2f, %.2f)", this->getPositionX(), this->getPositionY());
-                        // 计算敌人的目标位置
-                        cocos2d::Vec2 targetPosition = this->getPosition() + movement;
-
-                        // 获取当前场景进行碰撞检测
-                        cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
-                        bool collision = false;
-                        //检测是否碰撞
-                        if (currentScene) {
-                            if (dynamic_cast<MainScene*>(currentScene)) {
-                                MainScene* scene = dynamic_cast<MainScene*>(currentScene);
-                                collision = scene->checkCollision(targetPosition);
-                            }
-                            else if (dynamic_cast<OtherScene*>(currentScene)) {
-                                OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
-                                collision = scene->checkCollision(targetPosition);
-                            }
-                        }
-                        // 如果没有碰到墙壁，继续追击
-                        if (!collision) {
-                            this->setPosition(this->getPosition() + movement);
-                            CCLOG("enermy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
-
-                        }
-                        else {
-                            // 碰到墙壁，返回出生点
-                            currentState = EnemyState::RETURN;
-                            CCLOG("enermy touch the wall");
-                            // 可选：碰墙后音效
-                        }
-
-                        float angle = std::atan2(directionToPlayer.y, directionToPlayer.x) * (180.0f / M_PI);
-                        //this->setRotation(-angle);
-                    }
-                    else
-                        currentState = EnemyState::STAY;
-                }
+                chaseLogic(dt, playerPos, enemyPos, directionToPlayer, distanceToPlayer);
                 break;
+
             case EnemyState::STAY:
-                // 停止的逻辑
-                if (distanceToPlayer > 10)
-                {
-                    // 切换到巡逻状态
-                    currentState = EnemyState::PATROL;
-                }
-                else
-                {
-                    //ATTACK
-                }
+                stayLogic(distanceToPlayer);
                 break;
+
             case EnemyState::RETURN:
-                // 返回出生点的逻辑
-                cocos2d::Vec2 directionToSpawn = spawnPoint - enemyPos;
-                float distanceToSpawn = directionToSpawn.length();
-
-                if (distanceToSpawn > 1.0f)
-                {
-                    directionToSpawn.normalize();
-                    cocos2d::Vec2 movement = directionToSpawn * m_moveSpeed * dt;
-                    this->setPosition(this->getPosition() + movement);
-
-                    float angle = std::atan2(directionToSpawn.y, directionToSpawn.x) * (180.0f / M_PI);
-                    //this->setRotation(angle);
-
-                    // 如果玩家进入检测范围，优先切换到追踪状态
-                    if (distanceToPlayer <= radius)
-                    {
-                        currentState = EnemyState::CHASE;
-                    }
-                }
-                else
-                {
-                    // 已经回到出生点，切换回巡逻状态
-                    currentState = EnemyState::PATROL;
-                    setRotation(0.0f);
-                    dirX = 1;
-                }
+                returnToSpawnLogic(dt, enemyPos, distanceToPlayer, playerPos);
                 break;
         }
+
+        return true;
     }
 
-    return true;
+    return false;
+}
+
+void Enemy::patrolLogic(float &dt, float &distanceToPlayer)
+{
+    patrol(dt);
+
+    if (distanceToPlayer <= radius)
+    {
+        currentState = EnemyState::CHASE;
+    }
+}
+
+void Enemy::chaseLogic(float& dt, cocos2d::Vec2& playerPos, cocos2d::Vec2& enemyPos, cocos2d::Vec2& directionToPlayer, float& distanceToPlayer)
+{
+    if (distanceToPlayer > radius)
+    {
+        currentState = EnemyState::RETURN;
+    }
+    else
+    {
+        if (distanceToPlayer > 10)
+        {
+            handleChasingMovement(dt, directionToPlayer);
+        }
+        else
+        {
+            currentState = EnemyState::STAY;
+        }
+    }
+}
+
+void Enemy::stayLogic(float& distanceToPlayer)
+{
+    if (distanceToPlayer > 10)
+    {
+        currentState = EnemyState::PATROL;
+    }
+    else
+    {
+        // 处理攻击逻辑
+    }
+}
+
+void Enemy::returnToSpawnLogic(float& dt, cocos2d::Vec2& enemyPos, float& distanceToPlayer, cocos2d::Vec2& playerPos)
+{
+    handleReturnToSpawnMovement(dt, enemyPos);
+
+    if (distanceToPlayer <= radius)
+    {
+        currentState = EnemyState::CHASE;
+    }
+}
+
+void Enemy::handleChasingMovement(float& dt, cocos2d::Vec2& directionToPlayer)
+{
+    directionToPlayer.normalize();
+    cocos2d::Vec2 movement = directionToPlayer * m_moveSpeed * dt;
+
+    CCLOG("Enemy position before move: (%.2f, %.2f)", this->getPositionX(), this->getPositionY());
+    cocos2d::Vec2 targetPosition = this->getPosition() + movement;
+
+    bool collision = checkCollisionWithScene(targetPosition);
+
+    if (!collision)
+    {
+        this->setPosition(this->getPosition() + movement);
+        CCLOG("Enemy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+    }
+    else
+    {
+        currentState = EnemyState::RETURN;
+        CCLOG("Enemy touched the wall");
+    }
+
+    float angle = std::atan2(directionToPlayer.y, directionToPlayer.x) * (180.0f / M_PI);
+    //this->setRotation(-angle);
+}
+
+void Enemy::handleReturnToSpawnMovement(float& dt, cocos2d::Vec2& enemyPos)
+{
+    cocos2d::Vec2 directionToSpawn = spawnPoint - enemyPos;
+    float distanceToSpawn = directionToSpawn.length();
+
+    if (distanceToSpawn > 1.0f)
+    {
+        directionToSpawn.normalize();
+        cocos2d::Vec2 movement = directionToSpawn * m_moveSpeed * dt;
+        this->setPosition(this->getPosition() + movement);
+
+        float angle = std::atan2(directionToSpawn.y, directionToSpawn.x) * (180.0f / M_PI);
+        //this->setRotation(angle);
+    }
+    else
+    {
+        currentState = EnemyState::PATROL;
+        setRotation(0.0f);
+        dirX = 1;
+    }
+}
+
+bool Enemy::checkCollisionWithScene(cocos2d::Vec2& targetPosition)
+{
+    cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+    if (currentScene)
+    {
+        if (dynamic_cast<MainScene*>(currentScene))
+        {
+            MainScene* scene = dynamic_cast<MainScene*>(currentScene);
+            return scene->checkCollision(targetPosition);
+        }
+        else if (dynamic_cast<OtherScene*>(currentScene))
+        {
+            OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
+            return scene->checkCollision(targetPosition);
+        }
+    }
+    return false;
+}
+
+void Enemy::patrol(float delta)
+{
+    // 巡逻逻辑，例如沿着路径移动或随机移动
+    // 示例：简单地左右移动
+    //后续可以添加向上下巡逻的功能
+
+    cocos2d::Vec2 moveDirection = cocos2d::Vec2(dirX * m_moveSpeed * delta, 0);
+    cocos2d::Vec2 targetPosition = getPosition() + moveDirection;
+
+    // 获取当前场景进行碰撞检测
+    bool collision = checkCollisionWithScene(targetPosition);
+
+    CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
+        targetPosition.x, targetPosition.y, collision ? "True" : "False");
+
+    //大于右边界,则规定向左移动
+    if (this->getPositionX() >= spawnPoint.x + rangedX)
+    {
+        dirX = -1;
+    }
+    //小于左边界，则规定向右移动
+    else if (this->getPositionX() <= spawnPoint.x - rangedX)
+    {
+        dirX = 1;
+    }
+
+    // 如果没有碰撞，执行移动
+    if (!collision)
+    {
+        moveBy(moveDirection);
+        CCLOG("Enemy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
+    }
+    else // 有碰撞，反向移动
+    {
+        // 向右移动碰到墙壁，反向向左
+        if (dirX == 1)
+        {
+            dirX = -1;
+        }
+        // 向左移动碰到墙壁，反向向右
+        else if (dirX == -1)
+        {
+            dirX = 1;
+        }
+    }
 }
 
 void Enemy::moveLogic(float dt) {
