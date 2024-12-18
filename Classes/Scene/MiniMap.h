@@ -21,13 +21,13 @@ public:
     // Factory method to create the MiniMap
     static MiniMap* create(TMXTiledMap* map, std::string file, Size visibleSize, Scene* scene);
 
-    /*  
+    /*
        创造小地图
        参数：地图文件名，屏幕大小，场景节点
    */
     bool init(TMXTiledMap* map, std::string file, Size visibleSize, Scene* scene);
 
-    /*  
+    /*
        设置小地图上的角色位置并进行同步
        参数：无
        */
@@ -48,7 +48,8 @@ public:
     void onMouseMove(EventMouse* event);
     void onMouseUp(EventMouse* event);
 
-
+    // 更新敌人位置
+    void updateDemonMarkers();
 private:
     // 主地图
     TMXTiledMap* map_;
@@ -71,36 +72,40 @@ private:
     // 小地图的边框
     DrawNode* miniMapBorder_;
     // 小地图的背景
-    TMXTiledMap * miniMapBackground_;
+    TMXTiledMap* miniMapBackground_;
     // 小地图的主角
     Hero* hero_;
-    // 小地图的敌人
-    Enemy* demon_;
     // 小地图的主角标记节点
     DrawNode* heroMarker_;
     // 小地图的敌人标记节点
     DrawNode* demonMarker_;
+    // 小地图的主角位置
+    Vec2 miniHeroPos;
+    // 小地图的敌人列表
+    std::vector<Enemy*> demons_;
+    // 小地图的敌人标记节点列表
+    std::vector<DrawNode*> demonMarkers_;
 
     // 小地图的背景
     TMXTiledMap* miniMapBackground_2_;
     // 小地图是否被放大
-    bool isExpanded_;      
+    bool isExpanded_;
     // 阴影遮罩层
-    LayerColor* shadowLayer_;    
+    LayerColor* shadowLayer_;
     // 关闭按钮
     cocos2d::ui::Button* closeButton_;
     // 方形窗口
-    Node* expandedWindow_;   
+    Node* expandedWindow_;
     // 地图缩放等级
-    float zoomLevel_;       
+    float zoomLevel_;
     // 是否正在拖动
-    bool isDragging_ = false;   
+    bool isDragging_ = false;
     // 鼠标按下时的位置
-    Vec2 dragStartPos_;    
+    Vec2 dragStartPos_;
     // 鼠标按下时的地图位置
-    Vec2 dragStartMapPos_;       
+    Vec2 dragStartMapPos_;
 
-    
+
 };
 
 #endif // MINIMAP_H

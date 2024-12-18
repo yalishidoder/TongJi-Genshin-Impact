@@ -1,7 +1,7 @@
 /****************************************************************
  * Project Name:  Genshin Impact
  * File Name:     MiniMap.cpp
- * File Function: 实现小地图(左上角的雷达)功能
+ * File Function: 实现小地图(左上角的雷达)功能 包括通过点击鼠标进行缩放、拖动、旋转等操作，以及同步主地图角色位置到小地图上
  * Author:        叶贤伟
  * Update Date:   2024.12.13
  ****************************************************************/
@@ -96,7 +96,7 @@ bool MiniMap::init(TMXTiledMap* map, std::string file, Size visibleSize, Scene* 
 
     // 同步小地图上的角色位置和视图区域
     setCharacter();
-   
+
     // 注册鼠标事件监听器
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(MiniMap::onMouseDown, this);
@@ -115,23 +115,13 @@ void MiniMap::setCharacter()
     {
         CCLOG("create heroMarker failed");
     }
-    else 
+    else
     {
         heroMarker_->drawDot(Vec2::ZERO, 3.0f, Color4F::GREEN);
         clipper_->addChild(heroMarker_);
     }
-    demonMarker_ = DrawNode::create(); // 敌人位置标记
-    if (demonMarker_ == nullptr)
-    {
-        CCLOG("create demonMarker failed");
-       
-    }
-    else 
-    {
-        demonMarker_->drawDot(Vec2::ZERO, 3.0f, Color4F::RED);
-        clipper_->addChild(demonMarker_);
-    }
     
+
     // 启动每帧调用 update()
     this->scheduleUpdate();  // 这行会将 update() 注册为每帧调用
 };
@@ -139,49 +129,81 @@ void MiniMap::setCharacter()
 
 
 // 更新小地图标记位置
-void MiniMap::update(float dt )
+void MiniMap::update(float dt)
 {
     // 检查必要的变量是否初始化
-    if (!map_ || !heroMarker_ || !demonMarker_) 
+    if (!map_ || !heroMarker_)
     {
         CCLOG("map_ or markers not properly initialized");
         return;
     }
 
     // 获取英雄节点
-    auto hero = dynamic_cast<Hero*>(scene_->getChildByName("hero"));
-    if (!hero) 
+    hero_ = dynamic_cast<Hero*>(scene_->getChildByName("hero"));
+    if (!hero_)
     {
         CCLOG("Hero node not found in the scene");
         return;
     }
-    
-    // 获取敌人节点
-    auto demon = dynamic_cast<Enemy*>(scene_->getChildByName("demon"));
-    if (!demon)
-    {
-        CCLOG("Demon node not found in the scene");
-    }
 
     // 更新英雄的位置
-    Vec2 heroPos = hero->getPosition();
-    Vec2 miniHeroPos = (heroPos - map_->getPosition() + Vec2(map_->getContentSize().width / 2, map_->getContentSize().height / 2)) * miniMapScale_;
+    Vec2 heroPos = hero_->getPosition();
+    miniHeroPos = (heroPos - map_->getPosition() + Vec2(map_->getContentSize().width / 2, map_->getContentSize().height / 2)) * miniMapScale_;
     heroMarker_->setPosition(miniMapCenter_ - miniHeroPos + heroPos * miniMapScale_);
 
     // 更新小地图视图位置
     Vec2 offset = miniMapCenter_ - miniHeroPos;
     miniMapBackground_->setPosition(offset);
 
-    //有敌人时更新敌人的位置
-    if (demon) 
-    {
-        // 更新敌人的位置
-        Vec2 demonPos = demon->getPosition();
-        Vec2 miniDemonPos = (demonPos - map_->getPosition() + Vec2(map_->getContentSize().width / 2, map_->getContentSize().height / 2)) * miniMapScale_;
-        demonMarker_->setPosition(miniMapCenter_ - miniHeroPos + demonPos * miniMapScale_);
-    }
+    // 更新所有敌人标记的位置
+    updateDemonMarkers();
 }
 
+// 更新所有敌人标记的位置
+void MiniMap::updateDemonMarkers()
+{
+    // 清除所有敌人标点
+    for (auto marker : demonMarkers_)
+    {
+        marker->removeFromParentAndCleanup(true);
+    }
+    
+    // 清空敌人列表并添加到容器中
+    demons_.clear();  // 清空敌人列表
+    demonMarkers_.clear();  // 清空敌人标记列表
+    // 获取所有敌人并将其添加到 demons_ 容器中
+    for (auto demonNode : scene_->getChildren())
+    {
+        // 判断是否为敌人节点
+        Enemy* demon = dynamic_cast<Enemy*>(demonNode);
+        if (demon)
+        {
+            // 将敌人添加到 demons_ 容器
+            demons_.push_back(demon);
+            // 为每个敌人创建一个标记
+            demonMarker_ = DrawNode::create();
+            if (demonMarker_)
+            {
+                demonMarker_->drawDot(Vec2::ZERO, 3.0f, Color4F::RED);
+                clipper_->addChild(demonMarker_);
+                // 添加敌人标记到列表
+                demonMarkers_.push_back(demonMarker_);
+            }
+        }
+    }
+
+    // 更新敌人的位置
+    for (size_t i = 0; i < demons_.size(); ++i)
+    {
+        Enemy* demon = demons_[i];
+        if (demon)
+        {
+            Vec2 demonPos = demon->getPosition();
+            Vec2 miniDemonPos = (demonPos - map_->getPosition() + Vec2(map_->getContentSize().width / 2, map_->getContentSize().height / 2)) * miniMapScale_;
+            demonMarkers_[i]->setPosition(miniMapCenter_ - miniHeroPos + demonPos * miniMapScale_);
+        }
+    }
+}
 
 void MiniMap::expandMiniMap()
 {
@@ -267,13 +289,13 @@ void MiniMap::expandMiniMap()
 
 
 // 关闭放大的小地图
-void MiniMap::closeExpandedMiniMap() 
+void MiniMap::closeExpandedMiniMap()
 {
     if (!isExpanded_) return; // 防止重复执行
     isExpanded_ = false;
 
     // 从场景移除放大窗口
-    if (expandedWindow_) 
+    if (expandedWindow_)
     {
         expandedWindow_->removeAllChildren();
         scene_->removeChild(expandedWindow_);
@@ -281,13 +303,13 @@ void MiniMap::closeExpandedMiniMap()
     }
 
     // 移除阴影层
-    if (shadowLayer_) 
+    if (shadowLayer_)
     {
         scene_->removeChild(shadowLayer_);
         shadowLayer_ = nullptr;
     }
 
-    
+
 }
 
 void MiniMap::onMouseScroll(EventMouse* event)
@@ -383,4 +405,3 @@ void MiniMap::onMouseUp(EventMouse* event)
     }
 
 }
-
