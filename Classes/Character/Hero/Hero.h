@@ -83,20 +83,40 @@ public:
     bool m_moveLeft;
     bool m_moveRight;
 
-    // 武器切换相关
-    void addWeapon(Weapon* weapon);
-    void removeWeapon(Weapon* weapon);
-    void switchToNextWeapon();
-    void switchToPreviousWeapon();
-    Weapon* getCurrentWeapon();
+    // 武器相关
+    bool m_isBayonetGet;
+    bool m_isBulletGet;
+    bool m_isBayonetChosen;
+    bool m_isBulletChosen;
+    void ChangeToBayonet();
+    void ChangeToBullet();
+
+
+    // Z技能相关
+    void SkillZ();
+    bool m_isZSkillUnlock = 1;
+    float m_skillZCoolDownTime;     //冷却时间
+    bool m_isSkillZOnCoolDown;      //是否冷却完毕
+    
+    // X技能相关
+    void SkillX();
+    bool m_isXSkillUnlock = 1;
+    float m_skillXCoolDownTime;     //冷却时间
+    bool m_isSkillXOnCoolDown;      //是否冷却完毕
+
+    // C技能相关
+    void SkillC();
+    bool m_isCSkillUnlock = 1;
+    float m_skillCCoolDownTime;     //冷却时间
+    bool m_isSkillCOnCoolDown;      //是否冷却完毕
+
     void onMouseMove(cocos2d::EventMouse* event);
 
-    // 升级标签
     cocos2d::Label* levelupLabel;
 
 private:
     bool m_isAlive;
-    bool Upgrading;                // 正在升级的标志
+    bool Upgrading;
 
     float m_speed;
 
@@ -106,11 +126,6 @@ private:
     int m_exp;
     int m_expToLevelUp;
     bool m_ismale;
-
-    //技能相关
-    float m_skillCoolDownTime;     //冷却时间
-    bool m_isSkillOnCoolDown;      //是否冷却完毕
-    float m_skillDuration;         //持续时间
 
     cocos2d::AnimationCache* m_animationCache;
     cocos2d::Animate* m_currentAnimate;

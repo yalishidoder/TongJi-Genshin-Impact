@@ -123,16 +123,6 @@ bool MainScene::init()
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中 
-
-                // 创建玩家面板
-                m_playerPanel = PlayerPanel::create();
-                if (m_playerPanel) {
-                    m_playerPanel->setName("m_playerPanel");
-                    m_playerPanel->setPosition(cocos2d::Vec2(250, 100));
-                    m_playerPanel->setVisible(false);
-                    m_playerPanel->setHero(hero);
-                    this->addChild(m_playerPanel, 11);
-                }
             }
 
             // 创建血条背景
@@ -160,7 +150,7 @@ bool MainScene::init()
                 levelLabel->setPosition(Vec2(500, 100));
                 this->addChild(levelLabel);
             }
-
+           
             //创建敌人
             auto demon = Enemy::create(Vec2(250, 300));
 
@@ -180,6 +170,16 @@ bool MainScene::init()
                 demon->setPosition(Vec2(adjustedX, adjustedY));
 
                 this->addChild(demon);  // 将角色添加到场景中
+
+                // 创建玩家面板
+                m_playerPanel = PlayerPanel::create();
+                if (m_playerPanel) {
+                    m_playerPanel->setName("m_playerPanel");
+                    m_playerPanel->setPosition(cocos2d::Vec2(250, 100));
+                    m_playerPanel->setVisible(false);
+                    m_playerPanel->setHero(hero);
+                    this->addChild(m_playerPanel, 11);
+                }
 
             }
             auto demon2 = Enemy::create(Vec2(250, 300));
@@ -297,7 +297,6 @@ bool MainScene::init()
         this->update(dt);
         }, "update_key");
 
-
     return true;
 }
 
@@ -350,8 +349,8 @@ void MainScene::update(float dt)
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         for (auto& switchPoint : sceneSwitchPoints) {
-            
-             // 跳过未激活的传送点
+
+            // 跳过未激活的传送点
             if (!switchPoint.isActive) continue;
 
             // 判断是否有弹窗正在显示&&判断地图传送点和人物是否碰撞
@@ -392,7 +391,7 @@ void MainScene::update(float dt)
                     if (dialog) {
                         dialog->removeFromParent();
                         // 恢复标志位
-                        isDialogActive = false; 
+                        isDialogActive = false;
                     }
 
                     // 将角色移出传送点范围
@@ -444,7 +443,6 @@ void MainScene::update(float dt)
             }
         }
     }
-
     // 玩家面板的显示
     auto protagonist = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (protagonist) {
@@ -456,8 +454,8 @@ void MainScene::update(float dt)
 
 void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    if (hero) {
-        switch (keyCode ) {
+    if (hero&& !(isPopupVisible || isDialogActive)) {
+        switch (keyCode) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
             case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_W:
             case cocos2d::EventKeyboard::KeyCode::KEY_W:
@@ -477,6 +475,24 @@ void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
             case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_D:
             case cocos2d::EventKeyboard::KeyCode::KEY_D:
                 hero->m_moveRight = true;
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_1:
+                hero->ChangeToBayonet();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_2:
+                hero->ChangeToBullet();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_Z:
+            case cocos2d::EventKeyboard::KeyCode::KEY_Z:
+                hero->SkillZ();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_X:
+            case cocos2d::EventKeyboard::KeyCode::KEY_X:
+                hero->SkillX();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_C:
+            case cocos2d::EventKeyboard::KeyCode::KEY_C:
+                hero->SkillC();
                 break;
             default:
                 break;
@@ -538,7 +554,6 @@ void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
         case cocos2d::EventKeyboard::KeyCode::KEY_B:
             isKeyPressedB = false;
-            break;
     }
 }
 
@@ -549,13 +564,13 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-        if (hero) {
+        if (hero && hero->m_isBulletChosen) {
             hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
         }
     }
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-        if (hero) {
+        if (hero && hero->m_isBayonetChosen) {
             hero->attackWithBayonet();
         }
     }
@@ -644,6 +659,7 @@ cocos2d::Vec2 MainScene::tileCoordForPosition(Vec2 position)
 }
 void MainScene::hidePopup()
 {
+    // 隐藏弹窗
     this->removeChildByName("popupLayer");
     isPopupVisible = false;
 
@@ -664,7 +680,7 @@ void MainScene::hidemyPanel()
 }
 
 void MainScene::operatemyPanel()
-{   
+{
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         if (m_playerPanel) {

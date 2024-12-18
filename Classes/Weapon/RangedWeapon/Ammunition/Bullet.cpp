@@ -43,7 +43,7 @@ bool Bullet::init(const cocos2d::Vec2& position, const cocos2d::Vec2& velocity,c
 
     // 设置子弹速度和生命周期
     this->setVelocity(velocity);
-    this->setLifeTime(5.0f); // 子弹存活时间5秒
+    this->setLifeTime(2.0f); // 子弹存活时间2秒
     this->_remainingLife = this->_lifeTime;
 
     // 设置子弹等级

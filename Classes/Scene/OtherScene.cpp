@@ -214,6 +214,7 @@ bool OtherScene::init(const std::string& mapFile)
         }, "update_key");
 
     return true;
+
 }
 
 void OtherScene::update(float dt)

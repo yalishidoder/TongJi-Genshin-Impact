@@ -92,14 +92,14 @@ private:
 
     // 控制敌人各种状态的逻辑
     // 巡逻
-    void patrolLogic(float &dt, float &distanceToPlayer);     
+    void patrolLogic(float& dt, float& distanceToPlayer);
     // 追逐
-    void chaseLogic(float &dt, cocos2d::Vec2 &playerPos, cocos2d::Vec2 &enemyPos, cocos2d::Vec2 &directionToPlayer, float& distanceToPlayer);
+    void chaseLogic(float& dt, cocos2d::Vec2& playerPos, cocos2d::Vec2& enemyPos, cocos2d::Vec2& directionToPlayer, float& distanceToPlayer);
     void handleChasingMovement(float& dt, cocos2d::Vec2& directionToPlayer);
     // 原地不动（攻击）
-    void stayLogic(float &distanceToPlayer);
+    void stayLogic(float& distanceToPlayer);
     // 返回出生点
-    void returnToSpawnLogic(float &dt, cocos2d::Vec2 &enemyPos, float &distanceToPlayer, cocos2d::Vec2 &playerPos);
+    void returnToSpawnLogic(float& dt, cocos2d::Vec2& enemyPos, float& distanceToPlayer, cocos2d::Vec2& playerPos);
     void handleReturnToSpawnMovement(float& dt, cocos2d::Vec2& enemyPos);
 
     // 碰撞逻辑

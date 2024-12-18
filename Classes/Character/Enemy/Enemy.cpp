@@ -73,12 +73,10 @@ Enemy* Enemy::create(const cocos2d::Vec2& initPosition)  {
     CC_SAFE_DELETE(enemy);
     return nullptr;
 }
-
 Hero* Enemy::getPlayer()
 {
     return player;
 }
-
 bool Enemy::isAlive() const
 {
     return m_isAlive;
@@ -214,6 +212,8 @@ void Enemy::takeDamage(float damage)
     }
     else
         this->setHealth(health);
+
+
 }
 
 // 更新伤害数字显示
@@ -286,6 +286,7 @@ void Enemy::setRadius(float radius = 100.0f)
     this->radius = radius;
 }
 
+//判定范围内是否存在玩家
 bool Enemy::isHeroExist(float dt)
 {
     if (player)
@@ -300,27 +301,22 @@ bool Enemy::isHeroExist(float dt)
             case EnemyState::PATROL:
                 patrolLogic(dt, distanceToPlayer);
                 break;
-
             case EnemyState::CHASE:
                 chaseLogic(dt, playerPos, enemyPos, directionToPlayer, distanceToPlayer);
                 break;
-
             case EnemyState::STAY:
                 stayLogic(distanceToPlayer);
                 break;
-
             case EnemyState::RETURN:
                 returnToSpawnLogic(dt, enemyPos, distanceToPlayer, playerPos);
                 break;
         }
-
         return true;
     }
-
     return false;
 }
 
-void Enemy::patrolLogic(float &dt, float &distanceToPlayer)
+void Enemy::patrolLogic(float& dt, float& distanceToPlayer)
 {
     patrol(dt);
 

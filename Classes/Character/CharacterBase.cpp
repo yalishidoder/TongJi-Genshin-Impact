@@ -1,5 +1,4 @@
 #include "CharacterBase.h"
-#include <string>
 
 CharacterBase::CharacterBase()
     : m_health(100)

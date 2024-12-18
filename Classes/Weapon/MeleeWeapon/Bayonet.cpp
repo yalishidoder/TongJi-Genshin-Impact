@@ -4,7 +4,7 @@
 
 
 // ¹¹Ôìº¯Êý
-Bayonet::Bayonet() : attackRange(50.0f), attackPower(10), attackCooldown(0.5f), remainingCooldown(0.0f) {
+Bayonet::Bayonet() : attackRange(50.0f), attackPower(10), attackCooldown(0.3f), remainingCooldown(0.0f) {
     
 }
 

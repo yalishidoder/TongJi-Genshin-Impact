@@ -1,9 +1,9 @@
-ï»¿/****************************************************************
+/****************************************************************
  * Project Name:  Genshin Impact
  * File Name:     Hero.cpp
- * File Function: ä¸»äººå…¬ç±»å®ç°
- * Author:        kfx
- * Update Date:   2024.12.10
+ * File Function: Ö÷ÈË¹«ÀàÊµÏÖ
+ * Author:        kfx wsm
+ * Update Date:   2024.12.19
  ****************************************************************/
 
 #include <cmath>
@@ -14,23 +14,29 @@
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 
+
 Hero::Hero()
-    : m_sleepiness(100)     // åˆå§‹ç¡æ„å€¼
-    , m_heroism(1000)       // åˆå§‹è‹±é›„åº¦
-    , m_speed(200.0f)       // åˆå§‹é€Ÿåº¦
-    , m_ismale(0)       // åˆå§‹æ€§åˆ«
-    , MaxLevel(100)         // ç­‰çº§ä¸Šé™
-    , m_exp(0)              // åˆå§‹ç»éªŒå€¼
-    , m_expToLevelUp(100)   // åˆå§‹å‡çº§æ‰€éœ€è¦çš„ç»éªŒ
+    : m_sleepiness(100)     // ³õÊ¼Ë¯ÒâÖµ
+    , m_heroism(1000)       // ³õÊ¼Ó¢ĞÛ¶È
+    , m_speed(200.0f)       // ³õÊ¼ËÙ¶È
+    , m_ismale(0)       // ³õÊ¼ĞÔ±ğ
+    , MaxLevel(100)         // µÈ¼¶ÉÏÏŞ
+    , m_exp(0)              // ³õÊ¼¾­ÑéÖµ
+    , m_expToLevelUp(100)   // ³õÊ¼Éı¼¶ËùĞèÒªµÄ¾­Ñé
     , m_isAlive(true)
-    , Upgrading(false)      
+    , Upgrading(false)
     , m_animationCache(cocos2d::AnimationCache::getInstance())
     , m_currentAnimate(nullptr)
     , m_moveDirection(cocos2d::Vec2::ZERO)
+    , m_isBayonetGet(true)
+    , m_isBulletGet(true)
+    , m_isBayonetChosen(false)
+    , m_isBulletChosen(false)
     , m_moveUp(false)
     , m_moveDown(false)
     , m_moveLeft(false)
-    , m_moveRight(false) 
+    , m_moveRight(false)
+
     , m_bayonet(nullptr)
     , m_inventory(new Inventory())
 {
@@ -38,6 +44,7 @@ Hero::Hero()
 
 Hero::~Hero() {
     CC_SAFE_RELEASE_NULL(m_animationCache);
+    //CC_SAFE_RELEASE_NULL(m_currentAnimate);
 }
 
 Hero* Hero::create(const cocos2d::Vec2& initPosition) {
@@ -54,30 +61,30 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     if (!Sprite::init()) {
         return false;
     }
-    // åŠ è½½è§’è‰²çš„åˆå§‹çº¹ç†
+    // ¼ÓÔØ½ÇÉ«µÄ³õÊ¼ÎÆÀí
     if (!this->getGender()) {
         this->setTexture("Character/Hero/Animation/female/female_default.png");
     }
     else {
         this->setTexture("Character/Hero/Animation/male/male_default.png");
     }
-    setScale(0.8f); // è°ƒæ•´è§’è‰²çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œé»˜è®¤è®¾ç½®ä¸º 1.0
+    setScale(0.8f); // µ÷Õû½ÇÉ«µÄËõ·Å±ÈÀı£¬Ä¬ÈÏÉèÖÃÎª 1.0
 
-    // åˆå§‹åŒ–è§’è‰²çš„åŠ¨ç”»ç¼“å­˜
+    // ³õÊ¼»¯½ÇÉ«µÄ¶¯»­»º´æ
     m_animationCache = cocos2d::AnimationCache::getInstance();
     m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_hero");
     m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_hero");
     m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
     m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_hero");
 
-    // åˆ›å»ºå‡çº§æ ‡ç­¾
+    // ´´½¨Éı¼¶±êÇ©
     levelupLabel = Label::createWithSystemFont("Level UP!", "Arial", 24);
     if (levelupLabel) {
         cocos2d::Vec2 labelPos = this->getAnchorPoint();
         labelPos.x += 30;
         labelPos.y += 60;
-        levelupLabel->setPosition(labelPos); // è®¾ç½®åˆé€‚çš„ä½ç½®
-        levelupLabel->setVisible(false); // åˆå§‹ä¸å¯è§
+        levelupLabel->setPosition(labelPos); // ÉèÖÃºÏÊÊµÄÎ»ÖÃ
+        levelupLabel->setVisible(false); // ³õÊ¼²»¿É¼û
         this->addChild(levelupLabel);
     }
     else {
@@ -88,23 +95,23 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
 }
 
 
-// ç§»åŠ¨åˆ°æŒ‡å®šä½ç½®
+// ÒÆ¶¯µ½Ö¸¶¨Î»ÖÃ
 void Hero::moveTo(const cocos2d::Vec2& targetPosition) {
     auto moveAction = cocos2d::MoveTo::create(
-        1.0f,  // ç§»åŠ¨æ—¶é—´ï¼Œå¯æ ¹æ®å®é™…æƒ…å†µè°ƒæ•´
+        1.0f,  // ÒÆ¶¯Ê±¼ä£¬¿É¸ù¾İÊµ¼ÊÇé¿öµ÷Õû
         targetPosition);
     runAction(moveAction);
 }
 
-// æŒ‰ç…§åç§»é‡ç§»åŠ¨
+// °´ÕÕÆ«ÒÆÁ¿ÒÆ¶¯
 void Hero::moveBy(const cocos2d::Vec2& offset) {
     auto moveAction = cocos2d::MoveBy::create(
-        0.01f,  // ç§»åŠ¨æ—¶é—´ï¼Œå¯è°ƒæ•´
+        0.01f,  // ÒÆ¶¯Ê±¼ä£¬¿Éµ÷Õû
         offset);
     runAction(moveAction);
 }
 
-// åˆ›å»ºå‘ä¸Šè¡Œèµ°åŠ¨ç”»
+// ´´½¨ÏòÉÏĞĞ×ß¶¯»­
 cocos2d::Animation* Hero::createWalkUpAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_UP.plist");
@@ -126,12 +133,12 @@ cocos2d::Animation* Hero::createWalkUpAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
+    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     return animation;
 }
 
-// åˆ›å»ºå‘ä¸‹è¡Œèµ°åŠ¨ç”»
+// ´´½¨ÏòÏÂĞĞ×ß¶¯»­
 cocos2d::Animation* Hero::createWalkDownAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_DOWN.plist");
@@ -153,12 +160,12 @@ cocos2d::Animation* Hero::createWalkDownAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
+    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     return animation;
 }
 
-// åˆ›å»ºå‘å·¦è¡Œèµ°åŠ¨ç”»
+// ´´½¨Ïò×óĞĞ×ß¶¯»­
 cocos2d::Animation* Hero::createWalkLeftAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_LEFT.plist");
@@ -180,12 +187,12 @@ cocos2d::Animation* Hero::createWalkLeftAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
+    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     return animation;
 }
 
-// åˆ›å»ºå‘å³è¡Œèµ°åŠ¨ç”»
+// ´´½¨ÏòÓÒĞĞ×ß¶¯»­
 cocos2d::Animation* Hero::createWalkRightAnimation() {
     if (!m_ismale) {
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/WALK_RIGHT.plist");
@@ -207,13 +214,13 @@ cocos2d::Animation* Hero::createWalkRightAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
+    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     //animation->setLoops(-1);
     return animation;
 }
 
-// æ’­æ”¾æŒ‡å®šåç§°çš„åŠ¨ç”»
+// ²¥·ÅÖ¸¶¨Ãû³ÆµÄ¶¯»­
 void Hero::playAnimation(const std::string& animationName) {
     auto animation = m_animationCache->getAnimation(animationName);
     if (animation) {
@@ -223,22 +230,23 @@ void Hero::playAnimation(const std::string& animationName) {
     }
 }
 
-// åœæ­¢å½“å‰åŠ¨ç”»
+// Í£Ö¹µ±Ç°¶¯»­
 void Hero::stopAnimation() {
-    //stopAllActionsByTag(100);  // è¿™é‡Œç”¨100ä½œä¸ºåŠ¨ç”»ç›¸å…³actionçš„æ ‡ç­¾ï¼Œå¯è‡ªå®šä¹‰
+    //stopAllActionsByTag(100);  // ÕâÀïÓÃ100×÷Îª¶¯»­Ïà¹ØactionµÄ±êÇ©£¬¿É×Ô¶¨Òå
     stopAllActions();
     CC_SAFE_RELEASE_NULL(m_currentAnimate);
+    
 }
 
-// æ·»åŠ åŠ¨ç”»åˆ°ç¼“å­˜
+// Ìí¼Ó¶¯»­µ½»º´æ
 void Hero::addAnimation(const std::string& animationName, const cocos2d::Animation& animation) {
-    // åˆ›å»ºä¸€ä¸ªæ–°çš„ Animation å¯¹è±¡ï¼Œå°†ä¼ å…¥çš„ animation å¤åˆ¶åˆ°æ–°å¯¹è±¡ä¸­
+    // ´´½¨Ò»¸öĞÂµÄ Animation ¶ÔÏó£¬½«´«ÈëµÄ animation ¸´ÖÆµ½ĞÂ¶ÔÏóÖĞ
     auto newAnimation = Animation::create();
     newAnimation->setDelayPerUnit(animation.getDelayPerUnit());
     newAnimation->setLoops(animation.getLoops());
     newAnimation->setRestoreOriginalFrame(animation.getRestoreOriginalFrame());
     for (const auto& frame : animation.getFrames()) {
-        // ä» AnimationFrame ä¸­æå– SpriteFrame å¹¶æ·»åŠ 
+        // ´Ó AnimationFrame ÖĞÌáÈ¡ SpriteFrame ²¢Ìí¼Ó
         SpriteFrame* spriteFrame = frame->getSpriteFrame();
         if (spriteFrame) {
             newAnimation->addSpriteFrame(spriteFrame);
@@ -249,27 +257,27 @@ void Hero::addAnimation(const std::string& animationName, const cocos2d::Animati
 
 void Hero::attack()
 {
-    //è¦ä¸æ­¦å™¨æ¨¡å—æŒ‚é’©
+    //ÒªÓëÎäÆ÷Ä£¿é¹Ò¹³
 }
 
-// è®¾ç½®èƒŒåŒ…
-void Hero::setInventory(Inventory* inventory) 
+// ÉèÖÃ±³°ü
+void Hero::setInventory(Inventory* inventory)
 {
     m_inventory = inventory;
 }
 
-// èƒŒåŒ…æ¥å£
-Inventory* Hero::getInventory() const 
+// ±³°ü½Ó¿Ú
+Inventory* Hero::getInventory() const
 {
     return m_inventory;
 }
 
-// è£…å¤‡æ­¦å™¨
-void Hero::equipWeapon(Weapon* weapon) 
+// ×°±¸ÎäÆ÷
+void Hero::equipWeapon(Weapon* weapon)
 {
     if (m_equippedWeapon != weapon) {
         m_equippedWeapon = weapon;
-        // è¿™é‡Œéœ€è¦è·å–æ­¦å™¨çš„æ”»å‡»åŠ›
+        // ÕâÀïĞèÒª»ñÈ¡ÎäÆ÷µÄ¹¥»÷Á¦
         if (weapon) {
             //m_attackPower += weapon->getAttackPower();
         }
@@ -279,19 +287,19 @@ void Hero::equipWeapon(Weapon* weapon)
     }
 }
 
-// å½“å‰æ­¦å™¨çš„æ¥å£
-Weapon* Hero::getEquippedWeapon() const 
+// µ±Ç°ÎäÆ÷µÄ½Ó¿Ú
+Weapon* Hero::getEquippedWeapon() const
 {
     return m_equippedWeapon;
 }
 
 void Hero::attackWithBullet(const Vec2& position)
 {
-    // åˆ›å»ºå­å¼¹
+    // ´´½¨×Óµ¯
     auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO,this->getLevel());
     if (bullet) {
 
-        // åŠ è½½å­å¼¹å›¾å½¢èµ„æº
+        // ¼ÓÔØ×Óµ¯Í¼ĞÎ×ÊÔ´
         switch (this->getElement()) {
         case(CharacterElement::FIRE):
             bullet->setTexture("Weapon/Ammunition/bullet_fire.png");
@@ -310,35 +318,35 @@ void Hero::attackWithBullet(const Vec2& position)
             break;
         }
 
-        // è®¾ç½®é”šç‚¹
+        // ÉèÖÃÃªµã
         bullet->setAnchorPoint(Vec2(0.5f, 0.5f));
 
-        // è®¾ç½®å­å¼¹çš„ä½ç½®ä¸ºè‹±é›„çš„ä½ç½®
+        // ÉèÖÃ×Óµ¯µÄÎ»ÖÃÎªÓ¢ĞÛµÄÎ»ÖÃ
         bullet->setPosition(getPosition());
-        // è®¡ç®—å­å¼¹çš„ç§»åŠ¨æ–¹å‘
+        // ¼ÆËã×Óµ¯µÄÒÆ¶¯·½Ïò
         Vec2 direction = position - getPosition();
         float distanceToClick = direction.length();
 
-        // è®¾ç½®æœ€å°ç§»åŠ¨è·ç¦»
+        // ÉèÖÃ×îĞ¡ÒÆ¶¯¾àÀë
         const float minDistance = 10.0f;
         if (distanceToClick < minDistance) {
             direction = Vec2(minDistance, 0);
             distanceToClick = minDistance;
         }
 
-        // åœ¨æ”»å‡»èŒƒå›´å†…
+        // ÔÚ¹¥»÷·¶Î§ÄÚ
         if (distanceToClick <= 1000.0f) {
             float angle = std::atan2(direction.y, direction.x) * (180.0f / M_PI);
             bullet->setRotation(-angle);
-            // è®¡ç®—é€Ÿåº¦
+            // ¼ÆËãËÙ¶È
             float speed = 100.0f * (log10(bullet->getLevel())+3);
             float time = distanceToClick / speed;
 
-            // ç§»åŠ¨å­å¼¹åˆ°ç‚¹å‡»ä½ç½®
+            // ÒÆ¶¯×Óµ¯µ½µã»÷Î»ÖÃ
             auto moveAction = MoveTo::create(time, position);
             auto removeAction = RemoveSelf::create();
             bullet->runAction(Sequence::create(moveAction, removeAction, nullptr));
-            // æ·»åŠ å­å¼¹åˆ°ä¸»åœºæ™¯
+            // Ìí¼Ó×Óµ¯µ½Ö÷³¡¾°
             this->getParent()->addChild(bullet);
             CCLOG("Angle: %f", angle);
         }
@@ -352,7 +360,7 @@ void Hero::attackWithBayonet()
 {
     if (!m_bayonet)
     {
-        // åˆ›å»ºBayonetå®ä¾‹
+        // ´´½¨BayonetÊµÀı
         m_bayonet = Bayonet::create("Weapon/bayonet.png");
         if (m_bayonet)
         {
@@ -366,60 +374,60 @@ void Hero::attackWithBayonet()
     }
     else
     {
-
+        
         m_bayonet->attack();
     }
 }
 
-// è·å–æ€§åˆ«
+// »ñÈ¡ĞÔ±ğ
 bool Hero::getGender() {
     return m_ismale;
 }
 
-// è®¾ç½®æ€§åˆ«
+// ÉèÖÃĞÔ±ğ
 void Hero::setGender(bool is_male) {
     m_ismale = is_male;
 }
 
 
-//è·å–ç»éªŒå€¼
+//»ñÈ¡¾­ÑéÖµ
 void Hero::addExp(int exp)
 {
     m_exp += exp;
     while (m_exp >= m_expToLevelUp) {
-        // ç©å®¶å‡çº§
+        // Íæ¼ÒÉı¼¶
         Upgrading = true;
         LevelUp();
         updateLevelUpLabel();
-        // æ›´æ–°å‡çº§æ‰€éœ€çš„ç»éªŒå€¼
+        // ¸üĞÂÉı¼¶ËùĞèµÄ¾­ÑéÖµ
         m_expToLevelUp = calculateExpToLevelUp();
     }
 }
 
-//è®¡ç®—å‡çº§æ‰€éœ€è¦çš„ç»éªŒå€¼
+//¼ÆËãÉı¼¶ËùĞèÒªµÄ¾­ÑéÖµ
 int Hero::calculateExpToLevelUp()const
 {
-    return 50 * pow(1.2, m_level); // ç»éªŒéœ€æ±‚æŒ‡æ•°å¢é•¿
+    return 50 * pow(1.2, m_level); // ¾­ÑéĞèÇóÖ¸ÊıÔö³¤
 }
 
-//è§’è‰²å‡çº§çš„é€»è¾‘
+//½ÇÉ«Éı¼¶µÄÂß¼­
 void Hero::LevelUp()
 {
     if (m_level <= MaxLevel) {
-        setLevel(getLevel() + 1);  
-        //å¢åŠ è‡ªèº«çš„å±æ€§å€¼ï¼Œä¸è£…å¤‡åˆ†å¼€è®¡ç®—
-        //åç»­éœ€è¦æ›´æ”¹
+        setLevel(getLevel() + 1);
+        //Ôö¼Ó×ÔÉíµÄÊôĞÔÖµ£¬Óë×°±¸·Ö¿ª¼ÆËã
+        //ºóĞøĞèÒª¸ü¸Ä
         setMaxHealth(getMaxHealth() + 10);
-        // å‡çº§æ—¶è‡ªåŠ¨æ¢å¤ç”Ÿå‘½å€¼
+        // Éı¼¶Ê±×Ô¶¯»Ö¸´ÉúÃüÖµ
         setHealth(getMaxHealth());
         setAttackPower(getAttackPower() + 2);
         m_heroism += 100;
     }
-    else   //è¾¾åˆ°ç­‰çº§ä¸Šé™
+    else   //´ïµ½µÈ¼¶ÉÏÏŞ
         m_exp = 999999999;
 }
 
-// æ›´æ–°å‡çº§æ˜¾ç¤º
+// ¸üĞÂÉı¼¶ÏÔÊ¾
 void Hero::updateLevelUpLabel()
 {
     if (!levelupLabel) {
@@ -430,29 +438,29 @@ void Hero::updateLevelUpLabel()
     if (Upgrading) {
         levelupLabel->setString("Level UP!");
         levelupLabel->setVisible(true);
-        // åˆå§‹é¢œè‰²
+        // ³õÊ¼ÑÕÉ«
         cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
         levelupLabel->setTextColor(initialColor);
 
-        // é—ªçƒé¢œè‰²
+        // ÉÁË¸ÑÕÉ«
         cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
         float blinkInterval = 0.05f;
         int blinkTimes = 1;
 
-        // é—ªçƒåŠ¨ä½œ
+        // ÉÁË¸¶¯×÷
         cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
             cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
             cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
             nullptr
         ), blinkTimes);
 
-        // ç›®æ ‡é¢œè‰²
+        // Ä¿±êÑÕÉ«
         cocos2d::Color3B targetColor = cocos2d::Color3B::WHITE;
 
-        // é¢œè‰²æ¸å˜åŠ¨ä½œ
+        // ÑÕÉ«½¥±ä¶¯×÷
         cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
 
-        // æœ€ç»ˆéšè—åŠ¨ä½œ
+        // ×îÖÕÒş²Ø¶¯×÷
         cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
             blinkAction,
             colorAction,
@@ -463,7 +471,7 @@ void Hero::updateLevelUpLabel()
             nullptr
         );
 
-        // è¿è¡ŒåŠ¨ä½œ
+        // ÔËĞĞ¶¯×÷
         levelupLabel->runAction(hideAction);
     }
     CCLOG("updateLevelUpLabel called");
@@ -475,28 +483,50 @@ bool Hero::isAlive()const
 }
 
 bool Hero::checkCollision(Hero* otherHero) {
-    // è·å–è§’è‰²çš„è¾¹ç•Œæ¡†
+    // »ñÈ¡½ÇÉ«µÄ±ß½ç¿ò
     auto thisBoundingBox = getBoundingBox();
     auto otherBoundingBox = otherHero->getBoundingBox();
     return thisBoundingBox.intersectsRect(otherBoundingBox);
 }
 
 void Hero::update(float dt) {
-    if (m_bayonet)
+
+    if(m_bayonet)
         m_bayonet->update(dt);
+    if (m_isZSkillUnlock) {
+        if (m_skillZCoolDownTime > 0) {
+            m_skillZCoolDownTime -= dt;
+        }
+        else
+            m_isSkillZOnCoolDown = 0;
+    }
+    if (m_isXSkillUnlock) {
+        if (m_skillXCoolDownTime > 0) {
+            m_skillXCoolDownTime -= dt;
+        }
+        else
+            m_isSkillXOnCoolDown = 0;
+    }
+    if (m_isCSkillUnlock) {
+        if (m_skillCCoolDownTime > 0) {
+            m_skillCCoolDownTime -= dt;
+        }
+        else
+            m_isSkillCOnCoolDown = 0;
+    }
 
     m_moveDirection = cocos2d::Vec2::ZERO;
 
     if (m_moveUp) {
         m_moveDirection.y += m_speed * dt;
-        // æ’­æ”¾å‘ä¸Šè¡Œèµ°åŠ¨ç”»å¹¶è®¾ç½®ä¸ºå¾ªç¯æ’­æ”¾
+        // ²¥·ÅÏòÉÏĞĞ×ß¶¯»­²¢ÉèÖÃÎªÑ­»·²¥·Å
         if (!m_currentAnimate || m_animationCache->getAnimation("walk_up_hero") != m_currentAnimate->getAnimation()) {
 
             playAnimation("walk_up_hero");
         }
     }
     else {
-        // åœæ­¢å‘ä¸Šè¡Œèµ°åŠ¨ç”»
+        // Í£Ö¹ÏòÉÏĞĞ×ß¶¯»­
         if (m_currentAnimate && m_animationCache->getAnimation("walk_up_hero") == m_currentAnimate->getAnimation()) {
             stopAnimation();
         }
@@ -505,14 +535,14 @@ void Hero::update(float dt) {
 
     if (m_moveDown) {
         m_moveDirection.y -= m_speed * dt;
-        // æ’­æ”¾å‘ä¸‹è¡Œèµ°åŠ¨ç”»å¹¶è®¾ç½®ä¸ºå¾ªç¯æ’­æ”¾
+        // ²¥·ÅÏòÏÂĞĞ×ß¶¯»­²¢ÉèÖÃÎªÑ­»·²¥·Å
         if (!m_currentAnimate || m_animationCache->getAnimation("walk_down_hero") != m_currentAnimate->getAnimation()) {
 
             playAnimation("walk_down_hero");
         }
     }
     else {
-        // åœæ­¢å‘ä¸‹è¡Œèµ°åŠ¨ç”»
+        // Í£Ö¹ÏòÏÂĞĞ×ß¶¯»­
         if (m_currentAnimate && m_animationCache->getAnimation("walk_down_hero") == m_currentAnimate->getAnimation()) {
             stopAnimation();
         }
@@ -521,14 +551,14 @@ void Hero::update(float dt) {
 
     if (m_moveLeft) {
         m_moveDirection.x -= m_speed * dt;
-        // æ’­æ”¾å‘å·¦è¡Œèµ°åŠ¨ç”»å¹¶è®¾ç½®ä¸ºå¾ªç¯æ’­æ”¾
+        // ²¥·ÅÏò×óĞĞ×ß¶¯»­²¢ÉèÖÃÎªÑ­»·²¥·Å
         if (!m_currentAnimate || m_animationCache->getAnimation("walk_left_hero") != m_currentAnimate->getAnimation()) {
 
             playAnimation("walk_left_hero");
         }
     }
     else {
-        // åœæ­¢å‘å·¦è¡Œèµ°åŠ¨ç”»
+        // Í£Ö¹Ïò×óĞĞ×ß¶¯»­
         if (m_currentAnimate && m_animationCache->getAnimation("walk_left_hero") == m_currentAnimate->getAnimation()) {
             stopAnimation();
         }
@@ -537,44 +567,44 @@ void Hero::update(float dt) {
 
     if (m_moveRight) {
         m_moveDirection.x += m_speed * dt;
-        // æ’­æ”¾å‘å³è¡Œèµ°åŠ¨ç”»å¹¶è®¾ç½®ä¸ºå¾ªç¯æ’­æ”¾
+        // ²¥·ÅÏòÓÒĞĞ×ß¶¯»­²¢ÉèÖÃÎªÑ­»·²¥·Å
         if (!m_currentAnimate || m_animationCache->getAnimation("walk_right_hero") != m_currentAnimate->getAnimation()) {
 
             playAnimation("walk_right_hero");
         }
     }
     else {
-        // åœæ­¢å‘å³è¡Œèµ°åŠ¨ç”»
+        // Í£Ö¹ÏòÓÒĞĞ×ß¶¯»­
         if (m_currentAnimate && m_animationCache->getAnimation("walk_right_hero") == m_currentAnimate->getAnimation()) {
             stopAnimation();
         }
     }
 
 
-    //å›é€€ç‰ˆ
+    //»ØÍË°æ
 #if 0
-    // å¦‚æœæœ‰ç§»åŠ¨æ–¹å‘ï¼Œåˆ™å…ˆè®¡ç®—ç›®æ ‡ä½ç½®
+    // Èç¹ûÓĞÒÆ¶¯·½Ïò£¬ÔòÏÈ¼ÆËãÄ¿±êÎ»ÖÃ
     if (m_moveDirection != cocos2d::Vec2::ZERO) {
-        // è®¡ç®—ç›®æ ‡ä½ç½®
+        // ¼ÆËãÄ¿±êÎ»ÖÃ
         cocos2d::Vec2 targetPosition = getPosition() + m_moveDirection;
         cocos2d::Vec2 beforePosition = getPosition();
-        // è¾“å‡ºè°ƒè¯•æ—¥å¿—ï¼šè§’è‰²çš„å½“å‰åæ ‡ã€ç›®æ ‡åæ ‡
+        // Êä³öµ÷ÊÔÈÕÖ¾£º½ÇÉ«µÄµ±Ç°×ø±ê¡¢Ä¿±ê×ø±ê
         CCLOG("Hero update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
             getPosition().x, getPosition().y, targetPosition.x, targetPosition.y);
 
-        // è·å–å½“å‰åœºæ™¯
+        // »ñÈ¡µ±Ç°³¡¾°
         cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
         if (currentScene) {
-            // æ£€æŸ¥ç›®æ ‡ä½ç½®æ˜¯å¦ç¢°åˆ°å¢™å£
+            // ¼ì²éÄ¿±êÎ»ÖÃÊÇ·ñÅöµ½Ç½±Ú
             bool collision = false;
-            // åˆ¤æ–­åœºæ™¯ç±»å‹ï¼Œå¹¶è°ƒç”¨ä¸åŒçš„ç¢°æ’æ£€æµ‹æ–¹æ³•
+            // ÅĞ¶Ï³¡¾°ÀàĞÍ£¬²¢µ÷ÓÃ²»Í¬µÄÅö×²¼ì²â·½·¨
             if (dynamic_cast<MainScene*>(currentScene)) {
-                // å¦‚æœæ˜¯ MainSceneï¼Œä½¿ç”¨ MainScene çš„ç¢°æ’æ£€æµ‹
+                // Èç¹ûÊÇ MainScene£¬Ê¹ÓÃ MainScene µÄÅö×²¼ì²â
                 MainScene* scene = dynamic_cast<MainScene*>(currentScene);
                 collision = scene->checkCollision(targetPosition);
             }
             else if (dynamic_cast<OtherScene*>(currentScene)) {
-                // å¦‚æœæ˜¯ OtherSceneï¼Œä½¿ç”¨ OtherScene çš„ç¢°æ’æ£€æµ‹
+                // Èç¹ûÊÇ OtherScene£¬Ê¹ÓÃ OtherScene µÄÅö×²¼ì²â
                 OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
                 collision = scene->checkCollision(targetPosition);
             }
@@ -582,20 +612,20 @@ void Hero::update(float dt) {
                 targetPosition.x, targetPosition.y, collision ? "True" : "False");
 
             if (!collision) {
-                // å¦‚æœæ²¡æœ‰ç¢°åˆ°å¢™å£ï¼Œæ‰§è¡Œç§»åŠ¨
+                // Èç¹ûÃ»ÓĞÅöµ½Ç½±Ú£¬Ö´ĞĞÒÆ¶¯
                 moveBy(m_moveDirection);
                 CCLOG("Hero moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
             }
             else {
-                // å¦‚æœç¢°åˆ°å¢™å£ï¼Œåˆ™é€€å›ä¸€ç‚¹ï¼Œé¿å…è§’è‰²å¡ä½
+                // Èç¹ûÅöµ½Ç½±Ú£¬ÔòÍË»ØÒ»µã£¬±ÜÃâ½ÇÉ«¿¨×¡
                 cocos2d::Vec2 adjustedPosition = getPosition();
-                const float ajt = 1;//é€€å›çš„å¤šå°‘
+                const float ajt = 1;//ÍË»ØµÄ¶àÉÙ
                 if (m_moveUp && collision) adjustedPosition.y -= ajt * m_speed * dt;
                 if (m_moveDown && collision) adjustedPosition.y += ajt * m_speed * dt;
                 if (m_moveLeft && collision) adjustedPosition.x += ajt * m_speed * dt;
                 if (m_moveRight && collision) adjustedPosition.x -= ajt * m_speed * dt;
 
-                // è¾“å‡ºé€€å›åçš„æ–°ä½ç½®
+                // Êä³öÍË»ØºóµÄĞÂÎ»ÖÃ
                 CCLOG("Hero adjusted position due to collision: (%.2f, %.2f)", adjustedPosition.x, adjustedPosition.y);
                 setPosition(adjustedPosition);
             }
@@ -606,24 +636,24 @@ void Hero::update(float dt) {
     }
 #endif
 
-    //ä¸å›é€€ç‰ˆï¼Œä½†å¦‚æœè§’è‰²ä¸€å¸§ç§»åŠ¨è¿‡å¤šï¼Œåˆ™ä¼šè¶…å‡ºè¿‡å¤šï¼Œå¯¼è‡´äººç‰©å¡ä½ï¼ˆå·²è§£å†³ï¼‰
+    //²»»ØÍË°æ£¬µ«Èç¹û½ÇÉ«Ò»Ö¡ÒÆ¶¯¹ı¶à£¬Ôò»á³¬³ö¹ı¶à£¬µ¼ÖÂÈËÎï¿¨×¡£¨ÒÑ½â¾ö£©
 #if 1
-    // å¦‚æœæœ‰ç§»åŠ¨æ–¹å‘ï¼Œåˆ™å…ˆè®¡ç®—ç›®æ ‡ä½ç½®
+    // Èç¹ûÓĞÒÆ¶¯·½Ïò£¬ÔòÏÈ¼ÆËãÄ¿±êÎ»ÖÃ
     if (m_moveDirection != cocos2d::Vec2::ZERO) {
-        // è®¡ç®—ç›®æ ‡ä½ç½®
+        // ¼ÆËãÄ¿±êÎ»ÖÃ
         cocos2d::Vec2 targetPosition = getPosition() + m_moveDirection;
 
-        // è¾“å‡ºè°ƒè¯•æ—¥å¿—ï¼šè§’è‰²çš„å½“å‰åæ ‡ã€ç›®æ ‡åæ ‡
+        // Êä³öµ÷ÊÔÈÕÖ¾£º½ÇÉ«µÄµ±Ç°×ø±ê¡¢Ä¿±ê×ø±ê
         CCLOG("Hero update: Current Position = (%.2f, %.2f), Target Position = (%.2f, %.2f)",
             getPosition().x, getPosition().y, targetPosition.x, targetPosition.y);
 
-        // è·å–å½“å‰è¿è¡Œçš„åœºæ™¯
+        // »ñÈ¡µ±Ç°ÔËĞĞµÄ³¡¾°
         cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
         if (currentScene) {
-            // æ£€æŸ¥ç›®æ ‡ä½ç½®æ˜¯å¦ç¢°åˆ°å¢™å£
+            // ¼ì²éÄ¿±êÎ»ÖÃÊÇ·ñÅöµ½Ç½±Ú
             bool collision = false;
 
-            // åˆ¤æ–­åœºæ™¯ç±»å‹å¹¶è°ƒç”¨ä¸åŒçš„ç¢°æ’æ£€æµ‹æ–¹æ³•
+            // ÅĞ¶Ï³¡¾°ÀàĞÍ²¢µ÷ÓÃ²»Í¬µÄÅö×²¼ì²â·½·¨
             if (dynamic_cast<MainScene*>(currentScene)) {
                 MainScene* scene = dynamic_cast<MainScene*>(currentScene);
                 collision = scene->checkCollision(targetPosition);
@@ -636,15 +666,15 @@ void Hero::update(float dt) {
             CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
                 targetPosition.x, targetPosition.y, collision ? "True" : "False");
 
-            // å¦‚æœæ²¡æœ‰ç¢°æ’ï¼Œæ‰§è¡Œç§»åŠ¨
+            // Èç¹ûÃ»ÓĞÅö×²£¬Ö´ĞĞÒÆ¶¯
             if (!collision) {
                 moveBy(m_moveDirection);
                 CCLOG("Hero moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
             }
             else {
-                // å¦‚æœç¢°æ’å‘ç”Ÿï¼Œåœæ­¢è§’è‰²ç§»åŠ¨ï¼ˆä¸è¿›è¡Œåå‘è°ƒæ•´ï¼‰
+                // Èç¹ûÅö×²·¢Éú£¬Í£Ö¹½ÇÉ«ÒÆ¶¯£¨²»½øĞĞ·´Ïòµ÷Õû£©
                 CCLOG("Collision detected, stopping Hero move.");
-                // ä¸æ”¹å˜è§’è‰²çš„ä½ç½®ï¼Œè®©å®ƒåœç•™åœ¨åŸåœ°
+                // ²»¸Ä±ä½ÇÉ«µÄÎ»ÖÃ£¬ÈÃËüÍ£ÁôÔÚÔ­µØ
                 setPosition(getPosition());
             }
         }
@@ -656,7 +686,7 @@ void Hero::update(float dt) {
 
 }
 
-//è·å–è§’è‰²å…ƒç´ å±æ€§
+//»ñÈ¡½ÇÉ«ÔªËØÊôĞÔ
 CharacterElement Hero::getElement() 
 {
     return element;
@@ -669,4 +699,222 @@ void Hero::onMouseMove(cocos2d::EventMouse* event) {
         mousePos.y = 768 - mousePos.y;
         m_bayonet->setMousePosition(mousePos);
     }
+}
+
+void Hero::ChangeToBayonet()
+{
+    if (!m_isBayonetGet)
+        return;
+    if (m_isBayonetChosen)
+        return;
+    else
+    {
+        if (!m_bayonet)
+        {
+            // ´´½¨BayonetÊµÀı
+            m_bayonet = Bayonet::create("Weapon/bayonet.png");
+            if (m_bayonet)
+            {
+                m_bayonet->setName("bayonet");
+                m_bayonet->setAnchorPoint(Vec2(-0.1f, 0.5f));
+                Vec2 handpos = getPosition();
+                handpos.y += 10;
+                m_bayonet->setPosition(handpos);
+                getParent()->addChild(m_bayonet);
+            }
+        }
+        else
+            m_bayonet->setVisible(true);
+        m_isBayonetChosen = true;
+        m_isBulletChosen = false;
+    }
+}
+
+void Hero::ChangeToBullet()
+{
+    if (!m_isBulletGet)
+        return;
+    if (m_isBulletChosen)
+        return;
+    else
+    {
+        m_isBulletChosen = true;
+        m_isBayonetChosen = false;
+        if (m_bayonet)
+            m_bayonet->setVisible(false);
+    }
+}
+
+void Hero::SkillZ()
+{
+    if (!m_isZSkillUnlock || m_isSkillZOnCoolDown)
+        return;
+    cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+    cocos2d::Size visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
+
+    // Î»ÒÆ¼¼ÄÜµÄ¾àÀëÎª 30 ÏñËØ
+    int moveDistance = 30;
+    Vec2 targetDir = Vec2(moveDistance * (m_moveRight - m_moveLeft), moveDistance * (m_moveUp - m_moveDown));
+    Vec2 posNow = getPosition();
+    Vec2 endPosition = posNow + targetDir;
+    if (endPosition.x <= moveDistance || endPosition.y <= moveDistance || endPosition.x >= visibleSize.width - moveDistance || endPosition.y >= visibleSize.height - moveDistance)
+        return;
+    bool collision = false;
+
+    // ÀëÉ¢»¯Â·¾¶£¬·Ö³É 100 ¶Î
+    int numSegments = 100;
+    cocos2d::Vec2 segmentStep = targetDir / numSegments * 1.5;
+    bool collisionDetected = false;
+
+    // ¼ì²éÂ·¾¶ÉÏµÄÅö×²
+    for (int i = 0; i < numSegments; ++i)
+    {
+        posNow += segmentStep;
+        // ¼ì²éÊÇ·ñ»á·¢ÉúÅö×²
+        bool collision = false;
+        if (dynamic_cast<MainScene*>(currentScene))
+        {
+            MainScene* scene = dynamic_cast<MainScene*>(currentScene);
+            collision = scene->checkCollision(posNow);
+        }
+        else if (dynamic_cast<OtherScene*>(currentScene))
+        {
+            OtherScene* scene = dynamic_cast<OtherScene*>(currentScene);
+            collision = scene->checkCollision(posNow);
+        }
+
+        if (collision)
+        {
+            collisionDetected = true;
+            break;
+        }
+    }
+
+    // Èç¹ûÃ»ÓĞ·¢ÉúÅö×²£¬Ö´ĞĞÎ»ÒÆ
+    if (!collisionDetected)
+    {
+        // Ê¹ÓÃ MoveBy ¶¯×÷½«½ÇÉ«ÒÆ¶¯µ½Ä¿±êÎ»ÖÃ
+        auto moveAction = cocos2d::MoveBy::create(0.1f, targetDir);
+        runAction(moveAction);
+        m_skillZCoolDownTime = 1.5f;
+        m_isSkillZOnCoolDown = true;
+    }
+}
+
+void Hero::SkillX()
+{
+    if (!m_isXSkillUnlock || m_isSkillXOnCoolDown)
+        return;
+    if (m_isBulletChosen) {
+        m_skillXCoolDownTime = 3.0f;
+        m_isSkillXOnCoolDown = true;
+        // »·ĞÎµ¯Ä»µÄ°ë¾¶
+        float radius = 1.0f;
+        // µ¯Ä»ÊıÁ¿
+        int numBullets = 30;
+        // Ã¿¸ö×Óµ¯Ö®¼äµÄ½Ç¶È²î
+        float angleStep = 360.0f / numBullets;
+        // ²¨Êı
+        int numWaves = 3;
+        // ²¨Ö®¼äµÄÑÓ³ÙÊ±¼ä
+        float waveDelay = 0.1f;
+
+        // ´´½¨¶¯×÷ĞòÁĞ
+        cocos2d::Vector<cocos2d::FiniteTimeAction*> actions;
+
+        for (int wave = 0; wave < numWaves; ++wave)
+        {
+            // ÑÓ³Ù¶¯×÷
+            actions.pushBack(cocos2d::DelayTime::create(wave * waveDelay));
+
+            // ·¢ÉäÒ»²¨µ¯Ä»µÄ¶¯×÷
+            actions.pushBack(cocos2d::CallFunc::create([=]() {
+                for (int i = 0; i < numBullets; ++i)
+                {
+                    // ¼ÆËã×Óµ¯µÄ½Ç¶È
+                    float angle = i * angleStep;
+                    // ½«½Ç¶È×ª»»Îª»¡¶È
+                    float radian = angle * (M_PI / 180.0f);
+
+                    // ¼ÆËã×Óµ¯µÄÎ»ÖÃ
+                    cocos2d::Vec2 bulletPosition = getPosition() + cocos2d::Vec2(radius * cos(radian), radius * sin(radian));
+
+                    // ´´½¨×Óµ¯
+                    auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, 1);
+
+
+                    if (bullet)
+                    {
+                        // Îª×Óµ¯ÉèÖÃÎÆÀí
+                        switch (this->getElement()) {
+                        case(CharacterElement::FIRE):
+                            bullet->setTexture("Weapon/Ammunition/bullet_fire.png");
+                            break;
+                        case(CharacterElement::ICE):
+                            bullet->setTexture("Weapon/Ammunition/bullet_ice.png");
+                            break;
+                        case(CharacterElement::WATER):
+                            bullet->setTexture("Weapon/Ammunition/bullet_water.png");
+                            break;
+                        case(CharacterElement::ROCK):
+                            bullet->setTexture("Weapon/Ammunition/bullet_rock.png");
+                            break;
+                        default:
+                            bullet->setTexture("Weapon/Ammunition/bullet_default.png");
+                            break;
+                        }
+
+
+                        // ÉèÖÃ×Óµ¯µÄÃªµã
+                        bullet->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
+
+
+                        // ÉèÖÃ×Óµ¯µÄÎ»ÖÃ
+                        bullet->setPosition(bulletPosition);
+                        bullet->setRotation(-angle);
+
+                        // ¼ÆËã×Óµ¯µÄ·½Ïò£¬Ê¹ÆäÑØ×ÅÔ²ÖÜµÄÇĞÏß·½Ïò·ÉĞĞ
+                        cocos2d::Vec2 direction(cos(radian), sin(radian));
+
+
+                        // ×Óµ¯µÄËÙ¶È
+                        float speed = 300.0f;
+
+
+                        // ¼ÆËã×Óµ¯µÄÒÆ¶¯Ê±¼ä
+                        float time = 1.0f;
+
+
+                        // ´´½¨ÒÆ¶¯¶¯×÷
+                        auto moveAction = cocos2d::MoveBy::create(time, direction * speed * time);
+
+
+                        // ´´½¨ÒÆ³ı¶¯×÷£¬µ±×Óµ¯ÒÆ¶¯Ò»¶¨Ê±¼äºó½«ÆäÒÆ³ı
+                        auto removeAction = cocos2d::RemoveSelf::create();
+
+
+                        // ÔËĞĞ¶¯×÷ĞòÁĞ
+                        bullet->runAction(cocos2d::Sequence::create(moveAction, removeAction, nullptr));
+
+
+                        // Ìí¼Ó×Óµ¯µ½¸¸½Úµã
+                        this->getParent()->addChild(bullet);
+                    }
+                }
+                }));
+        }
+
+
+        // ÔËĞĞ¶¯×÷ĞòÁĞ
+        runAction(cocos2d::Sequence::create(actions));
+    }
+    else
+    {
+        attackWithBayonet();
+    }
+}
+
+void Hero::SkillC()
+{
+
 }
