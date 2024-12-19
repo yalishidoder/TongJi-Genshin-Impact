@@ -2,6 +2,8 @@
 #include <vector>
 #include "Weapon.h"
 
+#ifndef __SWITCHER_H__
+#define __SWITCHER_H__
 
 class WeaponSwitcher : public cocos2d::Node {
 public:
@@ -42,3 +44,5 @@ private:
     std::vector<Weapon*> m_weapons;
     int m_currentWeaponIndex;
 };
+
+#endif

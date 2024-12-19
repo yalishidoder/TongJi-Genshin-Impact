@@ -17,7 +17,7 @@ public:
     void update(float delta);
 
     // 攻击函数
-    void attack();
+    void attack(float angle = 0);
 
     // 检查和处理与敌人的碰撞
     void checkAndHandleCollision();
@@ -32,11 +32,12 @@ public:
     void addAnimation(const std::string& animationName, const cocos2d::Animation& animation);
     void playAnimation(const std::string& animationName);
 #endif
+    // 刺刀的攻击力
+    int attackPower;
 protected:
     // 刺刀的攻击范围
     float attackRange;
-    // 刺刀的攻击力
-    int attackPower;
+    
     // 刺刀的攻击冷却时间
     float attackCooldown;
     // 剩余的攻击冷却时间

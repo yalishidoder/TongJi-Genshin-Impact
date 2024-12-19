@@ -50,12 +50,15 @@ public:
     // 攻击方法
     virtual void attack()override;
     void attackWithBullet(const Vec2& position);
-    void attackWithBayonet();
+    void attackWithBayonet(float angle = 0);
 
     // 角色动画相关方法
     void playAnimation(const std::string& animationName);
     void stopAnimation();
     void addAnimation(const std::string& animationName, const cocos2d::Animation& animation);
+    void resetAnimationCache();
+    cocos2d::AnimationCache* m_animationCache;
+    cocos2d::Animate* m_currentAnimate;
     cocos2d::Animation* Hero::createWalkUpAnimation();
     cocos2d::Animation* Hero::createWalkDownAnimation();
     cocos2d::Animation* Hero::createWalkLeftAnimation();
@@ -127,8 +130,7 @@ private:
     int m_expToLevelUp;
     bool m_ismale;
 
-    cocos2d::AnimationCache* m_animationCache;
-    cocos2d::Animate* m_currentAnimate;
+    
 
     Inventory* m_inventory;
     Weapon* m_equippedWeapon;

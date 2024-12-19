@@ -70,7 +70,15 @@ void PlayerPanel::changeHeroGender()
 {
     if (m_hero)
     {
-        m_hero->setGender(!m_hero->getGender());
+        m_hero->setGender(!(m_hero->getGender()));
+        // 根据性别修改模型
+        if (!m_hero->getGender()) {
+            m_hero->setTexture("Character/Hero/Animation/female/female_default.png");
+        }
+        else {
+            m_hero->setTexture("Character/Hero/Animation/male/male_default.png");
+        }
+        m_hero->resetAnimationCache();
         updateInfo();
     }
     else

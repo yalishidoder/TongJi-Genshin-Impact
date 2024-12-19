@@ -336,7 +336,7 @@ void MainScene::update(float dt)
                 if (levelLabel)
                     levelLabel->setString(StringUtils::format("Lv %d", character->CharacterBase::getLevel()));
                 // 输出当前角色等级
-                CCLOG("hero level : %d", character->CharacterBase::getLevel());
+                //CCLOG("hero level : %d", character->CharacterBase::getLevel());
             }
         }
         if (enemy) {

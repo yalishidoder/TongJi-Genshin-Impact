@@ -1,5 +1,5 @@
 #include "Bullet.h"
-#include "Character/Enemy/Enemy.h"
+
 
 Bullet::Bullet()
 {
@@ -130,7 +130,7 @@ void Bullet::checkAndHandleCollision()
 void Bullet::onCollisionWithEnemy(cocos2d::Node* enemy)
 {
     // 减少敌人的生命值
-    static_cast<Enemy*>(enemy)->takeDamage((this->getLevel()+1.5)*20);
+    static_cast<Enemy*>(enemy)->takeDamage((this->getLevel()+1.5)*5);
 
     // 销毁子弹
     this->removeFromParentAndCleanup(true);

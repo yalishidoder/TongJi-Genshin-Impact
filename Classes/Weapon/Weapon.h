@@ -5,11 +5,11 @@
  * Author:        kfx
  * Update Date:   2024.12.10
  ****************************************************************/
-#include "cocos2d.h"
+
 
 #ifndef __WEAPON_H__
 #define __WEAPON_H__
-
+#include "cocos2d.h"
 class Weapon : public cocos2d::Node {
 public:
     // 构造函数与析构函数

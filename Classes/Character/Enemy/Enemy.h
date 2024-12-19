@@ -5,6 +5,9 @@
  * Author:        kfx
  * Update Date:   2024.12.10
  ****************************************************************/
+#ifndef __ENEMY_H__
+#define __ENEMY_H__
+
 #include "cocos2d.h"
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
@@ -129,4 +132,7 @@ private:
     cocos2d::Animation* createWalkDownAnimation();
     cocos2d::Animation* createWalkLeftAnimation();
     cocos2d::Animation* createWalkRightAnimation();
+    cocos2d::Animation* createDeathAnimation();
 };
+
+#endif

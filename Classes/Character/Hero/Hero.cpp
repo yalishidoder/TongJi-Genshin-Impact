@@ -124,7 +124,11 @@ cocos2d::Animation* Hero::createWalkUpAnimation() {
     cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
 
     for (int i = 2; i <= 8; ++i) {
-        std::string frameName = StringUtils::format("WALK_UP_%d.png", i);
+        std::string frameName;
+        if (!m_ismale)
+            frameName = StringUtils::format("WALK_UP_%d.png", i);
+        else
+            frameName = StringUtils::format("WALK_UP_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);
@@ -151,7 +155,11 @@ cocos2d::Animation* Hero::createWalkDownAnimation() {
     cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
     
     for (int i = 2; i <= 8; ++i) {
-        std::string frameName = StringUtils::format("WALK_DOWN_%d.png", i);
+        std::string frameName;
+        if (!m_ismale)
+            frameName = StringUtils::format("WALK_DOWN_%d.png", i);
+        else
+            frameName = StringUtils::format("WALK_DOWN_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);
@@ -178,7 +186,11 @@ cocos2d::Animation* Hero::createWalkLeftAnimation() {
     cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
 
     for (int i = 2; i <= 8; ++i) {
-        std::string frameName = StringUtils::format("WALK_LEFT_%d.png", i);
+        std::string frameName;
+        if (!m_ismale)
+            frameName = StringUtils::format("WALK_LEFT_%d.png", i);
+        else
+            frameName = StringUtils::format("WALK_LEFT_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);
@@ -205,7 +217,11 @@ cocos2d::Animation* Hero::createWalkRightAnimation() {
     cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
 
     for (int i = 2; i <= 8; ++i) {
-        std::string frameName = StringUtils::format("WALK_RIGHT_%d.png", i);
+        std::string frameName;
+        if (!m_ismale)
+            frameName = StringUtils::format("WALK_RIGHT_%d.png", i);
+        else
+            frameName = StringUtils::format("WALK_RIGHT_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);
@@ -356,7 +372,7 @@ void Hero::attackWithBullet(const Vec2& position)
     }
 }
 
-void Hero::attackWithBayonet()
+void Hero::attackWithBayonet(float angle)
 {
     if (!m_bayonet)
     {
@@ -368,6 +384,7 @@ void Hero::attackWithBayonet()
             m_bayonet->setAnchorPoint(Vec2(-0.1f, 0.5f));
             Vec2 handpos = getPosition();
             handpos.y += 10;
+            m_bayonet->attackPower = 10 * (m_level + 1);
             m_bayonet->setPosition(handpos);
             getParent()->addChild(m_bayonet);
         }
@@ -489,7 +506,22 @@ bool Hero::checkCollision(Hero* otherHero) {
     return thisBoundingBox.intersectsRect(otherBoundingBox);
 }
 
+void Hero::resetAnimationCache()
+{
+    if (m_animationCache)
+    {
+        m_animationCache->destroyInstance();
+        CCLOG("Cache destroyed!");
+        m_animationCache = cocos2d::AnimationCache::getInstance();
+        m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_hero");
+        m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_hero");
+        m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
+        m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_hero");
+    }
+}
+
 void Hero::update(float dt) {
+#if 0
     // 根据性别修改模型
     if (!this->getGender()) {
         this->setTexture("Character/Hero/Animation/female/female_default.png");
@@ -497,7 +529,7 @@ void Hero::update(float dt) {
     else {
         this->setTexture("Character/Hero/Animation/male/male_default.png");
     }
-
+#endif
     if(m_bayonet)
         m_bayonet->update(dt);
     if (m_isZSkillUnlock) {
@@ -917,8 +949,9 @@ void Hero::SkillX()
     }
     else
     {
-        attackWithBayonet();
+
     }
+
 }
 
 void Hero::SkillC()

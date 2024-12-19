@@ -5,6 +5,7 @@
 #include "Hero/Hero.h"
 #include "ui/CocosGUI.h"
 
+
 class PlayerPanel : public cocos2d::Node {
 public:
 

@@ -60,6 +60,8 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
     m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_enemy");
     m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_enemy");
     m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_enemy");
+    m_animationCache->addAnimation(createDeathAnimation(), "death_enemy");
+
     return true;
 }
 
@@ -98,8 +100,16 @@ void Enemy::setInitData(int level)
 
 void Enemy::setDeath() 
 {
-    this->m_isAlive = 0;
-    this->removeFromParentAndCleanup(true);
+    playAnimation("death_enemy");
+    m_isAlive = 0;
+    currentState = EnemyState::STAY;
+    // 添加一个延时动作，等待动画播放完成
+    auto delay = cocos2d::DelayTime::create(1.2f); // 假设死亡动画持续1秒
+    auto remove = cocos2d::CallFunc::create([=]() {
+        removeFromParentAndCleanup(true);
+        });
+    auto sequence = cocos2d::Sequence::create(delay, remove, nullptr);
+    runAction(sequence);
 }
 
 void Enemy::update(float delta) 
@@ -112,6 +122,7 @@ void Enemy::update(float delta)
         //moveLogic(delta);
         //attackLogic();
     }
+
 }
 
 // 简单的元素反应逻辑
@@ -123,6 +134,8 @@ void Enemy::update(float delta)
 
 void Enemy::takeDamage(float damage)
 {
+    if (!m_isAlive)
+        return;
     Hero* player = this->getPlayer();
 
     switch (player->getElement())//元素附加伤害
@@ -347,7 +360,7 @@ void Enemy::chaseLogic(float& dt, cocos2d::Vec2& playerPos, cocos2d::Vec2& enemy
 
 void Enemy::stayLogic(float& distanceToPlayer)
 {
-    if (distanceToPlayer > 10)
+    if (distanceToPlayer > 10 && m_isAlive)
     {
         currentState = EnemyState::PATROL;
     }
@@ -580,6 +593,28 @@ cocos2d::Animation* Enemy::createWalkRightAnimation() {
 
     for (int i = 2; i <= 8; ++i) {
         std::string frameName = StringUtils::format("Character/Enemy/Animation/WALK_RIGHT_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+// 创建死亡动画
+cocos2d::Animation* Enemy::createDeathAnimation() {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/ENEMY_DEATH.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/ENEMY_DEATH.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 0; i <= 6; ++i) {
+        std::string frameName = StringUtils::format("DEATH-%d.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);

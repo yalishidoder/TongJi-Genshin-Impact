@@ -4,7 +4,7 @@
 
 
 // 构造函数
-Bayonet::Bayonet() : attackRange(50.0f), attackPower(10), attackCooldown(0.3f), remainingCooldown(0.0f) {
+Bayonet::Bayonet() : attackRange(50.0f), attackPower(100), attackCooldown(0.3f), remainingCooldown(0.0f) {
     
 }
 
@@ -32,7 +32,6 @@ bool Bayonet::init(const std::string& textureFileName) {
     // 加载挥砍动画
     m_animationCache = cocos2d::AnimationCache::getInstance();
     //m_animationCache->addAnimation(createSwingAnimation(), "bayonet_swing");
-    
     return true;
 }
 
@@ -74,13 +73,13 @@ void Bayonet::updateRotation() {
 }
 
 // 攻击函数
-void Bayonet::attack() {
+void Bayonet::attack(float angle) {
     if (remainingCooldown > 0) {
         return;
     }
     if(nextDir)
         remainingCooldown -= 0.2;
-    setRotation(m_rotationAngle + 100 * (nextDir - 0.5));
+    setRotation(m_rotationAngle + 100 * (nextDir - 0.5)+angle);
     nextDir = !nextDir;
     // 播放挥砍动画
     //playAnimation("bayonet_swing");

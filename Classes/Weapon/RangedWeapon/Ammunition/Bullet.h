@@ -2,7 +2,7 @@
 #define __BULLET_H__
 
 #include "cocos2d.h"
-
+#include "Character/Enemy/Enemy.h"
 class Bullet : public cocos2d::Sprite
 {
 public:
