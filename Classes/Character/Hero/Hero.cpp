@@ -490,6 +490,13 @@ bool Hero::checkCollision(Hero* otherHero) {
 }
 
 void Hero::update(float dt) {
+    // 根据性别修改模型
+    if (!this->getGender()) {
+        this->setTexture("Character/Hero/Animation/female/female_default.png");
+    }
+    else {
+        this->setTexture("Character/Hero/Animation/male/male_default.png");
+    }
 
     if(m_bayonet)
         m_bayonet->update(dt);

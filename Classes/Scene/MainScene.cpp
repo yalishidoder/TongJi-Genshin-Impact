@@ -123,6 +123,17 @@ bool MainScene::init()
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中 
+
+                // 创建玩家面板
+                m_playerPanel = PlayerPanel::create();
+                if (m_playerPanel) {
+                    m_playerPanel->setName("m_playerPanel");
+                    m_playerPanel->setPosition(cocos2d::Vec2(250, 100));
+                    m_playerPanel->setVisible(false);
+                    m_playerPanel->setHero(hero);
+                    m_playerPanel->initUi();
+                    this->addChild(m_playerPanel, 11);
+                }
             }
 
             // 创建血条背景
@@ -170,16 +181,6 @@ bool MainScene::init()
                 demon->setPosition(Vec2(adjustedX, adjustedY));
 
                 this->addChild(demon);  // 将角色添加到场景中
-
-                // 创建玩家面板
-                m_playerPanel = PlayerPanel::create();
-                if (m_playerPanel) {
-                    m_playerPanel->setName("m_playerPanel");
-                    m_playerPanel->setPosition(cocos2d::Vec2(250, 100));
-                    m_playerPanel->setVisible(false);
-                    m_playerPanel->setHero(hero);
-                    this->addChild(m_playerPanel, 11);
-                }
 
             }
             auto demon2 = Enemy::create(Vec2(250, 300));
@@ -684,21 +685,25 @@ void MainScene::operatemyPanel()
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         if (m_playerPanel) {
+            m_playerPanel->setHero(hero);
+            //m_playerPanel->initUi();
+            m_playerPanel->updateInfo();
             m_playerPanel->setVisible(!m_playerPanel->isVisible());
             isPanelVisible = (m_playerPanel->isVisible());
+            CCLOG("Panel visibility set to: %d", m_playerPanel->isVisible());
 
             showmyPanel();
 
             // 创建关闭按钮
-            auto closeButton_ = cocos2d::ui::Button::create("CloseNormal.png");
-            closeButton_->setPosition(Vec2(m_playerPanel->getContentSize().width - 20, m_playerPanel->getContentSize().height - 20));
-            closeButton_->addClickEventListener([=](Ref* sender)
-                {
-                    this->hidemyPanel();
-                });
-            m_playerPanel->addChild(closeButton_);
-
-            CCLOG("Panel visibility set to: %d", m_playerPanel->isVisible());
+            auto closeButton_ = cocos2d::ui::Button::create("Character/panel/Close_Icon.png");
+            if (closeButton_) {
+                closeButton_->setPosition(Vec2(550, 550));
+                closeButton_->addClickEventListener([=](Ref* sender)
+                    {
+                        this->hidemyPanel();
+                    });
+                m_playerPanel->addChild(closeButton_);
+            }
         }
         else
             CCLOG("m_playerPanel is null!");

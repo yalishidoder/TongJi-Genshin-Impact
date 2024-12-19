@@ -7,11 +7,15 @@
 
 class PlayerPanel : public cocos2d::Node {
 public:
+
     // 创建PlayerPanel实例的静态方法
     static PlayerPanel* create();
 
     // 初始化方法
     virtual bool init();
+
+    // 初始化ui组件
+    void initUi();
 
     // 更新UI信息
     void updateInfo();
@@ -19,6 +23,9 @@ public:
     // 设置角色
     void setHero(Hero* hero);
 
+    // 更改角色性别
+    void changeHeroGender();
+    
 private:
     Hero* m_hero; // 角色指针
 

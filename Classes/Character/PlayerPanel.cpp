@@ -63,15 +63,26 @@ void PlayerPanel::setHero(Hero* hero)
     else {
         CCLOG("m_hero is null.");
     }
-
-    updateInfo();
 }
 
-// 更新UI信息，显示背包物品和角色状态
-void PlayerPanel::updateInfo()
+// 返回角色，用于更改性别
+void PlayerPanel::changeHeroGender()
+{
+    if (m_hero)
+    {
+        m_hero->setGender(!m_hero->getGender());
+        updateInfo();
+    }
+    else
+        CCLOG("m_hero is null");
+}
+
+// 初始化ui组件
+void PlayerPanel::initUi()
 {
     if (m_hero && m_inventory) {
         CCLOG("m_hero and m_inventory are valid");
+
         m_inventoryLayout->removeAllChildren();
 
         // 遍历背包中的所有物品，创建节点并添加到布局中
@@ -99,9 +110,141 @@ void PlayerPanel::updateInfo()
         // 确保ScrollView的内容区域大小正确
         m_scrollView->setInnerContainerSize(cocos2d::Size(200, height));
 
+        // 创建面板背景
+        auto backgroundSprite = Sprite::create("Character/panel/Character_Box.png");
+        if (backgroundSprite) {
+            backgroundSprite->setPosition(cocos2d::Vec2(250, 250));
+            backgroundSprite->setScale(1.25f);
+            this->addChild(backgroundSprite);
+        }
+
         // 创建人物头像
         auto headshotSprite = cocos2d::Sprite::create("Character/Hero/test.png");
-        
+        if (headshotSprite)
+        {
+            headshotSprite->setName("headshotSprite");
+            headshotSprite->setPosition(cocos2d::Vec2(400, 400));
+            this->addChild(headshotSprite);
+        }
+
+        // 创建label背景
+        auto namebackgroundSprite = Sprite::create("Character/panel/Nickname_Slot.png");
+        if (namebackgroundSprite) {
+            namebackgroundSprite->setPosition(cocos2d::Vec2(110, 500));
+            namebackgroundSprite->setScale(2.0f);
+            this->addChild(namebackgroundSprite);
+        }
+
+        // 显示角色名称
+        auto heronameLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 48);
+        if (heronameLabel) {
+            heronameLabel->setName("heronameLabel");
+            heronameLabel->setPosition(cocos2d::Vec2(110, 500));
+            this->addChild(heronameLabel);
+        }
+
+        // 创建label背景
+        auto levelbackgroundSprite = Sprite::create("Character/panel/Nickname_Slot.png");
+        if (levelbackgroundSprite) {
+            levelbackgroundSprite->setPosition(cocos2d::Vec2(110, 400));
+            levelbackgroundSprite->setScale(2.0f);
+            this->addChild(levelbackgroundSprite);
+        }
+
+        // 显示角色等级
+        auto levelLabelinPanel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 48);
+        if (levelLabelinPanel) {
+            levelLabelinPanel->setName("levelLabelinPanel");
+            levelLabelinPanel->setPosition(cocos2d::Vec2(110, 400));
+            this->addChild(levelLabelinPanel);
+        }
+
+        // 显示角色性别
+        auto genderLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
+        if (genderLabel) {
+            genderLabel->setName("genderLabel");
+            genderLabel->setPosition(cocos2d::Vec2(110, 300));
+            this->addChild(genderLabel);
+        }
+
+        // 显示角色最大生命值
+        auto fullHealthLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
+        if (fullHealthLabel) {
+            fullHealthLabel->setName("fullHealthLabel");
+            fullHealthLabel->setPosition(cocos2d::Vec2(110, 200));
+            this->addChild(fullHealthLabel);
+        }
+
+        // 显示已装备的武器信息
+        auto equippedWeapon = m_hero->getEquippedWeapon();
+        if (equippedWeapon) {
+            auto weaponLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
+            if (weaponLabel) {
+                weaponLabel->setName("weaponLabel");
+                weaponLabel->setPosition(cocos2d::Vec2(110, 100));
+                this->addChild(weaponLabel);
+            }
+        }
+
+        // 显示攻击力信息
+        auto attackLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
+        if (attackLabel) {
+            attackLabel->setName("attackLabel");
+            attackLabel->setPosition(cocos2d::Vec2(110, 0));
+            this->addChild(attackLabel);
+        }
+
+        // 创建修改按钮
+        auto changeButton = cocos2d::ui::Button::create("CloseNormal.png");
+        if (changeButton) {
+            changeButton->setPosition(cocos2d::Vec2(300, 300));
+            changeButton->addClickEventListener([=](Ref* sender)
+                {
+                    this->changeHeroGender();
+                });
+            this->addChild(changeButton);
+        }
+    }
+    else {
+        CCLOG("m_hero or m_inventory is null.");
+    }
+}
+
+// 更新UI信息，显示背包物品和角色状态
+void PlayerPanel::updateInfo()
+{
+    if (m_hero && m_inventory) {
+        CCLOG("m_hero and m_inventory are valid");
+
+        m_inventoryLayout->removeAllChildren();
+
+        // 遍历背包中的所有物品，创建节点并添加到布局中
+        auto items = m_inventory->getAllItem();
+
+        CCLOG("Number of items: %d", items.size());
+        for (auto item : items) {
+            if (item != nullptr) {
+                auto itemNode = createItemNode(item);
+                m_inventoryLayout->addChild(itemNode);
+            }
+            else {
+                CCLOG("Found null item in inventory.");
+            }
+        }
+
+        // 设置布局的大小
+        float height = items.size() * 50;
+
+        if (!items.size())
+            height = 1000;
+
+        m_inventoryLayout->setContentSize(cocos2d::Size(200, height));
+
+        // 确保ScrollView的内容区域大小正确
+        m_scrollView->setInnerContainerSize(cocos2d::Size(200, height));
+
+        // 显示人物头像
+        auto headshotSprite = dynamic_cast<Sprite*>(this->getChildByName("headshotSprite"));
         if (headshotSprite)
         {
             // 根据性别切换头像
@@ -111,63 +254,50 @@ void PlayerPanel::updateInfo()
             else {
                 headshotSprite->setTexture("Character/Hero/Animation/male/male_default.png");
             }
-
-            headshotSprite->setPosition(cocos2d::Vec2(300, 400));
-            this->addChild(headshotSprite);
-
+            headshotSprite->setScale(4.0f);
         }
 
-        // 显示角色名称
-        auto nameLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 48);
-        if (nameLabel) {
-            nameLabel->setString(m_hero->getCharacterName());
-            nameLabel->setPosition(cocos2d::Vec2(100, 600));
-            this->addChild(nameLabel);
+        // 显示角色名
+        auto heronameLabel = dynamic_cast<Label*>(this->getChildByName("heronameLabel"));
+        if (heronameLabel) {
+            heronameLabel->setString(m_hero->CharacterBase::getCharacterName());
         }
 
         // 显示角色等级
-        auto levelLabelinPanel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 48);
+        auto levelLabelinPanel = dynamic_cast<Label*>(this->getChildByName("levelLabelinPanel"));
         if (levelLabelinPanel) {
-            levelLabelinPanel->setString("LV :" + std::to_string(m_hero->getLevel()));
-            levelLabelinPanel->setPosition(cocos2d::Vec2(100, 500));
-            this->addChild(levelLabelinPanel);
+            levelLabelinPanel->setString(StringUtils::format("Lv %d", m_hero->CharacterBase::getLevel()));
         }
 
         // 显示角色性别
-        auto genderLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 48);
+        auto genderLabel = dynamic_cast<Label*>(this->getChildByName("genderLabel"));
         if (genderLabel) {
-            std::string m_gender = (m_hero->getGender()) ? "Woman" : "Man";
+            std::string m_gender = (m_hero->getGender()) ? "Man" : "Woman";
             genderLabel->setString("Gender: " + m_gender);
-            genderLabel->setPosition(cocos2d::Vec2(100, 400));
-            this->addChild(genderLabel);
         }
 
         // 显示角色最大生命值
-        auto fullHealthLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 48);
+        auto fullHealthLabel = dynamic_cast<Label*>(this->getChildByName("fullHealthLabel"));
         if (fullHealthLabel) {
-            fullHealthLabel->setString("MaxHealth: " + std::to_string(m_hero->getMaxHealth()));
-            fullHealthLabel->setPosition(cocos2d::Vec2(100, 300));
-            this->addChild(fullHealthLabel);
+            fullHealthLabel->setString(StringUtils::format("MaxHealth: %d", m_hero->CharacterBase::getMaxHealth()));
         }
 
         // 显示已装备的武器信息
         auto equippedWeapon = m_hero->getEquippedWeapon();
         if (equippedWeapon) {
-            auto weaponLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 48);
+            auto weaponLabel = dynamic_cast<Label*>(this->getChildByName("weaponLabel"));
             if (weaponLabel) {
                 weaponLabel->setString("equippedWeapon: ");// + equippedWeapon->getName());
-                weaponLabel->setPosition(cocos2d::Vec2(100, 200));
-                this->addChild(weaponLabel);
             }
         }
 
         // 显示攻击力信息
-        auto attackLabel = cocos2d::Label::createWithTTF("", "fonts/Marker Felt.ttf", 48);
+        auto attackLabel = dynamic_cast<Label*>(this->getChildByName("attackLabel"));
         if (attackLabel) {
-            attackLabel->setString("AttackPower: " + std::to_string(m_hero->getAttackPower()));
-            attackLabel->setPosition(cocos2d::Vec2(100, 100));
-            this->addChild(attackLabel);
+            attackLabel->setString(StringUtils::format("AttackPower: %d", m_hero->CharacterBase::getAttackPower()));
         }
+
+
     }
     else {
         CCLOG("m_hero or m_inventory is null.");
