@@ -16,6 +16,11 @@ void MapManager::saveforestSwitchPoints(const std::vector<PositionSwitchPoint>& 
     forestSwitchPoints = points;
 }
 
+void MapManager::savedesertSwitchPoints(const std::vector<PositionSwitchPoint>& points)
+{
+    desertSwitchPoints = points;
+}
+
 // 获取保存的 MainScene 的传送点数据
 std::vector<PositionSwitchPoint> MapManager::getMainSceneSwitchPoints() const {
     return mainSceneSwitchPoints;
@@ -24,4 +29,9 @@ std::vector<PositionSwitchPoint> MapManager::getMainSceneSwitchPoints() const {
 std::vector<PositionSwitchPoint> MapManager::getforestSwitchPoints() const
 {
     return forestSwitchPoints;
+}
+
+std::vector<PositionSwitchPoint> MapManager::getdesertSwitchPoints() const
+{
+    return desertSwitchPoints;
 }

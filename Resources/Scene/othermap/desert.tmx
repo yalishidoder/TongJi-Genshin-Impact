@@ -1,110 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="30">
- <tileset firstgid="1" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
-  <image source="springobjects.es-ES.png" width="384" height="624"/>
- </tileset>
- <tileset firstgid="937" name="summer_beach.fr-FR" tilewidth="16" tileheight="16" tilecount="527" columns="17">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="12">
+ <tileset firstgid="1" name="summer_beach.fr-FR" tilewidth="16" tileheight="16" tilecount="527" columns="17">
   <image source="summer_beach.fr-FR.png" width="272" height="496"/>
  </tileset>
- <layer id="1" name="desert" width="30" height="30">
+ <tileset firstgid="528" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
+  <image source="springobjects.es-ES.png" width="384" height="624"/>
+ </tileset>
+ <tileset firstgid="1464" name="desert_npc" tilewidth="16" tileheight="16" tilecount="6" columns="2">
+  <image source="../../NPC/desert_npc.png" width="32" height="48"/>
+ </tileset>
+ <tileset firstgid="1470" name="spring_outdoorsTileSheet.pt-BR" tilewidth="16" tileheight="16" tilecount="1975" columns="25">
+  <image source="spring_outdoorsTileSheet.pt-BR.png" width="400" height="1264"/>
+ </tileset>
+ <layer id="15" name="WallLayer" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJw7yMzAcJAALmQhrIYS9aP2jkx7ae3OoW4vsW4jhAfajUMFj4bhKB7FQw8P5jKQGm4brvUeLvNH7R21d9TegbEXAKMjnW8=
+   eJztmMENgDAMxGCS7r8lIyTosALUJ/E6xcEPKmCdx7E2v6hU7LRPo7/+9I5qf9I/sV9/dke1P+mf2K8/yyf7NPrrrz/Ln5zv8PVn+ZPzHf5X/f3+zfN2fzr6668/y0/6avbv5z8d/fWn/aeevTv3R/KTno7++uvP8pO+mvX9J4v++uvP8pOeztv9//7/j57v8PVn+ZPzHb7+LH9yvsP3/Gf5ZJ9Gf/313/u6ANr4MAE=
   </data>
  </layer>
- <layer id="2" name="gem" width="30" height="30">
+ <layer id="1" name="sand" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJxjYBh4kEBl8/QH2H5y3EBLkICDTQswWPydQCNzB4v/RsEoGAWjYBSMAnoD3YF2ABKgp1sI2cULxehiowA/wBWu2MRxhedoOFMHAAAexQO/
+   eJyVlcGNpEAQBMcOXBhD8N+j25X2gUIR2dwDzQjo7qqszOD+fD733/X9ua7H//txXX/3vnjvxj2u55oLe/P/hX14Lvd6PucerP+WZ9fHa32u+cr6WvON96ov2+/ZE5+tM9gre7F+qAP1rMverdqXF3hZ39SPtXO+NlfuYX4x7/L80mHpt+bHvcwb3PukP3WsjFav3L+8U/2aVtzHfMv3zSfFKuptM6996E/Wt3xn/iy+kTvGlPJeZab8szQyftH7xsvSm7XXt4F+WdnhfWO21VUzKi7ZPjYn04PnVV7t+1E8XNqXHqyl8sk5LO+uGr9y8b5li9kwrWy2lQvrefnOcrM4ZAw49URdmH3znelW8zYGVo6sNuvfdLW+zfeLJTY/8zczwd/qwWZic7A515nlm+KafSMq95YtY5Nlx3jLPsr7Kyfld5vtypqxj6w2TxrPlx+5BzWt+uwsy6rVYrrWHPlbGS2fG6MsM5yxZacyXlmuHoo1xrXTPsavyk958M33Yc2PDGCPla/KKTWoXtZzamtrzRM8v7Jt2WA99JcxsjixsmIzIWtPXCv/rewZO7h+aWl+s73NR9b7GybSz6WB9WQMPdVNRi4/rhxX/snx4msxuDJkzyv7xZTqq74FVVexh9pZr2vN+t7wOdfYjM1v5kPqZXUVC8r/1m9l/eTR4q6x0Hqq3ugd4wxrWBktJpfnWKexynK/9Kx8VA3ml/Xfsm55M42KBafzLC+8X/m12mpfZsueme+4pvhFfTgny7r5t3hc2eGMWLt5374FlsHSyuZO77+Zq7GG+vAsaszZFgfKNzxjcWTlwOqw/Yyh5ofTfKz/0s2ywTWcXzG1+Mc1xgfTnvWvPFq/VrfNuphSOS0f277M8KrdWGbn2TfEZmqeoRbGDuNY+bh04W9pVZy3862etaa4a9xbWhhrrU+eYfpUXopp1av5ir3XWeUF4015zPQpBpR/Kpemx+Lo8pHtWxwy/atmnlGMtfdtrfVTPrC827nFllpX3jcuG6uYn8qxed24Xv41lhYDuY/tbf3/b+81++LeiSeLoZbT8i7XWO12hvmRzDF/13POuBhGTazf8gJ1MHYYV2zm1g/1JdcrQ6y72EuOGddO+WENxvNirj0rT5xYY3NhHoxhlZ3KknmJmVh84Uxqhiun5Vtjg71n3rqwL+s11tiMaz723Pi25r1mzDNNk6plPat5FufMF5apU7/FTr5n+580MD/WnFe+y0PFD/ZQnl9ZqW8Js2b5fcMmO2/x1+ZhGVp5Ke7VzIpVxgvr33xm/rar9imOmvaLWVY7+zv5xPJJxln2Fm/LZ8VD1nXyoWlS834zV6vB/htjzYOV0dLY3llamefN9ytbJ7aWfuytNLQM2289X9rVeZyTca7OoJ+rH8uWZWjNh+tLb/M8vX5iqPVPTlEr4+FJp6qzfFY8Kc6TZavmkx/tTPO1ZdBmZ3MrTrLu3/v/AEkYMQc=
   </data>
  </layer>
- <layer id="7" name="decorations" width="30" height="30">
+ <layer id="16" name="baseland" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJxjYKAOKGCkkkF4gDkz7e0YBaNgFBAGQQNsPz3Km1FAHUAorrClpYFOX8MBkJNHSNFDSX08WpePglEwCkbB4AIAoHoD2g==
+   eJzVmVFqAzEMRPcaOUOOsP++/5FKIYaX15EbKBRGsCTxZkvHHo1Gyrqu68a1Xtd+/8C9x+ta+HxjbeGZ79eG2BiIiWvGdOs+v8+9uv8TxB8inbn34sQBri/db4iEm5+N3/uyrp882c83BPGeOJ04krBzDxvipGHWhrRH6ftN/J9ymfm8MT9fV9qLtNYQ5rc17xmupIvOhRb++3831nTPue6a0Zb/xEcc5ryxWyOtGQ1B/hJf4v7ki5jzvNcQid/G7rz2/iQ/0KR/1q7n9c7/xHPvT9LAhjCPN56Nm/iI+b7e9yblQEO4vic9cB7sfUmcp4doCPLcHsB+h5xwH5TqQkPw3CcPkDTP3E99QkNMnmfjmvKfueIeuAk/ee4ZRzpz173UK+09bQj3cwmH+Z54kjjSEO5luR9J/5MXTj1SC//t43mO6Uxd/1wfyIeGmGZdE9Z0zgl7y/knDfvE9/leq/+xrzc+Y5xqYPKADTH5t8T1yf+lGVgL/jTH5hm69lHzjNc60hDp94w073Lv4+86j5r0P/nXpPHsi7xGLjT1P4nH7v3sjcgJa0db/U/eN3meNBfgepqDNoQ1i9wn3ydv5Gf52hCeWaT67lxw/pv/Tf6PfDW3P5n/pH6xqf5PPo9rxOo9mDxSi/5Rv9IczLPd32ZFbefPc3WNYy54TkQd8G8FTfU/4bLGERv135pgn9wQzPGpn/X95If4TFP9P/V6znPrm/W/sf+37530LGk8tdN+sAV/mnknL0S+0+8YM71EQxiLMZzO2L7Pc6SGmPAR0zQjtu/332mIqYcnRuv7Olxt9c/4TzOdyec+rp/a0cR/czppnfVt8sGN+N3HGqtrHXE699vmf1+yxNgi
   </data>
  </layer>
- <layer id="3" name="flag" width="30" height="30">
+ <layer id="2" name="wall" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUDBRYzDzQLhgFowA7yGdiYChgIk0PNdJzO9DODhLtHQWjgBZgtHweBaNgFIwUAAA24QPp
+   eJztmEEKgDAQxOpL/P8vxRd4mA6zUxPwFBYapIu4lo/78vrp0O/10/l7/xf0a76d0/v/fv/p9/rp0O/101HPT/+ec6Sg3zf/uh2PE/af5tuhX/Pt0K/5r9nT93879Gu+nfT9S8P713w79Gu+Hb5/NN8O/Zpvh37Nt8P/v+x8Gvqz82noz86nYf97/XTo9/rp0O/1O3gA+P4VwQ==
   </data>
  </layer>
- <objectgroup id="6" name="gem">
-  <object id="6" name="gem1" x="56.5" y="20">
-   <point/>
-  </object>
-  <object id="7" name="gem1" x="24.5" y="68.5">
-   <point/>
-  </object>
-  <object id="8" name="gem1" x="38.5" y="100">
-   <point/>
-  </object>
-  <object id="9" name="gem1" x="74" y="67">
-   <point/>
-  </object>
-  <object id="10" name="gem1" x="88.5" y="38">
-   <point/>
-  </object>
-  <object id="11" x="56.5" y="20" visible="0">
-   <point/>
-  </object>
-  <object id="12" name="gem2" x="375" y="18">
-   <point/>
-  </object>
-  <object id="13" name="gem2" x="425" y="34">
-   <point/>
-  </object>
-  <object id="14" name="gem2" x="455.5" y="66.5">
-   <point/>
-  </object>
-  <object id="15" name="gem2" x="393.5" y="100.5">
-   <point/>
-  </object>
-  <object id="16" name="gem3" x="376.5" y="339">
-   <point/>
-  </object>
-  <object id="17" name="gem3" x="455" y="352.5">
-   <point/>
-  </object>
-  <object id="18" name="gem3" x="408" y="373">
-   <point/>
-  </object>
-  <object id="19" name="gem3" x="345.5" y="421">
-   <point/>
-  </object>
-  <object id="20" name="gem3" x="440" y="417.5">
-   <point/>
-  </object>
-  <object id="21" name="gem3" x="138.5" y="388.5">
-   <point/>
-  </object>
-  <object id="22" name="gem3" x="72" y="386">
-   <point/>
-  </object>
-  <object id="23" name="gem3" x="55" y="386">
-   <point/>
-  </object>
-  <object id="24" name="gem3" x="40.5" y="437.5">
-   <point/>
-  </object>
-  <object id="25" name="gem3" x="138.5" y="435.5">
+ <layer id="3" name="gem" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt1lsKAjEMBdBB6frchz/+uLNp6/Y0TENDaMcBFUxyDxQfFeG2STvLAgBg2+302TwA+IO+Bwn14AftJfYTAAAA/tU19RER8sfODwBxPdI2IuLsUdfg1/nL6z9z2l5rG2v7zrvSso7ktgZ15zfWlZbrXT6P+avKtDre56P0mlzO/SyIsj7cEzX19yyLtdBz1lRx7vOrzM7zM55qgXJSrbOiPkcg7/wId7/cX9nrRdS+pxqf0X0uz4HRcyA/D+m7whq9z0Vl4pw85+k8kGe/rnE+Cz3WfhY9TiinrmO++yzd7/fUx8wok/UeZpx7Lz+pouZzGue32OdH9h++7wlhE1Y0
+  </data>
+ </layer>
+ <layer id="6" name="npc" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz0kNACAMAMF+8G+H0xsVAQ/CjIBNNuKsWiJaORx9SM/38fH/zPf18T8AAAAAAAAAAAAAwC0btxEEfg==
+  </data>
+ </layer>
+ <objectgroup id="13" name="task_start">
+  <object id="6" name="task_start" x="342" y="54">
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="4" name="flag">
-  <object id="1" name="firstflag" x="231.5" y="231.5">
-   <point/>
-  </object>
-  <object id="3" name="secondflag" x="232" y="117.5">
-   <point/>
-  </object>
-  <object id="4" name="thirdflag" x="233.5" y="307">
+ <layer id="7" name="flag" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt2LERwCAMBEGR0oJdhd1/b1CAcmb43Qr0iYKrAgAAAACAC8yqMU8fcc6zt7/B+7+9/Q/eTzj/z/8L3g8AAECwrokEdZKuiSR1kq6JpHSSBXTOA2U=
+  </data>
+ </layer>
+ <objectgroup id="8" name="flag">
+  <object id="1" name="firstflag" x="71" y="745">
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="8" name="SceneSwitchPoints">
-  <object id="27" name="MainScene" x="45.3441" y="221.107">
+ <layer id="9" name="SceneSwitchPoints_house" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz9kRgkAUBVFQEnAhAVQSwCX/AARMwIUEAE3AjmKmiulTr//fzTJJkiRJSsOdWuqop0fcd4J70ove9KEh6jfhjTTRTF/6xX0nvJyjFa2pyGM/FNaGvVva0Z7KxPZX7D3QkU5UJ7a/Ye+ZLnSlW2L7JUmSJEmSJEmSJC3HH6f1D1s=
+  </data>
+ </layer>
+ <layer id="17" name="SceneSwitchPoints_spot" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztzzENAAAIBDEW/COZEQ98m5yAqwIAAAAAvpu+EqX/AwAAAAAA8MMCFJoDfw==
+  </data>
+ </layer>
+ <objectgroup id="10" name="SceneSwitchPoints">
+  <object id="3" name="MainScene" x="55" y="315">
    <properties>
-    <property name="no_position" value="70 259"/>
+    <property name="no_position" value="55 385"/>
     <property name="targetMap" value="mainmap.tmx"/>
    </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="11" name="flag2_PositionSwitchPoints" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt2KENADAMA8GQ8u4/bVXQDSoZ+E4yz9PMAPyzV/qCnNv+1qq5HQAAAACS/Cb1N/cDAAAAQJMDDt0A6A==
+  </data>
+ </layer>
+ <objectgroup id="12" name="PositionSwitchPoints">
+  <object id="4" name="spot" x="343" y="85">
+   <point/>
+  </object>
+  <object id="5" name="spot" x="968" y="420">
    <point/>
   </object>
  </objectgroup>

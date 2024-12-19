@@ -194,6 +194,14 @@ bool OtherScene::init(const std::string& mapFile)
         }
         positionSwitchPoints[2].isActive = true;
     }
+    else if (mapname == "desert.tmx") {
+        auto savedSwitchPoints = MapManager::getInstance()->getdesertSwitchPoints();
+        for (size_t i = 0; i < savedSwitchPoints.size(); ++i) {
+            if (i < positionSwitchPoints.size()) {
+                positionSwitchPoints[i].isActive = savedSwitchPoints[i].isActive;
+            }
+        }
+    }
  //////////////////////////////
  // 添加小地图
  /////////////////////////////
@@ -319,6 +327,9 @@ void OtherScene::update(float dt)
                     spot.isActive = true;  // 解锁
                     if (mapname == "forest.tmx") {
                         MapManager::getInstance()->saveforestSwitchPoints(positionSwitchPoints);
+                    }
+                    else if (mapname == "desert.tmx") {
+                        MapManager::getInstance()->savedesertSwitchPoints(positionSwitchPoints);
                     }
                 }
 
@@ -475,6 +486,18 @@ void OtherScene::showSelectionPopup()
                     }
                 );
                 button = button_forest;
+            }
+            else if (mapname == "desert.tmx") {
+                auto button_desert = cocos2d::MenuItemImage::create(
+                    "Transfer_switch/Transfer_normal_desert.png",  // 普通状态的按钮图片
+                    "Transfer_switch/Transfer_select_desert.png",  // 按下状态的按钮图片
+                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                        player->setPosition(spot.position);  // 传送角色
+                        popupLayer->removeFromParent();  // 隐藏弹窗
+                        isPopupVisible = false;  // 设置弹窗为不可见
+                    }
+                );
+                button = button_desert;
             }
             // 设置按钮位置
             button->setPosition(spot.position);  // 将按钮位置设置为传送点的位置

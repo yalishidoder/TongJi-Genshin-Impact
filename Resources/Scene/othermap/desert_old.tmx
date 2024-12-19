@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="30">
+ <tileset firstgid="1" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
+  <image source="springobjects.es-ES.png" width="384" height="624"/>
+ </tileset>
+ <tileset firstgid="937" name="summer_beach.fr-FR" tilewidth="16" tileheight="16" tilecount="527" columns="17">
+  <image source="summer_beach.fr-FR.png" width="272" height="496"/>
+ </tileset>
+ <layer id="1" name="desert" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJw7yMzAcJAALmQhrIYS9aP2jkx7ae3OoW4vsW4jhAfajUMFj4bhKB7FQw8P5jKQGm4brvUeLvNH7R21d9TegbEXAKMjnW8=
+  </data>
+ </layer>
+ <layer id="2" name="gem" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJxjYBh4kEBl8/QH2H5y3EBLkICDTQswWPydQCNzB4v/RsEoGAWjYBSMAnoD3YF2ABKgp1sI2cULxehiowA/wBWu2MRxhedoOFMHAAAexQO/
+  </data>
+ </layer>
+ <layer id="7" name="decorations" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAOKGCkkkF4gDkz7e0YBaNgFBAGQQNsPz3Km1FAHUAorrClpYFOX8MBkJNHSNFDSX08WpePglEwCkbB4AIAoHoD2g==
+  </data>
+ </layer>
+ <layer id="3" name="flag" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUDBRYzDzQLhgFowA7yGdiYChgIk0PNdJzO9DODhLtHQWjgBZgtHweBaNgFIwUAAA24QPp
+  </data>
+ </layer>
+ <objectgroup id="6" name="gem">
+  <object id="6" name="gem1" x="56.5" y="20">
+   <point/>
+  </object>
+  <object id="7" name="gem1" x="24.5" y="68.5">
+   <point/>
+  </object>
+  <object id="8" name="gem1" x="38.5" y="100">
+   <point/>
+  </object>
+  <object id="9" name="gem1" x="74" y="67">
+   <point/>
+  </object>
+  <object id="10" name="gem1" x="88.5" y="38">
+   <point/>
+  </object>
+  <object id="11" x="56.5" y="20" visible="0">
+   <point/>
+  </object>
+  <object id="12" name="gem2" x="375" y="18">
+   <point/>
+  </object>
+  <object id="13" name="gem2" x="425" y="34">
+   <point/>
+  </object>
+  <object id="14" name="gem2" x="455.5" y="66.5">
+   <point/>
+  </object>
+  <object id="15" name="gem2" x="393.5" y="100.5">
+   <point/>
+  </object>
+  <object id="16" name="gem3" x="376.5" y="339">
+   <point/>
+  </object>
+  <object id="17" name="gem3" x="455" y="352.5">
+   <point/>
+  </object>
+  <object id="18" name="gem3" x="408" y="373">
+   <point/>
+  </object>
+  <object id="19" name="gem3" x="345.5" y="421">
+   <point/>
+  </object>
+  <object id="20" name="gem3" x="440" y="417.5">
+   <point/>
+  </object>
+  <object id="21" name="gem3" x="138.5" y="388.5">
+   <point/>
+  </object>
+  <object id="22" name="gem3" x="72" y="386">
+   <point/>
+  </object>
+  <object id="23" name="gem3" x="55" y="386">
+   <point/>
+  </object>
+  <object id="24" name="gem3" x="40.5" y="437.5">
+   <point/>
+  </object>
+  <object id="25" name="gem3" x="138.5" y="435.5">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="flag">
+  <object id="1" name="firstflag" x="231.5" y="231.5">
+   <point/>
+  </object>
+  <object id="3" name="secondflag" x="232" y="117.5">
+   <point/>
+  </object>
+  <object id="4" name="thirdflag" x="233.5" y="307">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="SceneSwitchPoints">
+  <object id="27" name="MainScene" x="45.3441" y="221.107">
+   <properties>
+    <property name="no_position" value="70 259"/>
+    <property name="targetMap" value="mainmap.tmx"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+</map>
