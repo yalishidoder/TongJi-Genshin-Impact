@@ -26,8 +26,8 @@ public:
 	//窗口到瓦片地图坐标转化
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 
-	void showSelectionPopup();
-
+	void showSelectionPopup_positionSwitchPoints();
+	void showSelectionPopup_taskStartPosition();
 	void hidePopup();
 private:
 	cocos2d::TMXTiledMap* othermap;
@@ -37,13 +37,20 @@ private:
 
 	//位置传送点的信息储存
 	std::vector<PositionSwitchPoint> positionSwitchPoints;
+	//任务触发点
+	cocos2d::Vec2 taskStartPosition;
+	//任务结束点
+	cocos2d::Vec2 taskEndPosition;
 	//当前是否有地图切换点弹窗
 	bool isDialogActive = false;
 	//当前是否有位置传送点弹窗    
 	bool isPopupVisible = false;
+	//当前是否有任务弹窗 
+	bool isTaskVisible = false;
 	//记录 E 键是否被按下
 	bool isKeyPressedE = false;
-
+	bool isKeyPressedR = false;
+	bool tasking = false;
 
 };
 #endif // __OtherScene_SCENE_H__

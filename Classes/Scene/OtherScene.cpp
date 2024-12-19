@@ -192,7 +192,7 @@ bool OtherScene::init(const std::string& mapFile)
                 positionSwitchPoints[i].isActive = savedSwitchPoints[i].isActive;
             }
         }
-        positionSwitchPoints[2].isActive = true;
+        positionSwitchPoints[0].isActive = true;
     }
     else if (mapname == "desert.tmx") {
         auto savedSwitchPoints = MapManager::getInstance()->getdesertSwitchPoints();
@@ -202,6 +202,38 @@ bool OtherScene::init(const std::string& mapFile)
             }
         }
     }
+    //任务点读取
+    auto objectGroup_taskStartPosition = othermap->getObjectGroup("task_start");
+    if (objectGroup_taskStartPosition) {
+        ValueMap taskStartData = objectGroup_taskStartPosition->getObject("task_start");
+        Vec2 switchPos(taskStartData["x"].asFloat(), taskStartData["y"].asFloat());
+        //由于地图的位置原点的改变，需要将从tmx读出来的坐标进行调整
+        float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // 地图左下角 + 出生点的 x 偏移
+        float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // 地图左下角 + 出生点的 y 偏移
+        switchPos.x = adjustedX;
+        switchPos.y = adjustedY;
+        //输出任务领取点位置
+        CCLOG("PositionSwitchPoints: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
+        // 存储到 taskStartPosition
+        taskStartPosition = switchPos;
+    }
+    //任务结束点读取
+    auto objectGroup_taskEndPosition = othermap->getObjectGroup("task_end");
+    if (objectGroup_taskEndPosition) {
+        ValueMap taskStartData = objectGroup_taskEndPosition->getObject("task_end");
+        Vec2 switchPos(taskStartData["x"].asFloat(), taskStartData["y"].asFloat());
+        //由于地图的位置原点的改变，需要将从tmx读出来的坐标进行调整
+        float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // 地图左下角 + 出生点的 x 偏移
+        float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // 地图左下角 + 出生点的 y 偏移
+        switchPos.x = adjustedX;
+        switchPos.y = adjustedY;
+        //输出任务结束点位置
+        CCLOG("taskEndPosition: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
+        // 存储到 taskEndPosition
+        taskEndPosition = switchPos;
+    }
+
+
  //////////////////////////////
  // 添加小地图
  /////////////////////////////
@@ -227,6 +259,7 @@ bool OtherScene::init(const std::string& mapFile)
 
 void OtherScene::update(float dt)
 {
+#if 1
     if ((isPopupVisible || isDialogActive)) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         hero->m_moveUp = false;
@@ -235,6 +268,7 @@ void OtherScene::update(float dt)
         hero->m_moveRight = false;
         return;
     }
+#endif
     Node::update(dt);
 
 
@@ -301,7 +335,7 @@ void OtherScene::update(float dt)
 
                     // 将角色移出传送点范围
                     //float offset = 100.0f;
-                    hero->setPosition(switchPoint.no_position.x , switchPoint.no_position.y);
+                    hero->setPosition(switchPoint.no_position.x, switchPoint.no_position.y);
                     CCLOG("Hero moved out of teleport area to position (%.2f, %.2f)", hero->getPositionX(), hero->getPositionY());
 
                     });
@@ -340,7 +374,7 @@ void OtherScene::update(float dt)
         if (isInRange && isKeyPressedE) {
             if (!isPopupVisible) {
                 // 如果弹窗未显示，则显示弹窗
-                showSelectionPopup();
+                showSelectionPopup_positionSwitchPoints();
                 isPopupVisible = true;  // 设置弹窗为可见
             }
         }
@@ -353,6 +387,70 @@ void OtherScene::update(float dt)
         }
 
 
+    }
+    ////////////////////
+    //人物碰到任务触发点
+    ////////////////////
+    auto player_task = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (player_task) {
+        // 设置触发范围半径
+        float triggerRadius = 50.0f;
+        Vec2 currentPosition = player_task->getPosition();  // 获取角色当前位置
+        bool isInRange = false;
+        // 检测角色是否进入任务点的范围
+        if (currentPosition.distance(taskStartPosition) < triggerRadius) {
+            isInRange = true;
+        }
+        // 如果角色进入范围并按下了 R 键
+        if (isInRange && isKeyPressedR&&!tasking) {
+            if (!isTaskVisible) {
+                // 如果弹窗未显示，则显示弹窗
+                showSelectionPopup_taskStartPosition();
+                isTaskVisible = true;  // 设置弹窗为可见
+            }
+        }
+    }
+    ////////////////////
+    //人物碰到任务结束点
+    ////////////////////
+    auto player_taskend = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (player_taskend) {
+        // 设置触发范围半径
+        float triggerRadius = 50.0f;
+        Vec2 currentPosition = player_taskend->getPosition();  // 获取角色当前位置
+        bool isInRange = false;
+        // 检测角色是否进入任务结束点的范围
+        if (currentPosition.distance(taskEndPosition) < triggerRadius) {
+            isInRange = true;
+        }
+        if (isInRange && tasking) {
+            tasking = false;// 任务结束
+            ///////////////////
+            //添加发放奖励代码
+            ///////////////////
+            // 在 taskEndPosition 显示任务完成的提示
+            auto label = Label::createWithSystemFont("Task Completed!", "Arial", 40);
+            label->setAnchorPoint(Vec2(1.0f, 0.5f));
+            label->setPosition(taskEndPosition);  // 设置标签的位置
+            this->addChild(label);  // 添加到场景中
+            //结束动画
+            auto scaleUp = ScaleTo::create(1.0f, 1.5f);  // 放大到1.5倍
+            auto scaleDown = ScaleTo::create(1.0f, 1.0f);  // 缩放回原大小
+            auto scaleSeq = Sequence::create(scaleUp, scaleDown, nullptr);  // 顺序执行
+            auto shake = MoveBy::create(0.1f, Vec2(10, 0));  // 左右震动10像素
+            auto shakeBack = MoveBy::create(0.1f, Vec2(-10, 0));  // 返回原位置
+            auto shakeSeq = Sequence::create(shake, shakeBack, nullptr);
+            label->runAction(Repeat::create(shakeSeq, 5));  // 执行动画
+            auto delay = DelayTime::create(2.0f);  // 延时2秒
+            auto removeAction = CallFunc::create([=]() {
+                label->removeFromParent();  // 任务完成后移除标签
+                });
+            // 执行延时操作
+            label->runAction(Sequence::create(delay, removeAction, nullptr));
+            if (mapname == "forest.tmx") {
+                positionSwitchPoints[2].isActive = true;
+            }
+        }
     }
 }
 
@@ -389,6 +487,10 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_E:
             isKeyPressedE = true;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
+        case cocos2d::EventKeyboard::KeyCode::KEY_R:
+            isKeyPressedR = true;
+            break;
     }
 }
 
@@ -424,6 +526,10 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_E:
         case cocos2d::EventKeyboard::KeyCode::KEY_E:
             isKeyPressedE = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
+        case cocos2d::EventKeyboard::KeyCode::KEY_R:
+            isKeyPressedR = false;
             break;
     }
 }
@@ -463,7 +569,7 @@ cocos2d::Vec2 OtherScene::tileCoordForPosition(Vec2 position)
     return Vec2(tileX, tileY);
 }
 
-void OtherScene::showSelectionPopup()
+void OtherScene::showSelectionPopup_positionSwitchPoints()
 {
 
     auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
@@ -511,6 +617,59 @@ void OtherScene::showSelectionPopup()
 
     // 显示弹窗
     isPopupVisible = true;
+}
+
+void OtherScene::showSelectionPopup_taskStartPosition()
+{
+    auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    auto dialog = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // 半透明黑色背景
+    this->addChild(dialog, 10);  // 将图层添加到场景，并设置显示优先级
+    Label* label = nullptr;
+    // 根据 mapname 设置不同的标签内容
+    if (mapname == "forest.tmx") {
+        label = Label::createWithSystemFont("Do you want to start the task:\n       FINISH THE MAZE", "Arial", 40);
+    }
+    else if (mapname == "desert.tmx") {
+        label = Label::createWithSystemFont("Do you want to start the task:\nEXPLORE EACH KIND OF GEM", "Arial", 40);
+    }
+    else {
+        label = Label::createWithSystemFont("Do you want to start the task", "Arial", 40); // 默认标签
+    }
+    label->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(0, 50));
+    dialog->addChild(label);
+
+    auto yesButton = cocos2d::ui::Button::create();
+    yesButton->setTitleText("Yes");
+    yesButton->setTitleFontSize(30);
+    yesButton->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(-50, -20));
+    dialog->addChild(yesButton);
+
+    auto noButton = cocos2d::ui::Button::create();
+    noButton->setTitleText("No");
+    noButton->setTitleFontSize(30);
+    noButton->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(50, -20));
+    dialog->addChild(noButton);
+
+    // Yes 按钮的回调
+    yesButton->addClickEventListener([=](Ref* sender) {
+        CCLOG("User selected YES. Starting the task...");
+        tasking = true;
+        dialog->removeFromParent();  // 移除对话框
+        isTaskVisible = false;  // 恢复标志位
+        //**表示是否在任务状态
+        tasking == true;
+        /////////////////////////////
+        // 这里开始任务
+        /////////////////////////////
+        CCLOG("Start the Task...");
+        });
+
+    // No 按钮的回调
+    noButton->addClickEventListener([=](Ref* sender) {
+        CCLOG("User selected NO. Dialog removed.");
+        dialog->removeFromParent();  // 移除对话框
+        isTaskVisible = false;  // 恢复标志位
+        });
 }
 
 void OtherScene::hidePopup()
