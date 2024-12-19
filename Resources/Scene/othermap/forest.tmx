@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="18">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="16" nextobjectid="19">
  <tileset firstgid="1" name="springobjects.es-ES" tilewidth="16" tileheight="16" tilecount="936" columns="24">
   <image source="springobjects.es-ES.png" width="384" height="624"/>
  </tileset>
@@ -132,6 +132,9 @@
  <tileset firstgid="9129" name="spring_outdoorsTileSheet.pt-BR" tilewidth="16" tileheight="16" tilecount="1975" columns="25">
   <image source="spring_outdoorsTileSheet.pt-BR.png" width="400" height="1264"/>
  </tileset>
+ <tileset firstgid="11104" name="forest_npc" tilewidth="16" tileheight="16" tilecount="6" columns="2">
+  <image source="../../NPC/forest_npc.png" width="32" height="48"/>
+ </tileset>
  <layer id="1" name="grass" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJztw0ENAAAMA6GaOf8WZ2MPSKgtVVVVVVVVVVVVVVX19QNFVngu
@@ -194,6 +197,16 @@
    <point/>
   </object>
   <object id="16" name="spot" x="902" y="535">
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="14" name="npc" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztzwkRACAMwLD5wRSvfwvMBcctUdBGAAAAAAAAAADU1FvEaK8r3pn5vgr/73w/hf8BAID/XNdBA1I=
+  </data>
+ </layer>
+ <objectgroup id="15" name="task_start">
+  <object id="18" name="task_start" x="241" y="565.5">
    <point/>
   </object>
  </objectgroup>
