@@ -7,11 +7,7 @@
  ****************************************************************/
 
 #include <cmath>
-#include "Hero.h"
-#include "Character/CharacterBase.h"
 #include "Weapon/RangedWeapon/Ammunition/Bullet.h"
-#include "Weapon/MeleeWeapon/Bayonet.h"
-#include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 
 
