@@ -98,18 +98,25 @@ void Enemy::setInitData(int level)
     this->setAttackPower(std::pow(1.2,level + 1)*50);
 }
 
-void Enemy::setDeath() 
-{
-    playAnimation("death_enemy");
-    m_isAlive = 0;
+void Enemy::setDeath() {
+    if (!m_isAlive) return;
+
+    m_isAlive = false;
     currentState = EnemyState::STAY;
-    // 添加一个延时动作，等待动画播放完成
-    auto delay = cocos2d::DelayTime::create(1.2f); // 假设死亡动画持续1秒
+
+#if 1
+    // 播放死亡动画
+    playAnimation("death_enemy");
+
+    // 使用延迟动作来延迟移除敌人
+    auto delay = cocos2d::DelayTime::create(1.0f);
     auto remove = cocos2d::CallFunc::create([=]() {
         removeFromParentAndCleanup(true);
         });
     auto sequence = cocos2d::Sequence::create(delay, remove, nullptr);
     runAction(sequence);
+    
+#endif
 }
 
 void Enemy::update(float delta) 

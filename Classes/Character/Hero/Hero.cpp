@@ -86,7 +86,7 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     else {
         CCLOG("Failed to create levelupLabel");
     }
-
+    
     return true;
 }
 
@@ -122,7 +122,7 @@ cocos2d::Animation* Hero::createWalkUpAnimation() {
     for (int i = 2; i <= 8; ++i) {
         std::string frameName;
         if (!m_ismale)
-            frameName = StringUtils::format("WALK_UP_%d.png", i);
+            frameName = StringUtils::format("WALK_UP_%dF.png", i);
         else
             frameName = StringUtils::format("WALK_UP_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
@@ -153,7 +153,7 @@ cocos2d::Animation* Hero::createWalkDownAnimation() {
     for (int i = 2; i <= 8; ++i) {
         std::string frameName;
         if (!m_ismale)
-            frameName = StringUtils::format("WALK_DOWN_%d.png", i);
+            frameName = StringUtils::format("WALK_DOWN_%dF.png", i);
         else
             frameName = StringUtils::format("WALK_DOWN_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
@@ -184,7 +184,7 @@ cocos2d::Animation* Hero::createWalkLeftAnimation() {
     for (int i = 2; i <= 8; ++i) {
         std::string frameName;
         if (!m_ismale)
-            frameName = StringUtils::format("WALK_LEFT_%d.png", i);
+            frameName = StringUtils::format("WALK_LEFT_%dF.png", i);
         else
             frameName = StringUtils::format("WALK_LEFT_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
@@ -215,7 +215,7 @@ cocos2d::Animation* Hero::createWalkRightAnimation() {
     for (int i = 2; i <= 8; ++i) {
         std::string frameName;
         if (!m_ismale)
-            frameName = StringUtils::format("WALK_RIGHT_%d.png", i);
+            frameName = StringUtils::format("WALK_RIGHT_%dF.png", i);
         else
             frameName = StringUtils::format("WALK_RIGHT_%dM.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
@@ -506,9 +506,6 @@ void Hero::resetAnimationCache()
 {
     if (m_animationCache)
     {
-        m_animationCache->destroyInstance();
-        CCLOG("Cache destroyed!");
-        m_animationCache = cocos2d::AnimationCache::getInstance();
         m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_hero");
         m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_hero");
         m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
@@ -953,4 +950,58 @@ void Hero::SkillX()
 void Hero::SkillC()
 {
 
+}
+
+void Hero::saveProfile(const std::string& filename) {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << m_sleepiness << std::endl;
+        file << m_heroism << std::endl;
+        file << m_speed << std::endl;
+        file << m_ismale << std::endl;
+        file << MaxLevel << std::endl;
+        file << m_level << std::endl;
+        file << m_exp << std::endl;
+        file << m_expToLevelUp << std::endl;
+        file << m_isAlive << std::endl;
+        file << Upgrading << std::endl;
+        file << m_moveDirection.x << " " << m_moveDirection.y << std::endl;
+        file << m_isBayonetGet << std::endl;
+        file << m_isBulletGet << std::endl;
+        file << m_isBayonetChosen << std::endl;
+        file << m_isBulletChosen << std::endl;
+        // 保存其他需要的信息
+        file.close();
+        CCLOG("Profile saved successfully.");
+    }
+    else {
+        CCLOG("Unable to open file for saving.");
+    }
+}
+
+void Hero::loadProfile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (file.is_open()) {
+        file >> m_sleepiness;
+        file >> m_heroism;
+        file >> m_speed;
+        file >> m_ismale;
+        file >> MaxLevel;
+        file >> m_level;
+        file >> m_exp;
+        file >> m_expToLevelUp;
+        file >> m_isAlive;
+        file >> Upgrading;
+        file >> m_moveDirection.x >> m_moveDirection.y;
+        file >> m_isBayonetGet;
+        file >> m_isBulletGet;
+        file >> m_isBayonetChosen;
+        file >> m_isBulletChosen;
+        // 加载其他需要的信息
+        file.close();
+        CCLOG("Profile loaded successfully.");
+    }
+    else {
+        CCLOG("Unable to open file for loading.");
+    }
 }

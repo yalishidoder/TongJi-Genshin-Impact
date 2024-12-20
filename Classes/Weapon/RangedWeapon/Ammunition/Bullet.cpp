@@ -114,12 +114,13 @@ void Bullet::checkAndHandleCollision()
         auto enemies = currentScene->getChildren();
         for (auto enemy : enemies)
         {
-            if (dynamic_cast<Enemy*>(enemy))
+            auto temp = dynamic_cast<Enemy*>(enemy);
+            if (temp && temp->isAlive())
             {
-                if (this->checkCollision(enemy))
+                if (this->checkCollision(temp))
                 {
                     // ´¦ÀíÅö×²Âß¼­
-                    onCollisionWithEnemy(enemy);
+                    onCollisionWithEnemy(temp);
                 }
             }
         }

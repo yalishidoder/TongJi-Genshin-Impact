@@ -110,8 +110,9 @@ bool OtherScene::init(const std::string& mapFile)
             // 创建角色并放置在出生位置
             auto hero = Hero::create(Vec2(500, 500));
             if (hero) {
+                hero->loadProfile("hero.txt");
                 hero->setName("hero"); // 设置角色名称
-                hero->setAnchorPoint(Vec2(0.5f, 0.15));
+                hero->setAnchorPoint(Vec2(0.5f, 0.15f));
 
                 // 将角色传送到 firstflag 的位置
                 // 计算出firstflag的屏幕坐标
@@ -121,9 +122,6 @@ bool OtherScene::init(const std::string& mapFile)
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
             }
-            else {
-                CCLOG("Failed to load character");
-            }
         }
         else {
             CCLOG("Failed to load object-firstflag");
@@ -131,6 +129,31 @@ bool OtherScene::init(const std::string& mapFile)
     }
     else {
         CCLOG("Failed to load objectGroup-flag");
+    }
+    // 创建血条背景
+    auto healthBg = Sprite::create("Character/Hero/health_bg.png");
+    if (healthBg) {
+        healthBg->setName("healthBg"); // 设置名字
+        healthBg->setPosition(Vec2(500, 50));
+        healthBg->setOpacity(128);
+        this->addChild(healthBg);
+    }
+
+    // 创建血条填充
+    auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
+    if (healthFill) {
+        healthFill->setName("healthFill"); // 设置名字
+        healthFill->setPosition(Vec2(500, 50));
+        healthFill->setOpacity(128);
+        this->addChild(healthFill);
+    }
+
+    // 创建等级Label
+    auto levelLabel = Label::createWithTTF("Lv 1", "fonts/Marker Felt.ttf", 24);
+    if (levelLabel) {
+        levelLabel->setName("levelLabel"); // 设置名字
+        levelLabel->setPosition(Vec2(500, 100));
+        this->addChild(levelLabel);
     }
     // 读取场景中的地图传送点位置
     auto objectGroup_SceneSwitchPoints = othermap->getObjectGroup("SceneSwitchPoints");
@@ -280,6 +303,22 @@ void OtherScene::update(float dt)
         auto character = dynamic_cast<Hero*>(child);
         if (character) {
             character->update(dt);
+            if (character) {
+                //更新角色相关的ui
+                // 
+                // 更新血条
+                float healthRatio = character->CharacterBase::getHealth() / float(character->CharacterBase::getMaxHealth());
+                auto healthFill = dynamic_cast<Sprite*>(this->getChildByName("healthFill"));
+                if (healthFill)
+                    healthFill->setScaleX(healthRatio);
+
+                // 更新等级Label
+                auto levelLabel = dynamic_cast<Label*>(this->getChildByName("levelLabel"));
+                if (levelLabel)
+                    levelLabel->setString(StringUtils::format("Lv %d", character->CharacterBase::getLevel()));
+                // 输出当前角色等级
+                //CCLOG("hero level : %d", character->CharacterBase::getLevel());
+            }
         }
     }
     //////////////////////
@@ -319,7 +358,7 @@ void OtherScene::update(float dt)
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
                     CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
-
+                    hero->saveProfile("hero.txt");
                     dialog->removeFromParent();
                     isDialogActive = false; // 恢复标志位
                     if (switchPoint.targetMap == "mainmap.tmx") {
@@ -709,6 +748,9 @@ void OtherScene::returnToLastScene()
 void OtherScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (hero)
+        hero->saveProfile("hero.txt");
     Director::getInstance()->end();
 
     /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/

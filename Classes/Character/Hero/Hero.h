@@ -16,7 +16,7 @@
 #include "Weapon/Switcher.h"
 #include "Weapon/MeleeWeapon/Bayonet.h"
 #include "Inventory/Inventory.h"
-
+#include <fstream>
 USING_NS_CC;
 
 class Hero : public CharacterBase {
@@ -116,6 +116,10 @@ public:
     void onMouseMove(cocos2d::EventMouse* event);
 
     cocos2d::Label* levelupLabel;
+    
+    //  ½ÇÉ«´æµµÏà¹Ø
+    void saveProfile(const std::string& filename);
+    void loadProfile(const std::string& filename);
 
 private:
     bool m_isAlive;

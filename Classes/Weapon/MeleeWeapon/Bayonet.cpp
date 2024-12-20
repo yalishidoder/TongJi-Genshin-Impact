@@ -78,7 +78,7 @@ void Bayonet::attack(float angle) {
         return;
     }
     if(nextDir)
-        remainingCooldown -= 0.2;
+        remainingCooldown -= 0.2f;
     setRotation(m_rotationAngle + 100 * (nextDir - 0.5)+angle);
     nextDir = !nextDir;
     // ²¥·Å»Ó¿³¶¯»­
@@ -94,12 +94,13 @@ void Bayonet::checkAndHandleCollision() {
     if (parent) {
         auto enemies = parent->getChildren();
         for (auto enemy : enemies) {
-            if (dynamic_cast<Enemy*>(enemy))
+            auto temp = dynamic_cast<Enemy*>(enemy);
+            if (temp && temp->isAlive())
             {
-                if (this->checkCollision(enemy))
+                if (this->checkCollision(temp))
                 {
                     // ´¦ÀíÅö×²Âß¼­
-                    onCollisionWithEnemy(enemy);
+                    onCollisionWithEnemy(temp);
                 }
             }
         }

@@ -107,8 +107,10 @@ bool MainScene::init()
             float y = chushengObject["y"].asFloat();
             CCLOG("Hero spawn position: x = %.2f, y = %.2f", x, y);
             // 创建角色并放置在出生位置
-            auto hero = Hero::create(Vec2(500, 500));
+
+            auto hero = Hero::create(Vec2(500, 500));;
             if (hero) {
+                hero->loadProfile("hero.txt");
                 hero->setName("hero"); // 设置角色名称
                 hero->setCharacterName("CaiXuKun");
                 hero->setAnchorPoint(Vec2(0.5f, 0.15f));
@@ -122,8 +124,9 @@ bool MainScene::init()
 
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
+                
                 this->addChild(hero);  // 将角色添加到场景中 
-
+                
                 // 创建玩家面板
                 m_playerPanel = PlayerPanel::create();
                 if (m_playerPanel) {
@@ -186,7 +189,7 @@ bool MainScene::init()
             auto demon2 = Enemy::create(Vec2(250, 300));
 
             if (demon2) {
-                demon2->setName("demon"); // 设置角色名称
+                demon2->setName("demon2"); // 设置角色名称
                 demon2->setAnchorPoint(Vec2(0.5f, 0.5f));
                 demon2->setPlayer(hero);  //设置玩家
                 demon2->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
@@ -379,6 +382,7 @@ void MainScene::update(float dt)
 
                 // Yes 按钮的回调
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
+                    hero->saveProfile("hero.txt");//存储角色信息
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
                     CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
                     dialog->removeFromParent();
@@ -713,6 +717,9 @@ void MainScene::operatemyPanel()
 void MainScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (hero)
+        hero->saveProfile("hero.txt");
     Director::getInstance()->end();
 
     /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/

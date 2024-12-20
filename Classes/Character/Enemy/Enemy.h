@@ -65,6 +65,7 @@ public:
 
     // …À∫¶±Í«©
     cocos2d::Label* damageLabel;
+
 private:
     int m_health;
     int m_full_health;
@@ -133,6 +134,7 @@ private:
     cocos2d::Animation* createWalkLeftAnimation();
     cocos2d::Animation* createWalkRightAnimation();
     cocos2d::Animation* createDeathAnimation();
+
 };
 
 #endif
