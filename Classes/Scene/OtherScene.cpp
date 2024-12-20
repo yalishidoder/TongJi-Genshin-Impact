@@ -4,6 +4,9 @@
 #include "ui/CocosGUI.h"
 #include "MiniMap.h"
 #include "Scene/MapManager.h"
+#include "Task/Maze.h"
+#include "Task/TreasureHunt.h"
+
 
 USING_NS_CC;
 
@@ -59,7 +62,7 @@ bool OtherScene::init(const std::string& mapFile)
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
     /////////////////////
-    //加载小地图
+    //加载地图
     ////////////////////
     std::string file = "Scene/othermap/" + mapFile;
     othermap = TMXTiledMap::create(file);
@@ -428,25 +431,6 @@ void OtherScene::update(float dt)
             ///////////////////
             //添加发放奖励代码
             ///////////////////
-            // 在 taskEndPosition 显示任务完成的提示
-            auto label = Label::createWithSystemFont("Task Completed!", "Arial", 40);
-            label->setAnchorPoint(Vec2(1.0f, 0.5f));
-            label->setPosition(taskEndPosition);  // 设置标签的位置
-            this->addChild(label);  // 添加到场景中
-            //结束动画
-            auto scaleUp = ScaleTo::create(1.0f, 1.5f);  // 放大到1.5倍
-            auto scaleDown = ScaleTo::create(1.0f, 1.0f);  // 缩放回原大小
-            auto scaleSeq = Sequence::create(scaleUp, scaleDown, nullptr);  // 顺序执行
-            auto shake = MoveBy::create(0.1f, Vec2(10, 0));  // 左右震动10像素
-            auto shakeBack = MoveBy::create(0.1f, Vec2(-10, 0));  // 返回原位置
-            auto shakeSeq = Sequence::create(shake, shakeBack, nullptr);
-            label->runAction(Repeat::create(shakeSeq, 5));  // 执行动画
-            auto delay = DelayTime::create(2.0f);  // 延时2秒
-            auto removeAction = CallFunc::create([=]() {
-                label->removeFromParent();  // 任务完成后移除标签
-                });
-            // 执行延时操作
-            label->runAction(Sequence::create(delay, removeAction, nullptr));
             if (mapname == "forest.tmx") {
                 positionSwitchPoints[2].isActive = true;
             }
@@ -627,10 +611,10 @@ void OtherScene::showSelectionPopup_taskStartPosition()
     Label* label = nullptr;
     // 根据 mapname 设置不同的标签内容
     if (mapname == "forest.tmx") {
-        label = Label::createWithSystemFont("Do you want to start the task:\n       FINISH THE MAZE", "Arial", 40);
+        label = Label::createWithSystemFont("Do you want to start the task:\nComplete the maze within the time limit", "Arial", 40);
     }
     else if (mapname == "desert.tmx") {
-        label = Label::createWithSystemFont("Do you want to start the task:\nEXPLORE EACH KIND OF GEM", "Arial", 40);
+        label = Label::createWithSystemFont("Do you want to start the task:\nCollect enough gems within a limited time", "Arial", 40);
     }
     else {
         label = Label::createWithSystemFont("Do you want to start the task", "Arial", 40); // 默认标签
@@ -661,6 +645,43 @@ void OtherScene::showSelectionPopup_taskStartPosition()
         /////////////////////////////
         // 这里开始任务
         /////////////////////////////
+        if (mapname == "forest.tmx")
+        {
+            // 创建迷宫任务节点
+            // 在20秒内完成迷宫任务，即可获得奖励
+            auto maze = Maze::Create("Forest Maze", taskStartPosition, taskEndPosition, 20.0f, "Unlock a new map! Get ranged weapons!");
+            this->addChild(maze,10);
+
+            // 启动任务
+            maze->StartTask();
+
+            // 获取任务状态(是否完成)
+            if (maze->GetTaskStatus() == Maze::TASK_COMPLETED)
+            {
+                /////////////////
+                // 完成任务后的奖励
+                //////////////////
+
+            };
+        }
+        if (mapname == "desert.tmx")
+        {
+            // 创建迷宫任务节点
+            auto treasure_hunt = TreasureHunt::create(Director::getInstance()->getVisibleSize(), othermap, player, taskStartPosition, taskEndPosition, 30,30.0f);
+            this->addChild(treasure_hunt, 10);
+
+            // 启动任务
+            treasure_hunt->StartTask();
+
+            // 获取任务状态(是否完成)
+            if (treasure_hunt->GetTaskStatus() == TreasureHunt::TASK_COMPLETED)
+            {
+                //////////////////
+                // 完成任务后的奖励
+                //////////////////
+
+            };
+        }
         CCLOG("Start the Task...");
         });
 
