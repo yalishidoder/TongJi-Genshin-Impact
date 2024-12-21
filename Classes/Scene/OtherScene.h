@@ -20,12 +20,13 @@ public:
 
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-	
+	void onMouseDown(cocos2d::EventMouse* event);
+
 	//检查位置是否发生碰撞
 	bool checkCollision(cocos2d::Vec2 position);
 	//窗口到瓦片地图坐标转化
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
-
+	void operatemyPanel();
 	void showSelectionPopup_positionSwitchPoints();
 	void showSelectionPopup_taskStartPosition();
 	void hidePopup();
@@ -47,10 +48,18 @@ private:
 	bool isPopupVisible = false;
 	//当前是否有任务弹窗 
 	bool isTaskVisible = false;
+	//当前是否显示玩家角色面板
+	bool isPanelVisible = false;
+
 	//记录 E 键是否被按下
 	bool isKeyPressedE = false;
+	//记录 P 键是否被按下（玩家面板）
+	bool isKeyPressedP = false;
+	//记录 R 键是否被按下（触发任务）
 	bool isKeyPressedR = false;
 	bool tasking = false;
+
+	PlayerPanel* m_playerPanel = nullptr;
 
 };
 #endif // __OtherScene_SCENE_H__

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="28" nextobjectid="8">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="35" nextobjectid="11">
  <tileset firstgid="1" name="victorian-garden" tilewidth="16" tileheight="16" tilecount="4096" columns="32">
   <image source="victorian-garden.png" width="512" height="2048"/>
  </tileset>
@@ -21,6 +21,12 @@
  <tileset firstgid="13606" name="springobjects" tilewidth="16" tileheight="16" tilecount="936" columns="24">
   <image source="springobjects.png" width="384" height="624"/>
  </tileset>
+ <tileset firstgid="14542" name="roofs" tilewidth="16" tileheight="16" tilecount="16384" columns="128">
+  <image source="roofs.png" width="2048" height="2048"/>
+ </tileset>
+ <tileset firstgid="30926" name="spring_town" tilewidth="16" tileheight="16" tilecount="2304" columns="32">
+  <image source="spring_town.png" width="512" height="1152"/>
+ </tileset>
  <layer id="1" name="land" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJyN1tGO2zAMRNG+5N+t+KfbArsAe/bS6YORQJJFcjic8Xn9+nX/ec6f5/31/P1/fa3Pvevr92Zv7n+vfe+/x3ONs/f4vcbviffecd/3+eshbuU466g659pFrDNinHgmfhO3WaN5bO/dPBsWnj+vf3E8xJk1zbjfe+JxjbOHuPbWvXnvWd4Xv+v1M5eZk3FmbWesbVy6Xt2vN2uFZcW7iHcixvwvr+zD9frZr4lJ9b1wNm/xc794LKYTo6e4s4/O2ez9RYxPcezvhocaVT2aedXMljbIJfXAeOqNNTrPn2KpI85FzX7Nsu86i/avemz/1YiJbfXbHldPi/8Tc/V00345Yt6b5skN+egMyiHzKC+Z9ap9G3/kgfdby3anPrjNb+Ux66uZLb28I/ab2PrjxEruzd+5Ps+q13Jn0yJr9mzV50zNGud8TK4/rW1c23qoz8hF+Tvv0VvNuTS/+jl7UBqt/1VPt7mbOnEirrlXraW74i131Ee5plaXLpQHFL76s3faX/mjvmw+KK5vfuVuacnFvaWf4qvPWHNhXtx68lY58uauqr3uNZ/q5VnuKb5uOlI6UHjYK/tcvjZxKJ4WHsV3NUpN93/xr/hRMQqTDdfNQ6YWv18/+7T1T4zkTdVib50Tc95mQh/dvgHEYWp/8XRyu7TcOi7eKY10Hq3bs9Y67y2M5vvF582P1V77I66ld3rpYa88Vw3UQ3x/nt38Vm8tnEpDzdMa60x58vyd62pJaezTbJdO2Z/yhfKpyQHrnHwQZ+tRI0885WnzXrFWg0p7vEddk2Olr9u6vLN29zbdrP7qkZ/q3b4RpobVTJTufZojeedMqmfbPDh39smcnF3z3nLQ22Yexd+psTNu6af8Vi9q3ktLS9tmLqW9xZnJwcpt+zYQX/2qPNcZcTY8o17ogXfEfbPuPaWRem75aX1vlGY+ze3Ewxilt089n5g7P9WvOZ/y/YkLE9PSTHlX3Hm6z5r0hcJGLfG+0uIn31b3p/6Ie3ncxE3u6R/qjB5WulY+rOc7A3K7vHLueU79/1/85rnyh+Jv/Zb3Ojv2yhzcP7xf2HvHzGXzKHu+1aYfinXppvojdqXvhYneYH7mYM56pzwu/72Ip85+0q8Zs/xHzzCX+obYZsu5rtrNqXLY8intnfg5LzOn4ru6VLpa+2JefX3Cact5aoJ92uam4szaKld98yxn1OOZ36bF5UVbD9R351HvmTwovXFtw8q85tlZg14rd+dT/lg6WD5h3+2RflNrh3smvsU165Znpb313tTEzfusTU2rdfnkTIml3jRnTf6oh4Wv2Di/G1dv4jprG17qsT5UfFaznr6bCsfNT+y159XNzffVRbEuL9IDre/mXOmEGrX1tL4jNq1WF0u3q46tv+ZfM6U2+/+p5/Lbd9SO0mZnavMF7ywN0FfLQ6YG6AfywrtqTmbcw37VfvFu+WfNhTNwLWdmH0q3aw7Pco+1enbGLx8uL60+V1/0PTVNLZdv9qD4om6W32wxnDF1t87XnNX79S3hXTM/15wf6yzdVOPk6OzVppfGENfio7F8ZrwZd9OU0vPC1TgX54pzs041UH7fca4wdU/NrG+NOVfmtnnd5OX2/hX3PPG4+iLHy5MKA7WpfFX/tQc1r3Jw08B5v/rxNNtP+W18du42H1VnnHF1WA8ojXAOfU8N9X45oifP/Eqbau5L7+W0eJd/lQaob2Jv/8oD7YMxjaHfFNefvK40VB9Qd815YlDzUPE3TfC+mtVP59Xa4rKaIfe2XjgvxXfxUCemDsx8qod/934DGUmuiw==
@@ -28,7 +34,7 @@
  </layer>
  <layer id="27" name="WallLayer" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJzt0UENgDAQRcFKqBL86wAbiOC6Dh5J5yU9/x3Y11r78Hdq/Pz89RVd/Pz89RVd/Pz89RVd/Pz89RVd/Pz8a93Be37w3cv///Ln8fPzN9v8ze6Mn5+/2eZvdmf8/PzNNn+zO+Pn52+2+ZvdGT8//9nvAzLXbtQ=
+   eJzt1EENgEAQQ9GRsEpQwgUEgGbABiJQQDiVNpnfZG4k9DHLjqlqNJ+uwY8fv7uFL/jx43e38AU/fvzuFr7gx4/f3cIX/PjxV52GuQK+u3P/N3578Of711k7yf5l13ZI3/+xaTvgx49f+463cP99P8P+tR3S/d33j1/bAT/+ZD/3v7YD/mx/9/OPX9sh3d/9///L33keP36SyA==
   </data>
  </layer>
  <layer id="15" name="house" width="64" height="48">
@@ -39,6 +45,11 @@
  <layer id="10" name="road" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJztmAEKwzAIRXuM3GDx/hccYwREtLiuW8T/HwRaKIGn4SfNcRBCCCGEEILFY7wHKi93Afe3Q4Ln2bBOYhyX53K3tehG1quzfyb/BNy/ev+v7mOSzDWdB15myPDzMspS/f0dXJ3rk/Vv8zHaN6I6Re938I3/rn1Nhr9ubP3WsHWP1pOed57Mt5vp+GtXrzZefc4cozkqnXmrZ+uvqdaPfyPg/l3/LbJUyeNd0B/bH33/Q+//BPfn+Yf9R+4//bHXf/YOriuI/3/efQ4S+k6K5x+89a9h/mP7o/ef93/Mvx3+T5MLNv0=
+  </data>
+ </layer>
+ <layer id="31" name="road_town" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt1tEJwDAIBcCM4QbF/RcspYR0gEII7w7896GgYwAAAAAAcJqu3R3sddVbqZ7syTvQ5h89fwA4Qdf6WWYl3e+Ztz/Zk/83AACAP92mhQVA
   </data>
  </layer>
  <layer id="2" name="forest_grass" width="64" height="48">
@@ -81,14 +92,34 @@
    eJzt0zEKwDAIBdAcI8fN0UvWEkyGgtS8Bw46+QVb+7fRz2ZVyX82u4n82Rvkkj97g+/MLLtizd2gvvcv3/bb8sd9dfLHPQAAAAAAAABU9wCQyBX5
   </data>
  </layer>
+ <layer id="28" name="town_land" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztmG3OnDAMhDlda86Qj3tXkD1L34CfZJb+r4LkkSJCWFaMPfFHti0QCAQCgUAgEAgEAoFAIBAIBAKBQCAQ+H9I+7YV27bPzzjtnie/Zl/rz6qv//l1j7rf633kfa719/r1+H2P1ZGc4/X9dtvjFJ7N17LzrP6sz/t68/s+T/6b5rbqtlkd/XuL+7I6pz4/fBTndAq35jar/u7hNjh8vcl1dVy+df0W55dd74foAb/DH99jM/7j0ojcr47kmv4I5ybcq8SAw6Ze8Hd66CG7ZtDE6tBv1jjXnCvxIT1sUv2d0/WCdrBh9X2xOtBucQ6VIfkAbkU0T/wnbqpOeNZ/vzrwfbbvfUxsS/v0u9oA/Re1neQK7lfH2Ls2c3dxHsS+JNpmL5APNRZm506ceIP+iXWawzTH87w8rk20XvZpF/SCLVeH+qyodj32VYnvh3NuxAWbdSM2zCZ76gX8k+zVy+c2a+Bs/9Y16aEJYgRxf9SR/v7qePKghi3iU2oc5tiFurDsc68UsdEr6l/JV+Q94jhaxyZ1nzqgFqxSC2E36qk31D9Jal+N9xoL8D2cRw9os8/RPML8Dfqvks+1Dhoxzu3QHvypCdAJMUTryVfEv116Fps1vcZ78oDmv1OG5jv+6/MS/vRz+PC071iODqh3rl7fZs+MNrLN85Ekdlwd9Lqc+XyE26iBJadT+5Pz0Ap2gj/7aXXAY5zpiKapYavsb/pfuLIHiJHogX55ddDr4ufR00m+O2Rw7jV8bFMf1EUjh76AP336OOMTvw/fyvOPzb5/1Eb2fUaCTvr1L0t3w14=
+  </data>
+ </layer>
+ <layer id="30" name="town_road" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt1jEKgzAUgOHcwHZx8nZ6CJ+zZ+w1bBcnh6bQIIj4qh0eefk/CIbgkB8DJgQAAAAAAAAAAADkZumtd2CjkxDaOBqx3omN1F8q+vPvn2R9np176K+G9Znmz9j0En3dQ/+eW2y7D/q6h/5O/hu5949yfaT+o3e8+tz52h/Oh1fN99vnfv4T7Q4/bTofva9+7Q5fbf4Hs7P+s2pn5/8K+vVRgpJa99BPP/3Wu7Bz1P8G1lJ5CA==
+  </data>
+ </layer>
+ <layer id="29" name="town_house" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt1ddrU2Ech/H3SjvAvW311gHubat3TkjT3WpTFzihrTvHrKOCE9q6V1MXOEH9A9yCE5K4FRx3TmjrXq36XOYiYE8Tw8np74EPvFeH8w1vEqUkSZIkSZIkSZIkSZIkSZIkSYp3AadSQYScxs9WqI4d9WhwGj9bIZumVBbsmvFzpJK8SiUjBane+G5pSWXsKEeFZvwcqX5s7o8BGJgA+yvZUYVqzfg5vElsnYwpmIppmJ4A+8+w4yzOacbP4c1n6wIsxCIsxpIE2B9gRxAhzfg5vA1s3YhN2Iwt2Gry/c9cSj3HC7x0RfesY2w9jhM4iVM4bfL9jWxuwm/8iXL/dbbewE3cwm3cMfn+NLdS6eiDvu7onvWKra/xBm/xDu9Nvj+DzZmYgIlR7m/jU6otkpCMFKT6YvOe/6sSNjtQihLuvwOlmIXZmIO5mBfld8PMedjuhZuNHnjhg461WIf1Ft7vZ3statjoRy0O4hAO4wiONnN/pDuUKJ3nXS/gIi7hMq7gKq41c0ekO9SainSHWlOR7pDZs/EflQU7spGDXOQhHwUoRBGKTf5/1pIq2VSFamzDduzATuzCbuzBXuyz4P4Am4II4S7u4T4e4CEe4TGe4Cn24wBq4LfA51HHhno04AM+4hM+4wu+4hu+4wd+4hca0WSB/e10pdqjAzqiEzqjC7qiG7qjB3qiF3ojDel6/N831g3SlRqMIRiKYRiOERiJURiNMRiLcRiPDGTq8X/fWGfT+f2HHdnIQS7ykI8CFKIIxZiBmSiBQ4//+8a6Ml2pclRgKZZhOVZgJVZhNZzQsAYuuOHR//38v01WZZ4=
+  </data>
+ </layer>
  <objectgroup id="13" name="chusheng">
-  <object id="4" name="initspot" x="32" y="166">
+  <object id="4" name="initspot" x="32" y="208">
    <point/>
   </object>
  </objectgroup>
  <layer id="17" name="flag1" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJzt2MEJg0AQBdCtxB6EtWBLiLdYg6kiFpIFWchhRW8q8x58mH/810kJAIBIxty+o5hz+waAu3v1KU0l3bCl9iiWsvXzt7/2s955y1N9y9a13+9Hnr4fAAAAAO4o+t8t+n4AuMoPMmIYDQ==
+  </data>
+ </layer>
+ <layer id="34" name="flag1_town" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt1VEJgFAMBdC1eKEMo7ZQW6gFjOhAjSAiOwfu/y4bLAIAAAAAAP6pbxFDZmxfT/KNKXvPmaVY/65dqbr/p3/V/QP8TdV/9aj+r9bsfdypqC/e3/1HbJm9aH8AAHjLCTApFE0=
   </data>
  </layer>
  <objectgroup id="12" name="SceneSwitchPoints">
@@ -110,6 +141,20 @@
    <properties>
     <property name="no_position" value="831 430"/>
     <property name="targetMap" value="desert.tmx"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="8" name="town" x="895" y="403">
+   <properties>
+    <property name="no_position" value="895 435"/>
+    <property name="targetMap" value="town.tmx"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" name="town" x="624" y="540">
+   <properties>
+    <property name="no_position" value="560 228"/>
+    <property name="targetMap" value="town.tmx"/>
    </properties>
    <point/>
   </object>

@@ -214,9 +214,6 @@
   <object id="19" name="task_end" x="990.5" y="131.5">
    <point/>
   </object>
-  <object id="20" x="643.5" y="-44.5">
-   <point/>
-  </object>
  </objectgroup>
  <layer id="3" name="tree" width="64" height="48">
   <data encoding="base64" compression="zlib">

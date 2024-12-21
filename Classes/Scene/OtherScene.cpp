@@ -112,7 +112,10 @@ bool OtherScene::init(const std::string& mapFile)
             if (hero) {
                 hero->loadProfile("hero.txt");
                 hero->setName("hero"); // 设置角色名称
+                hero->setCharacterName("CaiXuKun");
                 hero->setAnchorPoint(Vec2(0.5f, 0.15f));
+                // 设置元素力
+                hero->setElement(CharacterElement::ICE);
 
                 // 将角色传送到 firstflag 的位置
                 // 计算出firstflag的屏幕坐标
@@ -121,6 +124,63 @@ bool OtherScene::init(const std::string& mapFile)
 
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
+
+                // 创建玩家面板
+                m_playerPanel = PlayerPanel::create();
+                if (m_playerPanel) {
+                    m_playerPanel->setName("m_playerPanel");
+                    m_playerPanel->setPosition(cocos2d::Vec2(250, 100));
+                    m_playerPanel->setVisible(false);
+                    m_playerPanel->setHero(hero);
+                    m_playerPanel->initUi();
+                    this->addChild(m_playerPanel, 11);
+                }
+            }
+            // 创建血条背景
+            auto healthBg = Sprite::create("Character/Hero/health_bg.png");
+            if (healthBg) {
+                healthBg->setName("healthBg"); // 设置名字
+                healthBg->setPosition(Vec2(500, 50));
+                healthBg->setOpacity(128);
+                this->addChild(healthBg);
+            }
+
+            // 创建血条填充
+            auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
+            if (healthFill) {
+                healthFill->setName("healthFill"); // 设置名字
+                healthFill->setPosition(Vec2(500, 50));
+                healthFill->setOpacity(128);
+                this->addChild(healthFill);
+            }
+
+            // 创建等级Label
+            auto levelLabel = Label::createWithTTF("Lv 1", "fonts/Marker Felt.ttf", 24);
+            if (levelLabel) {
+                levelLabel->setName("levelLabel"); // 设置名字
+                levelLabel->setPosition(Vec2(500, 100));
+                this->addChild(levelLabel);
+            }
+            if (mapname == "town.tmx") {
+                //创建敌人
+                auto demon = Enemy::create(Vec2(300, 178));
+                if (demon) {
+                    demon->setName("demon"); // 设置角色名称
+                    demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                    demon->setPlayer(hero);  //设置玩家
+                    demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
+                    demon->setRadius(100.0f);
+                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                    demon->setElement(CharacterElement::WATER);   // 初始化属性
+                    // 计算出生点的屏幕坐标
+                    float adjustedX = othermapOriginX + 300.0f; // 地图左下角 + 出生点的 x 偏移
+                    float adjustedY = othermapOriginX + 178.0f; // 地图左下角 + 出生点的 y 偏移
+
+                    // 设置人物位置
+                    demon->setPosition(Vec2(adjustedX, adjustedY));
+
+                    this->addChild(demon);  // 将角色添加到场景中
+                }
             }
         }
         else {
@@ -130,31 +190,7 @@ bool OtherScene::init(const std::string& mapFile)
     else {
         CCLOG("Failed to load objectGroup-flag");
     }
-    // 创建血条背景
-    auto healthBg = Sprite::create("Character/Hero/health_bg.png");
-    if (healthBg) {
-        healthBg->setName("healthBg"); // 设置名字
-        healthBg->setPosition(Vec2(500, 50));
-        healthBg->setOpacity(128);
-        this->addChild(healthBg);
-    }
 
-    // 创建血条填充
-    auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
-    if (healthFill) {
-        healthFill->setName("healthFill"); // 设置名字
-        healthFill->setPosition(Vec2(500, 50));
-        healthFill->setOpacity(128);
-        this->addChild(healthFill);
-    }
-
-    // 创建等级Label
-    auto levelLabel = Label::createWithTTF("Lv 1", "fonts/Marker Felt.ttf", 24);
-    if (levelLabel) {
-        levelLabel->setName("levelLabel"); // 设置名字
-        levelLabel->setPosition(Vec2(500, 100));
-        this->addChild(levelLabel);
-    }
     // 读取场景中的地图传送点位置
     auto objectGroup_SceneSwitchPoints = othermap->getObjectGroup("SceneSwitchPoints");
     if (objectGroup_SceneSwitchPoints) {
@@ -228,6 +264,15 @@ bool OtherScene::init(const std::string& mapFile)
             }
         }
     }
+    else if (mapname == "town.tmx") {
+        auto savedSwitchPoints = MapManager::getInstance()->gettownSwitchPoints();
+        for (size_t i = 0; i < savedSwitchPoints.size(); ++i) {
+            if (i < positionSwitchPoints.size()) {
+                positionSwitchPoints[i].isActive = savedSwitchPoints[i].isActive;
+            }
+        }
+
+    }
     //任务点读取
     auto objectGroup_taskStartPosition = othermap->getObjectGroup("task_start");
     if (objectGroup_taskStartPosition) {
@@ -286,7 +331,7 @@ bool OtherScene::init(const std::string& mapFile)
 void OtherScene::update(float dt)
 {
 #if 1
-    if ((isPopupVisible || isDialogActive)) {
+    if ((isPopupVisible || isDialogActive || isPanelVisible|| isTaskVisible)) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
         hero->m_moveUp = false;
         hero->m_moveDown = false;
@@ -301,6 +346,7 @@ void OtherScene::update(float dt)
     auto children = getChildren();
     for (auto child : children) {
         auto character = dynamic_cast<Hero*>(child);
+        auto enemy = dynamic_cast<Enemy*>(child);
         if (character) {
             character->update(dt);
             if (character) {
@@ -319,6 +365,9 @@ void OtherScene::update(float dt)
                 // 输出当前角色等级
                 //CCLOG("hero level : %d", character->CharacterBase::getLevel());
             }
+        }
+        if (enemy) {
+            enemy->update(dt);
         }
     }
     //////////////////////
@@ -406,6 +455,9 @@ void OtherScene::update(float dt)
                     }
                     else if (mapname == "desert.tmx") {
                         MapManager::getInstance()->savedesertSwitchPoints(positionSwitchPoints);
+                    }
+                    else if (mapname == "town.tmx") {
+                        MapManager::getInstance()->savetownSwitchPoints(positionSwitchPoints);
                     }
                 }
 
@@ -510,6 +562,10 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_E:
             isKeyPressedE = true;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_P:
+        case cocos2d::EventKeyboard::KeyCode::KEY_P:
+            isKeyPressedP = true;
+            break;
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
         case cocos2d::EventKeyboard::KeyCode::KEY_R:
             isKeyPressedR = true;
@@ -549,6 +605,10 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_E:
         case cocos2d::EventKeyboard::KeyCode::KEY_E:
             isKeyPressedE = false;
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_P:
+        case cocos2d::EventKeyboard::KeyCode::KEY_P:
+            isKeyPressedP = false;
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
         case cocos2d::EventKeyboard::KeyCode::KEY_R:
@@ -627,6 +687,18 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     }
                 );
                 button = button_desert;
+            }
+            else if (mapname == "town.tmx") {
+                auto button_town = cocos2d::MenuItemImage::create(
+                    "Transfer_switch/Transfer_normal_town.png",  // 普通状态的按钮图片
+                    "Transfer_switch/Transfer_selected_town.png",  // 按下状态的按钮图片
+                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                        player->setPosition(spot.position);  // 传送角色
+                        popupLayer->removeFromParent();  // 隐藏弹窗
+                        isPopupVisible = false;  // 设置弹窗为不可见
+                    }
+                );
+                button = button_town;
             }
             // 设置按钮位置
             button->setPosition(spot.position);  // 将按钮位置设置为传送点的位置
@@ -720,6 +792,10 @@ void OtherScene::showSelectionPopup_taskStartPosition()
                 //////////////////
 
             };
+        }
+        if (mapname == "town.tmx")
+        {
+            CCLOG("Start the Task...");
         }
         CCLOG("Start the Task...");
         });
