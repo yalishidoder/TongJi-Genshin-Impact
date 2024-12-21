@@ -163,23 +163,33 @@ bool OtherScene::init(const std::string& mapFile)
             }
             if (mapname == "town.tmx") {
                 //创建敌人
-                auto demon = Enemy::create(Vec2(300, 178));
-                if (demon) {
-                    demon->setName("demon"); // 设置角色名称
-                    demon->setAnchorPoint(Vec2(0.5f, 0.5f));
-                    demon->setPlayer(hero);  //设置玩家
-                    demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
-                    demon->setRadius(100.0f);
-                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                    demon->setElement(CharacterElement::WATER);   // 初始化属性
-                    // 计算出生点的屏幕坐标
-                    float adjustedX = othermapOriginX + 300.0f; // 地图左下角 + 出生点的 x 偏移
-                    float adjustedY = othermapOriginX + 178.0f; // 地图左下角 + 出生点的 y 偏移
+                std::vector<Vec2>initposition = {
+                    {300,178},
+                    {370,358},
+                    {380,546},
+                    {815,358},
+                    {814,610},
+                    {814,166}
+                };
+                for (int i = 0; i < 6; i++) {
+                    auto demon = Enemy::create(initposition[i]);
+                    if (demon) {
+                        demon->setName("demon"); // 设置角色名称
+                        demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                        demon->setPlayer(hero);  //设置玩家
+                        demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
+                        demon->setRadius(100.0f);
+                        demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                        demon->setElement(CharacterElement::WATER);   // 初始化属性
+                        // 计算出生点的屏幕坐标
+                        float adjustedX = othermapOriginX + initposition[i].x; // 地图左下角 + 出生点的 x 偏移
+                        float adjustedY = othermapOriginX + initposition[i].y; // 地图左下角 + 出生点的 y 偏移
 
-                    // 设置人物位置
-                    demon->setPosition(Vec2(adjustedX, adjustedY));
+                        // 设置人物位置
+                        demon->setPosition(Vec2(adjustedX, adjustedY));
 
-                    this->addChild(demon);  // 将角色添加到场景中
+                        this->addChild(demon);  // 将角色添加到场景中
+                    }
                 }
             }
         }
@@ -195,7 +205,6 @@ bool OtherScene::init(const std::string& mapFile)
     auto objectGroup_SceneSwitchPoints = othermap->getObjectGroup("SceneSwitchPoints");
     if (objectGroup_SceneSwitchPoints) {
         for (auto& obj : objectGroup_SceneSwitchPoints->getObjects()) {
-            
             Vec2 switchPos(obj.asValueMap()["x"].asFloat(), obj.asValueMap()["y"].asFloat());
             CCLOG("before Switch Position: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
             //由于地图的位置原点的改变，需要将从tmx读出来的坐标进行调整
@@ -318,7 +327,14 @@ bool OtherScene::init(const std::string& mapFile)
 
     // 将监听器添加到事件分发器
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+    // 添加鼠标事件监听器
+    auto mouseListener = cocos2d::EventListenerMouse::create();
+    mouseListener->onMouseDown = CC_CALLBACK_1(OtherScene::onMouseDown, this);
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    mouseListener->onMouseMove = CC_CALLBACK_1(Hero::onMouseMove, hero);
 
+    // 将监听器添加到事件分发器
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
     // 注册 update 函数，让它每一帧都被调用
     this->schedule([this](float dt) {
         this->update(dt);
@@ -531,7 +547,7 @@ void OtherScene::update(float dt)
 
 void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    if (hero) {
+    if (hero && !(isPopupVisible || isDialogActive)) {
         switch (keyCode) {
             case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
             case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_W:
@@ -553,6 +569,24 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
             case cocos2d::EventKeyboard::KeyCode::KEY_D:
                 hero->m_moveRight = true;
                 break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_1:
+                hero->ChangeToBayonet();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_2:
+                hero->ChangeToBullet();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_Z:
+            case cocos2d::EventKeyboard::KeyCode::KEY_Z:
+                hero->SkillZ();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_X:
+            case cocos2d::EventKeyboard::KeyCode::KEY_X:
+                hero->SkillX();
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_C:
+            case cocos2d::EventKeyboard::KeyCode::KEY_C:
+                hero->SkillC();
+                break;
             default:
                 break;
         }
@@ -566,9 +600,9 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_P:
             isKeyPressedP = true;
             break;
-        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
-        case cocos2d::EventKeyboard::KeyCode::KEY_R:
-            isKeyPressedR = true;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
+        case cocos2d::EventKeyboard::KeyCode::KEY_B:
+            isKeyPressedB = true;
             break;
     }
 }
@@ -610,11 +644,39 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
         case cocos2d::EventKeyboard::KeyCode::KEY_P:
             isKeyPressedP = false;
             break;
-        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
-        case cocos2d::EventKeyboard::KeyCode::KEY_R:
-            isKeyPressedR = false;
-            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
+        case cocos2d::EventKeyboard::KeyCode::KEY_B:
+            isKeyPressedB = false;
     }
+}
+void OtherScene::onMouseDown(cocos2d::EventMouse* event)
+{
+    auto mouseEvent = dynamic_cast<EventMouse*>(event);
+    if (isPopupVisible || isDialogActive)
+        return;
+    if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
+        auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero && hero->m_isBulletChosen) {
+            hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
+        }
+    }
+    else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
+        auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero && hero->m_isBayonetChosen) {
+            hero->attackWithBayonet();
+        }
+    }
+}
+
+cocos2d::Vec2 OtherScene::TranslatePos(cocos2d::Vec2 origin)
+{
+    cocos2d::Vec2 res;
+    //auto map = dynamic_cast<TMXTiledMap*>(this->getChildByName("map"));
+    float mapOriginX = othermap->getPositionX() - (othermap->getContentSize().width * othermap->getScale() * othermap->getAnchorPoint().x);
+    float mapOriginY = othermap->getPositionY() - (othermap->getContentSize().height * othermap->getScale() * othermap->getAnchorPoint().y);
+    res.x = -mapOriginX + origin.x; // 地图左下角 x 偏移修正
+    res.y = -origin.y + 768;           // 地图左下角 y 偏移修正
+    return res;
 }
 
 bool OtherScene::checkCollision(cocos2d::Vec2 position)

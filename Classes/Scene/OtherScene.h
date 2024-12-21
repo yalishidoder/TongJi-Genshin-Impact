@@ -21,6 +21,7 @@ public:
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onMouseDown(cocos2d::EventMouse* event);
+	cocos2d::Vec2 TranslatePos(cocos2d::Vec2 origin);
 
 	//检查位置是否发生碰撞
 	bool checkCollision(cocos2d::Vec2 position);
@@ -58,7 +59,8 @@ private:
 	//记录 R 键是否被按下（触发任务）
 	bool isKeyPressedR = false;
 	bool tasking = false;
-
+	//记录 B 键是否被按下（背包）
+	bool isKeyPressedB = false;
 	PlayerPanel* m_playerPanel = nullptr;
 
 };
