@@ -116,7 +116,8 @@ public:
     void onMouseMove(cocos2d::EventMouse* event);
 
     cocos2d::Label* levelupLabel;
-    
+    cocos2d::Label* weaponLabel;
+
     //  ½ÇÉ«´æµµÏà¹Ø
     void saveProfile(const std::string& filename);
     void loadProfile(const std::string& filename);

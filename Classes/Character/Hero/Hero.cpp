@@ -78,7 +78,7 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     if (levelupLabel) {
         cocos2d::Vec2 labelPos = this->getAnchorPoint();
         labelPos.x += 30;
-        labelPos.y += 60;
+        labelPos.y += 72;
         levelupLabel->setPosition(labelPos); // 设置合适的位置
         levelupLabel->setVisible(false); // 初始不可见
         this->addChild(levelupLabel);
@@ -86,7 +86,20 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     else {
         CCLOG("Failed to create levelupLabel");
     }
-    
+    // 创建武器标签
+    weaponLabel = Label::createWithSystemFont("", "Arial", 14);
+    if (weaponLabel) {
+        cocos2d::Vec2 labelPos = this->getAnchorPoint();
+        labelPos.x += 30;
+        labelPos.y += 60;
+        weaponLabel->setPosition(labelPos); // 设置合适的位置
+        weaponLabel->setVisible(true); // 初始不可见
+        this->addChild(weaponLabel);
+    }
+    else {
+        CCLOG("Failed to create weaponLabel");
+    }
+
     return true;
 }
 
@@ -747,8 +760,10 @@ void Hero::ChangeToBayonet()
         return;
     else
     {
+        weaponLabel->setString("Bayonet");
         if (!m_bayonet)
         {
+
             // 创建Bayonet实例
             m_bayonet = Bayonet::create("Weapon/bayonet.png");
             if (m_bayonet)
@@ -776,6 +791,7 @@ void Hero::ChangeToBullet()
         return;
     else
     {
+        weaponLabel->setString("Bullet");
         m_isBulletChosen = true;
         m_isBayonetChosen = false;
         if (m_bayonet)
@@ -878,7 +894,7 @@ void Hero::SkillX()
                     cocos2d::Vec2 bulletPosition = getPosition() + cocos2d::Vec2(radius * cos(radian), radius * sin(radian));
 
                     // 创建子弹
-                    auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, 1);
+                    auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, (m_level + 1) / 2);
 
 
                     if (bullet)
@@ -947,10 +963,61 @@ void Hero::SkillX()
         runAction(cocos2d::Sequence::create(actions));
     }
     else
-    {
-
+    {  
+        m_skillXCoolDownTime = 3.0f;
+        m_isSkillXOnCoolDown = true;
+        // 飞刀(实际为子弹)的半径
+        float radius = 1.0f;
+        // 弹幕的数量
+        int numBullets = 20;
+        // 每个飞刀之间的角度差
+        float angleStep = 360.0f / numBullets;
+        // 动作序列
+        cocos2d::Vector<cocos2d::FiniteTimeAction*> actions;
+        // 发射一波弹幕的动作  
+        actions.pushBack(cocos2d::CallFunc::create([=]() {        
+            for (int i = 0; i < numBullets; ++i) 
+            {  
+                // 计算飞刀的角度 
+                float angle = i * angleStep;   
+                // 将角度转换为弧度
+                float radian = angle * (M_PI / 180.0f);
+                // 计算飞刀的位置
+                cocos2d::Vec2 bulletPosition = getPosition() + cocos2d::Vec2(radius * cos(radian), radius * sin(radian));    
+                // 创建子弹
+                auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, m_level);
+                if (bullet)
+                    {                
+                    bullet->setTexture("Weapon/bayonet.png");          
+                    // 设置飞刀的锚点  
+                    bullet->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));           
+                    // 设置飞刀的位置            
+                    bullet->setPosition(bulletPosition);       
+                    bullet->setRotation(-angle);              
+                    // 计算飞刀的方向，使其沿着圆周的切线方向飞行 
+                    cocos2d::Vec2 direction(cos(radian), sin(radian));
+                    // 飞刀的速度
+                    float speed = 200.0f;
+                    // 计算飞刀的移动时间
+                    float time = 1.6f;
+                    // 创建移动动作
+                    auto moveAction = cocos2d::MoveBy::create(time / 4, direction * speed * time / 4);
+                    // 创建移除动作，当飞刀移动一定时间后将其移除
+                    auto removeAction = cocos2d::RemoveSelf::create();
+                    // 创建旋转动作，使飞刀在飞行过程中不断旋转
+                    auto rotateAction = RotateBy::create(time / 4, 360.0f);
+                    // 使用 Spawn 动作同时执行移动和旋转动作
+                    auto spawnAction = Spawn::create(moveAction, rotateAction, nullptr);
+                    // 运行动作序列
+                    bullet->runAction(cocos2d::Sequence::create(spawnAction, moveAction, moveAction, moveAction, removeAction, nullptr));
+                    // 添加飞刀到父节点
+                    this->getParent()->addChild(bullet);
+                }
+            }   
+            }));
+        // 运行动作序列
+        runAction(cocos2d::Sequence::create(actions));
     }
-
 }
 
 void Hero::SkillC()

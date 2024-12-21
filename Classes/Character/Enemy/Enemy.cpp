@@ -53,8 +53,8 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
     this->addChild(damageLabel);
     damageLabel->setVisible(false);
 
-    ERLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 24);
-    labelPos.x += 50;
+    ERLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 20);
+    labelPos.x += 60;
     labelPos.y -= 30;
     ERLabel->setPosition(labelPos);
     this->addChild(ERLabel);
@@ -62,6 +62,7 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
 
     freezeSprite= cocos2d::Sprite::create("Character/ER/Crystal_Icon.png");
     freezeSprite->setPosition(this->getPosition());
+    freezeSprite->setOpacity(150);
     this->addChild(freezeSprite);
     freezeSprite->setVisible(isControlled);
 
