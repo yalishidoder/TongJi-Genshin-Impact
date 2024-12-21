@@ -6,7 +6,7 @@
 #include "Scene/MapManager.h"
 #include "Task/Maze.h"
 #include "Task/TreasureHunt.h"
-
+#include "Task/EnemyHunt.h"
 
 USING_NS_CC;
 
@@ -189,6 +189,8 @@ bool OtherScene::init(const std::string& mapFile)
                         demon->setPosition(Vec2(adjustedX, adjustedY));
 
                         this->addChild(demon);  // 将角色添加到场景中
+                        // 将敌人对象添加到 enemies 向量中
+                        enemies.push_back(demon);
                     }
                 }
             }
@@ -523,23 +525,25 @@ void OtherScene::update(float dt)
     ////////////////////
     //人物碰到任务结束点
     ////////////////////
-    auto player_taskend = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    if (player_taskend) {
-        // 设置触发范围半径
-        float triggerRadius = 50.0f;
-        Vec2 currentPosition = player_taskend->getPosition();  // 获取角色当前位置
-        bool isInRange = false;
-        // 检测角色是否进入任务结束点的范围
-        if (currentPosition.distance(taskEndPosition) < triggerRadius) {
-            isInRange = true;
-        }
-        if (isInRange && tasking) {
-            tasking = false;// 任务结束
-            ///////////////////
-            //添加发放奖励代码
-            ///////////////////
-            if (mapname == "forest.tmx") {
-                positionSwitchPoints[2].isActive = true;
+    if (mapname == "forest.tmx" || mapname == "desert.tmx") {
+        auto player_taskend = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (player_taskend) {
+            // 设置触发范围半径
+            float triggerRadius = 50.0f;
+            Vec2 currentPosition = player_taskend->getPosition();  // 获取角色当前位置
+            bool isInRange = false;
+            // 检测角色是否进入任务结束点的范围
+            if (currentPosition.distance(taskEndPosition) < triggerRadius) {
+                isInRange = true;
+            }
+            if (isInRange && tasking) {
+                tasking = false;// 任务结束
+                ///////////////////
+                //添加发放奖励代码
+                ///////////////////
+                if (mapname == "forest.tmx") {
+                    positionSwitchPoints[2].isActive = true;
+                }
             }
         }
     }
@@ -788,13 +792,13 @@ void OtherScene::showSelectionPopup_taskStartPosition()
     Label* label = nullptr;
     // 根据 mapname 设置不同的标签内容
     if (mapname == "forest.tmx") {
-        label = Label::createWithSystemFont("Do you want to start the task:\nComplete the maze within the time limit", "Arial", 40);
+        label = Label::createWithSystemFont("Do you want to start the task:\nComplete the maze within the time limit", "fonts/Marker Felt.ttf", 40);
     }
     else if (mapname == "desert.tmx") {
-        label = Label::createWithSystemFont("Do you want to start the task:\nCollect enough gems within a limited time", "Arial", 40);
+        label = Label::createWithSystemFont("Do you want to start the task:\nCollect enough gems within a limited time", "fonts/Marker Felt.ttf", 40);
     }
-    else {
-        label = Label::createWithSystemFont("Do you want to start the task", "Arial", 40); // 默认标签
+    else if (mapname == "town.tmx") {
+        label = Label::createWithSystemFont("The town has been overrun by the bad guys T.T \nWarrior! would you like to help me save the town", "fonts/Marker Felt.ttf", 40); // 默认标签
     }
     label->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(0, 50));
     dialog->addChild(label);
@@ -861,7 +865,18 @@ void OtherScene::showSelectionPopup_taskStartPosition()
         }
         if (mapname == "town.tmx")
         {
+            auto enemy_hunt = EnemyHunt::create(Director::getInstance()->getVisibleSize(),othermap, player, enemies, 6);
+            this->addChild(enemy_hunt, 10);
+            enemy_hunt->StartTask();
             CCLOG("Start the Task...");
+            // 获取任务状态(是否完成)
+            if (enemy_hunt->GetTaskStatus() == EnemyHunt::TASK_COMPLETED)
+            {
+                //////////////////
+                // 完成任务后的奖励
+                //////////////////
+
+            };
         }
         CCLOG("Start the Task...");
         });

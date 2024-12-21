@@ -3,7 +3,7 @@
 #include "Scene/MainScene.h"
 #include "cocos2d.h"
 #include "Character/Hero/Hero.h"
-
+#include "Character/Enemy/Enemy.h"
 
 class OtherScene : public cocos2d::Scene
 {
@@ -62,6 +62,7 @@ private:
 	//记录 B 键是否被按下（背包）
 	bool isKeyPressedB = false;
 	PlayerPanel* m_playerPanel = nullptr;
+	std::vector<Enemy*> enemies;  // 存储town敌人的容器
 
 };
 #endif // __OtherScene_SCENE_H__

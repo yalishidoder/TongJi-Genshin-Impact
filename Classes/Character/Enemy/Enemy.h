@@ -65,7 +65,7 @@ public:
 
     //ÉèÖÃÑ²Âß±ß½ç
     void setPatrolRange(float X, float Y);
-
+    bool task_alive = 1;
 private:
     int m_health;
     int m_full_health;
