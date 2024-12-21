@@ -5,6 +5,7 @@ CharacterBase::CharacterBase()
     , m_full_health(100)
     , m_level(1)
     , m_attackPower(10)
+    , isControlled(false)
 {
 }
 
@@ -98,3 +99,27 @@ void CharacterBase::setElement(CharacterElement Elementpower)
 {
     element = Elementpower;
 }
+
+void CharacterBase::applyControl(float duration)
+{
+    setControlled(true);
+
+    // 使用scheduleOnce在duration秒后解除控制
+    this->scheduleOnce(schedule_selector(CharacterBase::onControlEnd), duration);
+
+    /*this->scheduleOnce([this](float dt)
+        {
+            setControlled(false);
+        }, duration);*/
+}
+
+void CharacterBase::setControlled(bool controlled)
+{
+    isControlled = controlled;
+}
+
+void CharacterBase::onControlEnd(float dt)
+{
+    setControlled(false);
+}
+

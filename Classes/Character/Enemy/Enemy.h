@@ -39,6 +39,9 @@ public:
     virtual void update(float delta)override;
     void takeDamage(float damage);
     void updateDamageLabel(int damage);
+    void updateERLabel();
+    void Freeze();
+    void hideFreezeSprite(float dt);
 
     // 存活状态相关
     bool isAlive() const;
@@ -63,9 +66,6 @@ public:
     //设置巡逻边界
     void setPatrolRange(float X, float Y);
 
-    // 伤害标签
-    cocos2d::Label* damageLabel;
-
 private:
     int m_health;
     int m_full_health;
@@ -87,9 +87,6 @@ private:
 
     //巡逻方向
     int dirX, dirY;
-
-    //敌人出生地
-    cocos2d::Vec2 spawnPoint;
 
     //敌人的巡逻函数
     void patrol(float delta);

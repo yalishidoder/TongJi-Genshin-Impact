@@ -13,6 +13,8 @@ enum class CharacterElement
     ROCK    //岩
 };
 
+const float FreezeTime = 2.0f;
+
 class CharacterBase : public cocos2d::Sprite
 {
 public:
@@ -55,8 +57,17 @@ public:
 
     // 回到出生点恢复生命值 
     virtual void Recover();
+
+    // 设置控制时间与控制状态
+    virtual void applyControl(float duration);
+    virtual void setControlled(bool controlled);
+    virtual void onControlEnd(float dt);
 protected:
+    // 角色特定名字
     std::string m_name;
+
+    // 元素反应类型
+    std::string ERType;
 
     // 生命值
     int m_health;
@@ -69,12 +80,21 @@ protected:
     int m_level;
     int MaxLevel;
 
+    bool isControlled;
     // 元素
     CharacterElement element;
 
     // 出生点
     // 所有角色返回出生点恢复所有生命值
     cocos2d::Vec2 spawnPoint;
+
+    // 伤害标签
+    cocos2d::Label* damageLabel;
+
+    // 元素反应标签
+    cocos2d::Label* ERLabel;
+
+    cocos2d::Sprite* freezeSprite;
 };
 
 #endif // __CHARACTER_BASE_H__

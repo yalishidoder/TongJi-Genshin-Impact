@@ -1,11 +1,10 @@
-/****************************************************************
+ï»¿/****************************************************************
  * Project Name:  Genshin Impact
  * File Name:     Enemy.cpp
- * File Function: µĞÈËÀàÊµÏÖ
+ * File Function: æ•Œäººç±»å®ç°
  * Author:        kfx
  * Update Date:   2024.12.10
  ****************************************************************/
-#include "cocos2d.h"
 #include "Enemy.h"
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
@@ -16,12 +15,12 @@
 
 Enemy::Enemy()
     : m_isAlive(true)
-    , m_moveSpeed(50.0f)  // ³õÊ¼ÒÆ¶¯ËÙ¶È
-    , isAttacking(false)  //ÊÇ·ñ·¢Æğ½ø¹¥
+    , m_moveSpeed(50.0f)  // åˆå§‹ç§»åŠ¨é€Ÿåº¦
+    , isAttacking(false)  //æ˜¯å¦å‘èµ·è¿›æ”»
     , m_animationCache(cocos2d::AnimationCache::getInstance())
     , m_currentAnimate(nullptr)
-    , currentState(EnemyState::PATROL)   //³õÊ¼×´Ì¬ÎªÑ²Âß
-    ,dirX(1) ,dirY(1)     //³õÊ¼Ñ²Âß·½ÏòÉèÎªÕı·½Ïò
+    , currentState(EnemyState::PATROL)   //åˆå§‹çŠ¶æ€ä¸ºå·¡é€»
+    ,dirX(1) ,dirY(1)     //åˆå§‹å·¡é€»æ–¹å‘è®¾ä¸ºæ­£æ–¹å‘
 {
     setMaxHealth(100);
     setAttackPower(5);
@@ -39,13 +38,13 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
     }
 
 
-    // ÉèÖÃµĞÈË³õÊ¼Î»ÖÃ
+    // è®¾ç½®æ•Œäººåˆå§‹ä½ç½®
     setPosition(initPosition);
     setScale(0.8f);
     spawnPoint = initPosition;
 
-    // ¿ÉÒÔÔÚÕâÀï¼ÓÔØµĞÈËµÄ³õÊ¼Íâ¹ÛÎÆÀíµÈ
-    // ÀıÈç£ºsetTexture("enemy_default.png");
+    // å¯ä»¥åœ¨è¿™é‡ŒåŠ è½½æ•Œäººçš„åˆå§‹å¤–è§‚çº¹ç†ç­‰
+    // ä¾‹å¦‚ï¼šsetTexture("enemy_default.png");
     damageLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 24);
     cocos2d::Vec2 labelPos = this->getAnchorPoint();
     labelPos.x += 30;
@@ -53,6 +52,18 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
     damageLabel->setPosition(labelPos);
     this->addChild(damageLabel);
     damageLabel->setVisible(false);
+
+    ERLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 24);
+    labelPos.x += 50;
+    labelPos.y -= 30;
+    ERLabel->setPosition(labelPos);
+    this->addChild(ERLabel);
+    ERLabel->setVisible(false);
+
+    freezeSprite= cocos2d::Sprite::create("Character/ER/Crystal_Icon.png");
+    freezeSprite->setPosition(this->getPosition());
+    this->addChild(freezeSprite);
+    freezeSprite->setVisible(isControlled);
 
     setTexture("Character/Enemy/Animation/hitman/WALK_DOWN_0.png");
     m_animationCache = cocos2d::AnimationCache::getInstance();
@@ -75,6 +86,7 @@ Enemy* Enemy::create(const cocos2d::Vec2& initPosition)  {
     CC_SAFE_DELETE(enemy);
     return nullptr;
 }
+
 Hero* Enemy::getPlayer()
 {
     return player;
@@ -105,10 +117,10 @@ void Enemy::setDeath() {
     currentState = EnemyState::STAY;
 
 #if 1
-    // ²¥·ÅËÀÍö¶¯»­
+    // æ’­æ”¾æ­»äº¡åŠ¨ç”»
     playAnimation("death_enemy");
 
-    // Ê¹ÓÃÑÓ³Ù¶¯×÷À´ÑÓ³ÙÒÆ³ıµĞÈË
+    // ä½¿ç”¨å»¶è¿ŸåŠ¨ä½œæ¥å»¶è¿Ÿç§»é™¤æ•Œäºº
     auto delay = cocos2d::DelayTime::create(1.0f);
     auto remove = cocos2d::CallFunc::create([=]() {
         removeFromParentAndCleanup(true);
@@ -121,7 +133,10 @@ void Enemy::setDeath() {
 
 void Enemy::update(float delta) 
 {
-    //ÅĞ¶¨·¶Î§ÄÚ´æÔÚÍæ¼ÒÔÙ½øĞĞ²Ù×÷
+    if (isControlled)
+        return;
+
+    //åˆ¤å®šèŒƒå›´å†…å­˜åœ¨ç©å®¶å†è¿›è¡Œæ“ä½œ
     
     if (isHeroExist(delta))
     {
@@ -132,12 +147,12 @@ void Enemy::update(float delta)
 
 }
 
-// ¼òµ¥µÄÔªËØ·´Ó¦Âß¼­
-// Í¬ÔªËØÎŞÉË 
-// »ğ±ùÈÚ»¯ Ë®»ğÕô·¢ ±¶ÂÊÒÀÕÕÔ­ÉñµÄ¹æÔò
-// ÌØÊâµÄ£ºÑÒÔªËØ´¥Åöµ½ÆäÓàÔªËØ»áÉú³ÉÔªËØ¶Ü£¬ÕâÀï¿ÉÒÔ¼ò»¯³ÉÑÒÔªËØÊ¼ÖÕ¼õÉË20%
-// Ë®±ùÏàÓö»á¶³½á µ«Ö»ÔÚ±ù¹¥»÷¸½´øË®ÔªËØµÄ½ÇÉ«µÄÇé¿öÏÂ
-// ÔÚ¶³½áµÄÇé¿öÏÂ£¬ÊÜµ½ÑÒÔªËØ¹¥»÷»áËé±ù
+// ç®€å•çš„å…ƒç´ ååº”é€»è¾‘
+// åŒå…ƒç´ æ— ä¼¤ 
+// ç«å†°èåŒ– æ°´ç«è’¸å‘ å€ç‡ä¾ç…§åŸç¥çš„è§„åˆ™
+// ç‰¹æ®Šçš„ï¼šå²©å…ƒç´ è§¦ç¢°åˆ°å…¶ä½™å…ƒç´ ä¼šç”Ÿæˆå…ƒç´ ç›¾ï¼Œè¿™é‡Œå¯ä»¥ç®€åŒ–æˆå²©å…ƒç´ å§‹ç»ˆå‡ä¼¤20%
+// æ°´å†°ç›¸é‡ä¼šå†»ç»“ ä½†åªåœ¨å†°æ”»å‡»é™„å¸¦æ°´å…ƒç´ çš„è§’è‰²çš„æƒ…å†µä¸‹
+// åœ¨å†»ç»“çš„æƒ…å†µä¸‹ï¼Œå—åˆ°å²©å…ƒç´ æ”»å‡»ä¼šç¢å†°
 
 void Enemy::takeDamage(float damage)
 {
@@ -145,21 +160,27 @@ void Enemy::takeDamage(float damage)
         return;
     Hero* player = this->getPlayer();
 
-    switch (player->getElement())//ÔªËØ¸½¼ÓÉËº¦
+    switch (player->getElement())//å…ƒç´ é™„åŠ ä¼¤å®³
     {
     case(CharacterElement::FIRE):
         CCLOG("BURN!");
-        //»ğĞ§¹û
+        //ç«æ•ˆæœ
         switch (this->getElement())
         {
+            //èåŒ–
         case(CharacterElement::ICE):
             damage *= 2.0f;
+            ERType = "Melt!";
             break;
+            //è’¸å‘
         case(CharacterElement::WATER):
             damage *= 1.5f;
+            ERType = "Evaporate!";
             break;
+            //æŠµæŠ—
         case(CharacterElement::ROCK):
             damage *= 0.8f;
+            ERType = "Resist!";
             break;
         default:
             break;
@@ -167,17 +188,22 @@ void Enemy::takeDamage(float damage)
         break;
     case(CharacterElement::ICE):
         CCLOG("FREEZE!");
-        //±ùĞ§¹û
+        //å†°æ•ˆæœ
         switch (this->getElement())
         {
+            //èåŒ–
         case(CharacterElement::FIRE):
             damage *= 1.5f;
+            ERType = "Melt!";
             break;
+            //å†»ç»“
         case(CharacterElement::WATER):
-            // freeze()
+            ERType = "Freeze!";
+            Freeze();
             break;
         case(CharacterElement::ROCK):
             damage *= 0.8f;
+            ERType = "Resist!";
             break;
         default:
             break;
@@ -185,17 +211,22 @@ void Enemy::takeDamage(float damage)
         break;
     case(CharacterElement::WATER):
         CCLOG("BE WATER MY FRIEND");
-        //Ë®Ğ§¹û
+        //æ°´æ•ˆæœ
         switch (this->getElement())
         {
+            //è’¸å‘
         case(CharacterElement::FIRE):
             damage *= 2.0f;
+            ERType = "Evaporate!";
             break;
+            //å†»ç»“
         case(CharacterElement::ICE):
-            // freeze()
+            ERType = "Freeze!";
+            Freeze();
             break;
         case(CharacterElement::ROCK):
             damage *= 0.8f;
+            ERType = "Resist!";
             break;
         default:
             break;
@@ -203,9 +234,10 @@ void Enemy::takeDamage(float damage)
         break;
     case(CharacterElement::ROCK):
         CCLOG("YOU SHALL NOT PASS!");
-        //ÑÒĞ§¹û
-        //if(freeze())
-        //   damage *= 3;
+        //å²©æ•ˆæœ
+        // ç¢å†°
+        if (isControlled && freezeSprite->isVisible())
+            damage *= 3;
         break;
     default:
         break;
@@ -214,20 +246,22 @@ void Enemy::takeDamage(float damage)
     if (this->getElement() == player->getElement())
         damage = 0;
 
-    // ¼õÉÙµĞÈËµÄÉúÃüÖµ
+    // å‡å°‘æ•Œäººçš„ç”Ÿå‘½å€¼
     float health = this->getHealth() - damage;
 
     const int player_lv = player->getLevel();
     const int enemy_lv = this->getLevel();
-    const int lv_gap = (enemy_lv - player_lv) < 5 ? std::pow(1.2, enemy_lv - player_lv + 1) : enemy_lv - player_lv;    // µÈ¼¶²îÃÖ²¹
+    const int lv_gap = (enemy_lv - player_lv) < 5 ? std::pow(1.2, enemy_lv - player_lv + 1) : enemy_lv - player_lv;    // ç­‰çº§å·®å¼¥è¡¥
 
-    // ¸üĞÂÉËº¦Êı×ÖÏÔÊ¾
+    // æ›´æ–°ä¼¤å®³æ•°å­—æ˜¾ç¤º
     updateDamageLabel(damage);
-    player->addExp(log10(damage + 10) * lv_gap / 10 + 10);  // ÉËº¦¾­Ñé
+    // æ›´æ–°å…ƒç´ ååº”æ˜¾ç¤º
+    updateERLabel();
+    player->addExp(log10(damage + 10) * lv_gap / 10 + 10);  // ä¼¤å®³ç»éªŒ
 
-    // ¼ì²éµĞÈËÊÇ·ñËÀÍö    
+    // æ£€æŸ¥æ•Œäººæ˜¯å¦æ­»äº¡    
     if (health < 0) {
-        player->addExp(std::pow(1.2, lv_gap) * 5 + 50);  // »÷É±µÈ¼¶¾­Ñé
+        player->addExp(std::pow(1.2, lv_gap) * 5 + 50);  // å‡»æ€ç­‰çº§ç»éªŒ
         this->setDeath();
     }
     else
@@ -236,35 +270,35 @@ void Enemy::takeDamage(float damage)
 
 }
 
-// ¸üĞÂÉËº¦Êı×ÖÏÔÊ¾
+// æ›´æ–°ä¼¤å®³æ•°å­—æ˜¾ç¤º
 void Enemy::updateDamageLabel(int damage)
 {
 
     damageLabel->setString('-'+std::to_string(damage));
     damageLabel->setVisible(true);
-    // ³õÊ¼ÑÕÉ«
+    // åˆå§‹é¢œè‰²
     cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
     damageLabel->setTextColor(initialColor);
 
-    // ÉÁË¸ÑÕÉ«
+    // é—ªçƒé¢œè‰²
     cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
     float blinkInterval = 0.05f;
     int blinkTimes = 1;
 
-    // ÉÁË¸¶¯×÷
+    // é—ªçƒåŠ¨ä½œ
     cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
         cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
         cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
         nullptr
     ), blinkTimes);
 
-    // Ä¿±êÑÕÉ«
+    // ç›®æ ‡é¢œè‰²
     cocos2d::Color3B targetColor = cocos2d::Color3B::RED;
 
-    // ÑÕÉ«½¥±ä¶¯×÷
+    // é¢œè‰²æ¸å˜åŠ¨ä½œ
     cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
 
-    // ×îÖÕÒş²Ø¶¯×÷
+    // æœ€ç»ˆéšè—åŠ¨ä½œ
     cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
         blinkAction,
         colorAction,
@@ -274,19 +308,91 @@ void Enemy::updateDamageLabel(int damage)
         nullptr
     );
 
-    // ÔËĞĞ¶¯×÷
+    // è¿è¡ŒåŠ¨ä½œ
     damageLabel->runAction(hideAction);
 }
 
-// »ñÈ¡µĞÈËÔªËØ
+// æ›´æ–°å…ƒç´ ååº”æ˜¾ç¤º
+void Enemy::updateERLabel()
+{
+    ERLabel->setString(ERType);
+    ERLabel->setVisible(true);
+    // åˆå§‹é¢œè‰²
+    cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
+    ERLabel->setTextColor(initialColor);
+
+    // é—ªçƒé¢œè‰²
+    cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
+    float blinkInterval = 0.05f;
+    int blinkTimes = 1;
+
+    // é—ªçƒåŠ¨ä½œ
+    cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
+        cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
+        cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
+        nullptr
+    ), blinkTimes);
+
+    // ç›®æ ‡é¢œè‰²
+    cocos2d::Color3B targetColor = cocos2d::Color3B::WHITE;
+
+    if(ERType=="Melt!")
+        targetColor = cocos2d::Color3B::RED;
+    else if(ERType == "Freeze!")
+        targetColor = cocos2d::Color3B::BLUE;
+    else if(ERType=="Resist!")
+        targetColor = cocos2d::Color3B::GRAY;
+
+    // é¢œè‰²æ¸å˜åŠ¨ä½œ
+    cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
+
+    // æœ€ç»ˆéšè—åŠ¨ä½œ
+    cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
+        blinkAction,
+        colorAction,
+        cocos2d::CallFunc::create([=]() {
+            ERLabel->setVisible(false);
+            }),
+        nullptr
+    );
+
+    // è¿è¡ŒåŠ¨ä½œ
+    ERLabel->runAction(hideAction);
+}
+
+// è®¾ç½®å†°å†»æ•ˆæœ
+void Enemy::Freeze()
+{
+    applyControl(FreezeTime);
+    cocos2d::Vec2 labelPos = this->getAnchorPoint();
+    labelPos.x += 30;
+    labelPos.y += 30;
+    freezeSprite->setPosition(labelPos);
+    freezeSprite->setVisible(isControlled);
+
+    // ä½¿ç”¨scheduleOnceå®‰æ’ä¸€ä¸ªå»¶è¿Ÿä»»åŠ¡
+    this->scheduleOnce(schedule_selector(Enemy::hideFreezeSprite), FreezeTime);
+
+    /*this->scheduleOnce([this](float dt) {
+        freezeSprite->setVisible(false);
+        }, FreezeTime);*/
+}
+
+// æ·»åŠ å›è°ƒå‡½æ•°
+void Enemy::hideFreezeSprite(float dt)
+{
+    freezeSprite->setVisible(false);
+}
+
+// è·å–æ•Œäººå…ƒç´ 
 CharacterElement Enemy::getElement()
 {
     return element;
 }
 
 void Enemy::attack() {
-    // µĞÈËµÄ¹¥»÷Âß¼­£¬¿É¸ù¾İĞèÒªÀ©Õ¹£¬ÀıÈç·¢Éä×Óµ¯¡¢½üÕ½¹¥»÷µÈ
-    // ÕâÀï½ö×÷Ê¾Àı£¬¿ÉÌí¼Ó¾ßÌåµÄ¹¥»÷ÊµÏÖ
+    // æ•Œäººçš„æ”»å‡»é€»è¾‘ï¼Œå¯æ ¹æ®éœ€è¦æ‰©å±•ï¼Œä¾‹å¦‚å‘å°„å­å¼¹ã€è¿‘æˆ˜æ”»å‡»ç­‰
+    // è¿™é‡Œä»…ä½œç¤ºä¾‹ï¼Œå¯æ·»åŠ å…·ä½“çš„æ”»å‡»å®ç°
     CCLOG("Enemy attacks with power %d", m_attackPower);
 }
 
@@ -306,7 +412,7 @@ void Enemy::setRadius(float radius = 100.0f)
     this->radius = radius;
 }
 
-//ÅĞ¶¨·¶Î§ÄÚÊÇ·ñ´æÔÚÍæ¼Ò
+//åˆ¤å®šèŒƒå›´å†…æ˜¯å¦å­˜åœ¨ç©å®¶
 bool Enemy::isHeroExist(float dt)
 {
     if (player)
@@ -373,7 +479,7 @@ void Enemy::stayLogic(float& distanceToPlayer)
     }
     else
     {
-        // ´¦Àí¹¥»÷Âß¼­
+        // å¤„ç†æ”»å‡»é€»è¾‘
     }
 }
 
@@ -455,44 +561,44 @@ bool Enemy::checkCollisionWithScene(cocos2d::Vec2& targetPosition)
 
 void Enemy::patrol(float delta)
 {
-    // Ñ²ÂßÂß¼­£¬ÀıÈçÑØ×ÅÂ·¾¶ÒÆ¶¯»òËæ»úÒÆ¶¯
-    // Ê¾Àı£º¼òµ¥µØ×óÓÒÒÆ¶¯
-    //ºóĞø¿ÉÒÔÌí¼ÓÏòÉÏÏÂÑ²ÂßµÄ¹¦ÄÜ
+    // å·¡é€»é€»è¾‘ï¼Œä¾‹å¦‚æ²¿ç€è·¯å¾„ç§»åŠ¨æˆ–éšæœºç§»åŠ¨
+    // ç¤ºä¾‹ï¼šç®€å•åœ°å·¦å³ç§»åŠ¨
+    //åç»­å¯ä»¥æ·»åŠ å‘ä¸Šä¸‹å·¡é€»çš„åŠŸèƒ½
 
     cocos2d::Vec2 moveDirection = cocos2d::Vec2(dirX * m_moveSpeed * delta, 0);
     cocos2d::Vec2 targetPosition = getPosition() + moveDirection;
 
-    // »ñÈ¡µ±Ç°³¡¾°½øĞĞÅö×²¼ì²â
+    // è·å–å½“å‰åœºæ™¯è¿›è¡Œç¢°æ’æ£€æµ‹
     bool collision = checkCollisionWithScene(targetPosition);
 
     CCLOG("Collision check: Target Position = (%.2f, %.2f), Collision = %s",
         targetPosition.x, targetPosition.y, collision ? "True" : "False");
 
-    //´óÓÚÓÒ±ß½ç,Ôò¹æ¶¨Ïò×óÒÆ¶¯
+    //å¤§äºå³è¾¹ç•Œ,åˆ™è§„å®šå‘å·¦ç§»åŠ¨
     if (this->getPositionX() >= spawnPoint.x + rangedX)
     {
         dirX = -1;
     }
-    //Ğ¡ÓÚ×ó±ß½ç£¬Ôò¹æ¶¨ÏòÓÒÒÆ¶¯
+    //å°äºå·¦è¾¹ç•Œï¼Œåˆ™è§„å®šå‘å³ç§»åŠ¨
     else if (this->getPositionX() <= spawnPoint.x - rangedX)
     {
         dirX = 1;
     }
 
-    // Èç¹ûÃ»ÓĞÅö×²£¬Ö´ĞĞÒÆ¶¯
+    // å¦‚æœæ²¡æœ‰ç¢°æ’ï¼Œæ‰§è¡Œç§»åŠ¨
     if (!collision)
     {
         moveBy(moveDirection);
         CCLOG("Enemy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
     }
-    else // ÓĞÅö×²£¬·´ÏòÒÆ¶¯
+    else // æœ‰ç¢°æ’ï¼Œåå‘ç§»åŠ¨
     {
-        // ÏòÓÒÒÆ¶¯Åöµ½Ç½±Ú£¬·´ÏòÏò×ó
+        // å‘å³ç§»åŠ¨ç¢°åˆ°å¢™å£ï¼Œåå‘å‘å·¦
         if (dirX == 1)
         {
             dirX = -1;
         }
-        // Ïò×óÒÆ¶¯Åöµ½Ç½±Ú£¬·´ÏòÏòÓÒ
+        // å‘å·¦ç§»åŠ¨ç¢°åˆ°å¢™å£ï¼Œåå‘å‘å³
         else if (dirX == -1)
         {
             dirX = 1;
@@ -501,7 +607,7 @@ void Enemy::patrol(float delta)
 }
 
 void Enemy::moveLogic(float dt) {
-    // ¼òµ¥µÄËæ»úÒÆ¶¯Âß¼­£¬¿É¸ù¾İĞèÒªÀ©Õ¹Îª×·ÖğÍæ¼Ò»òÆäËûÂß¼­
+    // ç®€å•çš„éšæœºç§»åŠ¨é€»è¾‘ï¼Œå¯æ ¹æ®éœ€è¦æ‰©å±•ä¸ºè¿½é€ç©å®¶æˆ–å…¶ä»–é€»è¾‘
     cocos2d::Vec2 moveDirection;
     float randomX = CCRANDOM_MINUS1_1();
     float randomY = CCRANDOM_MINUS1_1();
@@ -515,20 +621,20 @@ void Enemy::moveLogic(float dt) {
 }
 
 void Enemy::attackLogic() {
-    // ¼òµ¥µÄ¹¥»÷Âß¼­£¬¿É¸ù¾İĞèÒªÀ©Õ¹Îª¸ü¸´ÔÓµÄ¹¥»÷ÅĞ¶ÏºÍ´¥·¢Ìõ¼ş
-    if (CCRANDOM_0_1() < 0.01) {  // 1% µÄ¸ÅÂÊ¹¥»÷£¬¿Éµ÷Õû
+    // ç®€å•çš„æ”»å‡»é€»è¾‘ï¼Œå¯æ ¹æ®éœ€è¦æ‰©å±•ä¸ºæ›´å¤æ‚çš„æ”»å‡»åˆ¤æ–­å’Œè§¦å‘æ¡ä»¶
+    if (CCRANDOM_0_1() < 0.01) {  // 1% çš„æ¦‚ç‡æ”»å‡»ï¼Œå¯è°ƒæ•´
         attack();
     }
 }
 
 
 void Enemy::aiLogic() {
-    // ÕâÀï¿ÉÒÔÊµÏÖ¸ü¸´ÔÓµÄ AI Âß¼­£¬ÀıÈçÑ²Âß¡¢×·ÖğÍæ¼Ò¡¢¶ã±ÜÍæ¼ÒµÈ
-    // ÔİÊ±Îª¿Õ£¬¿É¸ù¾İÓÎÏ·ĞèÇóÌí¼Ó
+    // è¿™é‡Œå¯ä»¥å®ç°æ›´å¤æ‚çš„ AI é€»è¾‘ï¼Œä¾‹å¦‚å·¡é€»ã€è¿½é€ç©å®¶ã€èº²é¿ç©å®¶ç­‰
+    // æš‚æ—¶ä¸ºç©ºï¼Œå¯æ ¹æ®æ¸¸æˆéœ€æ±‚æ·»åŠ 
 
 }
 
-// ´´½¨ÏòÉÏĞĞ×ß¶¯»­
+// åˆ›å»ºå‘ä¸Šè¡Œèµ°åŠ¨ç”»
 cocos2d::Animation* Enemy::createWalkUpAnimation() {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_UP.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_UP.png");
@@ -544,12 +650,12 @@ cocos2d::Animation* Enemy::createWalkUpAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
+    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     return animation;
 }
 
-// ´´½¨ÏòÏÂĞĞ×ß¶¯»­
+// åˆ›å»ºå‘ä¸‹è¡Œèµ°åŠ¨ç”»
 cocos2d::Animation* Enemy::createWalkDownAnimation() {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_DOWN.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_DOWN.png");
@@ -566,12 +672,12 @@ cocos2d::Animation* Enemy::createWalkDownAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
+    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     return animation;
 }
 
-// ´´½¨Ïò×óĞĞ×ß¶¯»­
+// åˆ›å»ºå‘å·¦è¡Œèµ°åŠ¨ç”»
 cocos2d::Animation* Enemy::createWalkLeftAnimation() {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_LEFT.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_LEFT.png");
@@ -587,12 +693,12 @@ cocos2d::Animation* Enemy::createWalkLeftAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
+    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     return animation;
 }
 
-// ´´½¨ÏòÓÒĞĞ×ß¶¯»­
+// åˆ›å»ºå‘å³è¡Œèµ°åŠ¨ç”»
 cocos2d::Animation* Enemy::createWalkRightAnimation() {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_RIGHT.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/WALK_RIGHT.png");
@@ -608,13 +714,13 @@ cocos2d::Animation* Enemy::createWalkRightAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
+    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     //animation->setLoops(-1);
     return animation;
 }
 
-// ´´½¨ËÀÍö¶¯»­
+// åˆ›å»ºæ­»äº¡åŠ¨ç”»
 cocos2d::Animation* Enemy::createDeathAnimation() {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/ENEMY_DEATH.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/ENEMY_DEATH.png");
@@ -630,13 +736,13 @@ cocos2d::Animation* Enemy::createDeathAnimation() {
             log("Failed to load frame: %s", frameName.c_str());
         }
     }
-    // ´´½¨¶¯»­£¬ÉèÖÃÖ¡¼ä¸ôÎª frameDelay Ãë
+    // åˆ›å»ºåŠ¨ç”»ï¼Œè®¾ç½®å¸§é—´éš”ä¸º frameDelay ç§’
     cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
     //animation->setLoops(-1);
     return animation;
 }
 
-// ²¥·ÅÖ¸¶¨Ãû³ÆµÄ¶¯»­
+// æ’­æ”¾æŒ‡å®šåç§°çš„åŠ¨ç”»
 void Enemy::playAnimation(const std::string& animationName) {
     auto animation = m_animationCache->getAnimation(animationName);
     if (animation) {
@@ -646,22 +752,22 @@ void Enemy::playAnimation(const std::string& animationName) {
     }
 }
 
-// Í£Ö¹µ±Ç°¶¯»­
+// åœæ­¢å½“å‰åŠ¨ç”»
 void Enemy::stopAnimation() {
-    //stopAllActionsByTag(100);  // ÕâÀïÓÃ100×÷Îª¶¯»­Ïà¹ØactionµÄ±êÇ©£¬¿É×Ô¶¨Òå
+    //stopAllActionsByTag(100);  // è¿™é‡Œç”¨100ä½œä¸ºåŠ¨ç”»ç›¸å…³actionçš„æ ‡ç­¾ï¼Œå¯è‡ªå®šä¹‰
     stopAllActions();
     CC_SAFE_RELEASE_NULL(m_currentAnimate);
 }
 
-// Ìí¼Ó¶¯»­µ½»º´æ
+// æ·»åŠ åŠ¨ç”»åˆ°ç¼“å­˜
 void Enemy::addAnimation(const std::string& animationName, const cocos2d::Animation& animation) {
-    // ´´½¨Ò»¸öĞÂµÄ Animation ¶ÔÏó£¬½«´«ÈëµÄ animation ¸´ÖÆµ½ĞÂ¶ÔÏóÖĞ
+    // åˆ›å»ºä¸€ä¸ªæ–°çš„ Animation å¯¹è±¡ï¼Œå°†ä¼ å…¥çš„ animation å¤åˆ¶åˆ°æ–°å¯¹è±¡ä¸­
     auto newAnimation = Animation::create();
     newAnimation->setDelayPerUnit(animation.getDelayPerUnit());
     newAnimation->setLoops(animation.getLoops());
     newAnimation->setRestoreOriginalFrame(animation.getRestoreOriginalFrame());
     for (const auto& frame : animation.getFrames()) {
-        // ´Ó AnimationFrame ÖĞÌáÈ¡ SpriteFrame ²¢Ìí¼Ó
+        // ä» AnimationFrame ä¸­æå– SpriteFrame å¹¶æ·»åŠ 
         SpriteFrame* spriteFrame = frame->getSpriteFrame();
         if (spriteFrame) {
             newAnimation->addSpriteFrame(spriteFrame);

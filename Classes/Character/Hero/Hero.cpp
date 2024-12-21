@@ -513,7 +513,10 @@ void Hero::resetAnimationCache()
     }
 }
 
-void Hero::update(float dt) {
+void Hero::update(float dt) 
+{
+    if (isControlled)
+        return;
 #if 0
     // 根据性别修改模型
     if (!this->getGender()) {
@@ -523,6 +526,9 @@ void Hero::update(float dt) {
         this->setTexture("Character/Hero/Animation/male/male_default.png");
     }
 #endif
+    // 恢复生命值
+    Recover();
+
     if(m_bayonet)
         m_bayonet->update(dt);
     if (m_isZSkillUnlock) {
