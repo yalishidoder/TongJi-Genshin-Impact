@@ -600,6 +600,10 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_P:
             isKeyPressedP = true;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
+        case cocos2d::EventKeyboard::KeyCode::KEY_R:
+            isKeyPressedR = true;
+            break;
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
         case cocos2d::EventKeyboard::KeyCode::KEY_B:
             isKeyPressedB = true;
