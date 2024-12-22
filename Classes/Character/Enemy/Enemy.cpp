@@ -165,7 +165,7 @@ void Enemy::setDeath() {
     if (!m_isAlive) return;
 
     m_isAlive = false;
-    currentState = EnemyState::STAY;
+    //currentState = EnemyState::STAY;
     cocos2d::experimental::AudioEngine::play2d("Audio/death.mp3", false, 0.5f);
 #if 1
     // 播放死亡动画
@@ -537,7 +537,7 @@ void Enemy::updatePistol()
         handpos.x -= 250;
         handpos.y -= 275;
         enemyPistol->setPosition(handpos);
-        enemyPistol->setVisible(isRanged);
+        enemyPistol->setVisible(0);
     }
 
     if (player)
