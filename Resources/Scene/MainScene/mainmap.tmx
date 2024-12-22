@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="37" nextobjectid="11">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="39" nextobjectid="11">
  <tileset firstgid="1" name="victorian-garden" tilewidth="16" tileheight="16" tilecount="4096" columns="32">
   <image source="victorian-garden.png" width="512" height="2048"/>
  </tileset>
@@ -37,14 +37,24 @@
    eJztz8EJACAAAzHHdWH3EYeQE0mg/94Y71qzftDSXz9o6a8ftPTXD1r66wct/fWDlv76QUt//aClv37Q0l8/aJ3+2wMAAAAAAAD+sQHWsDZ9
   </data>
  </layer>
+ <layer id="27" name="WallLayer" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztmMENwjAMRTNCswiTcIEB4MoYQNdgi4pBgDUYAiqRSxQUYerEUd6X/i12/6vTqO2wcm4QevTOHRV8evvs5bl+tVQXL6+t2TvoX/5RMaNm7yD47e7/Fvh7nz/8y2Up2TsIfvjhl9fDv1yWkr2D4Icffnn9/P5/SDhWak3OLXz/Xj//KmLHSq3JeWqAv3XBD//sewU/DNz3mvN/wl9d8Nvn3651bZl/s9fNYH3+t51uBvjhh1/3Gt/E+Zdfw/x1M1jn733+8OtmgB9+y/yc/7oZ4LfN3/v+h183g3X+3p//Uvw9+wUwsMHj
+  </data>
+ </layer>
  <layer id="1" name="land" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJyN1tGO2zAMRNG+5N+t+KfbArsAe/bS6YORQJJFcjic8Xn9+nX/ec6f5/31/P1/fa3Pvevr92Zv7n+vfe+/x3ONs/f4vcbviffecd/3+eshbuU466g659pFrDNinHgmfhO3WaN5bO/dPBsWnj+vf3E8xJk1zbjfe+JxjbOHuPbWvXnvWd4Xv+v1M5eZk3FmbWesbVy6Xt2vN2uFZcW7iHcixvwvr+zD9frZr4lJ9b1wNm/xc794LKYTo6e4s4/O2ez9RYxPcezvhocaVT2aedXMljbIJfXAeOqNNTrPn2KpI85FzX7Nsu86i/avemz/1YiJbfXbHldPi/8Tc/V00345Yt6b5skN+egMyiHzKC+Z9ap9G3/kgfdby3anPrjNb+Ux66uZLb28I/ab2PrjxEruzd+5Ps+q13Jn0yJr9mzV50zNGud8TK4/rW1c23qoz8hF+Tvv0VvNuTS/+jl7UBqt/1VPt7mbOnEirrlXraW74i131Ee5plaXLpQHFL76s3faX/mjvmw+KK5vfuVuacnFvaWf4qvPWHNhXtx68lY58uauqr3uNZ/q5VnuKb5uOlI6UHjYK/tcvjZxKJ4WHsV3NUpN93/xr/hRMQqTDdfNQ6YWv18/+7T1T4zkTdVib50Tc95mQh/dvgHEYWp/8XRyu7TcOi7eKY10Hq3bs9Y67y2M5vvF582P1V77I66ld3rpYa88Vw3UQ3x/nt38Vm8tnEpDzdMa60x58vyd62pJaezTbJdO2Z/yhfKpyQHrnHwQZ+tRI0885WnzXrFWg0p7vEddk2Olr9u6vLN29zbdrP7qkZ/q3b4RpobVTJTufZojeedMqmfbPDh39smcnF3z3nLQ22Yexd+psTNu6af8Vi9q3ktLS9tmLqW9xZnJwcpt+zYQX/2qPNcZcTY8o17ogXfEfbPuPaWRem75aX1vlGY+ze3Ewxilt089n5g7P9WvOZ/y/YkLE9PSTHlX3Hm6z5r0hcJGLfG+0uIn31b3p/6Ie3ncxE3u6R/qjB5WulY+rOc7A3K7vHLueU79/1/85rnyh+Jv/Zb3Ojv2yhzcP7xf2HvHzGXzKHu+1aYfinXppvojdqXvhYneYH7mYM56pzwu/72Ip85+0q8Zs/xHzzCX+obYZsu5rtrNqXLY8intnfg5LzOn4ru6VLpa+2JefX3Cact5aoJ92uam4szaKld98yxn1OOZ36bF5UVbD9R351HvmTwovXFtw8q85tlZg14rd+dT/lg6WD5h3+2RflNrh3smvsU165Znpb313tTEzfusTU2rdfnkTIml3jRnTf6oh4Wv2Di/G1dv4jprG17qsT5UfFaznr6bCsfNT+y159XNzffVRbEuL9IDre/mXOmEGrX1tL4jNq1WF0u3q46tv+ZfM6U2+/+p5/Lbd9SO0mZnavMF7ywN0FfLQ6YG6AfywrtqTmbcw37VfvFu+WfNhTNwLWdmH0q3aw7Pco+1enbGLx8uL60+V1/0PTVNLZdv9qD4om6W32wxnDF1t87XnNX79S3hXTM/15wf6yzdVOPk6OzVppfGENfio7F8ZrwZd9OU0vPC1TgX54pzs041UH7fca4wdU/NrG+NOVfmtnnd5OX2/hX3PPG4+iLHy5MKA7WpfFX/tQc1r3Jw08B5v/rxNNtP+W18du42H1VnnHF1WA8ojXAOfU8N9X45oifP/Eqbau5L7+W0eJd/lQaob2Jv/8oD7YMxjaHfFNefvK40VB9Qd815YlDzUPE3TfC+mtVP59Xa4rKaIfe2XjgvxXfxUCemDsx8qod/934DGUmuiw==
   </data>
  </layer>
- <layer id="27" name="WallLayer" width="64" height="48">
+ <layer id="37" name="ex_scene" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJzt1EENgEAQQ9GRsEpQwgUEgGbABiJQQDiVNpnfZG4k9DHLjqlqNJ+uwY8fv7uFL/jx43e38AU/fvzuFr7gx4/f3cIX/PjxV52GuQK+u3P/N3578Of711k7yf5l13ZI3/+xaTvgx49f+463cP99P8P+tR3S/d33j1/bAT/+ZD/3v7YD/mx/9/OPX9sh3d/9///L33keP36SyA==
+   eJztl01OQjEUhTtEmBBIfAOd+LMEnfizBJ0ArkJxYtyBygDcgTOVRRCQVYiuQnQFHkKa3Nz0PYvy5N3kfMkJTVuSfpfyXuscyYuHqnPX1VWvYvXM6iATGrfMRuLcZjJvx7j8VA9r7MF9P/ndfO1vsSYncDkV/vr31U56vvzOVc2efxYx+9yPd+HeQ+5r/7e+ZSCf8aH97D9DdfB9j3B+Qp6RvjH/GHSNZF1mDOE8Ql6QsXH/tD2Q1X6F8wR5Q94N+ksX+T7UY7JP9n/AeYp8Il8G/SX6fRhz5inVnVtDykilnu/68sI7yfeb/p/ruZ4tOG8jO8iuQf+sZ7tv6zHJAZwPkSPk2Ji/v+eknXtCtdH3ogacm0gLOTPoH5s0zuF8gbSRywL462f4X4g509/A+Ra5QzoF8F/0TiMZrIfbWRTNP3RHIYQQQgghhBBCCCGEEEIIIYQQUly+AW3CXCE=
+  </data>
+ </layer>
+ <layer id="38" name="ex_scene_1" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt2MsJgDAQBNC0YJVqF37asAsbFK8SEMIGXHwP9haGmWtKaXcMpayd7s7+up4d7e+XHcX+nNlR7M+ZHcX+nNlR7M+ZHcX+nNlR7M+ZHWX/+f674/S4udJ7rLx7uwz7z8q/xVbpvTT8f5wJ9gMAAAAAAADwHRdXOTe8
   </data>
  </layer>
  <layer id="15" name="house" width="64" height="48">

@@ -175,44 +175,84 @@ bool MainScene::init()
                 this->addChild(levelLabel);
             }
            
-            //创建敌人
-            auto demon = Enemy::create(Vec2(250, 300));
+            //创建练武场敌人
+            std::vector<Vec2>initposition_1 = {//创建的敌人位置
+                    {425, 718},
+                    {545, 675},
+                    {328, 616},
+                    {300, 552}
+            };
+            for (int i = 0; i < initposition_1.size(); i++) {
+                auto demon = Enemy::create(initposition_1[i]);
+                if (demon) {
+                    demon->setName("demon"); // 设置角色名称
+                    demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                    demon->setPlayer(hero);  //设置玩家
+                    demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
+                    demon->setRadius(100.0f);
+                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                    if (i ==0) {
+                        demon->setElement(CharacterElement::WATER);   // 水
+                        demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
+                    }
+                    else if(i==1) {
+                        demon->setElement(CharacterElement::FIRE);   // 火
+                        demon->setAttackMethods(Melee_Enemy);         // 设置为近战
+                    }
+                    else if (i == 2) {
+                        demon->setElement(CharacterElement::FIRE);   // 初始化属性
+                        demon->setAttackMethods(Ranged_Enemy);
+                    }
+                    else {
+                        demon->setElement(CharacterElement::WATER);   // 初始化属性
+                        demon->setAttackMethods(Melee_Enemy);
+                    }
+                    // 计算出生点的屏幕坐标
+                    float adjustedX = mapOriginX + initposition_1[i].x; // 地图左下角 + 出生点的 x 偏移
+                    float adjustedY = mapOriginX + initposition_1[i].y; // 地图左下角 + 出生点的 y 偏移
 
-            if (demon) {
-                demon->setName("demon"); // 设置角色名称
-                demon->setAnchorPoint(Vec2(0.5f, 0.5f));
-                demon->setPlayer(hero);  //设置玩家
-                demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                demon->setElement(CharacterElement::WATER);   // 初始化属性
-                demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
-                // 计算出生点的屏幕坐标
-                float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
-                float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移
+                    // 设置人物位置
+                    demon->setPosition(Vec2(adjustedX, adjustedY));
 
-                // 设置人物位置
-                demon->setPosition(Vec2(adjustedX, adjustedY));
-                demon->setSpawnPoint(Vec2(adjustedX, adjustedY));
-                this->addChild(demon);  // 将角色添加到场景中
-
+                    this->addChild(demon);  // 将角色添加到场景中
+                }
             }
-            auto demon2 = Enemy::create(Vec2(250, 300));
+            //创建小地图示范敌人
+            std::vector<Vec2>initposition = {//创建的敌人位置
+                    {150, 220},
+                    {820, 658},
+                    {840, 137},
+            };
+            for (int i = 0; i < initposition.size(); i++) {
+                auto demon = Enemy::create(initposition[i]);
+                if (demon) {
+                    demon->setName("demon"); // 设置角色名称
+                    demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                    demon->setPlayer(hero);  //设置玩家
+                    demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
+                    demon->setRadius(100.0f);
+                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                    if (i == 0) {
+                        demon->setElement(CharacterElement::WATER);   // 水
+                        demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
+                    }
+                    else if (i == 1) {
+                        demon->setElement(CharacterElement::FIRE);   // 火
+                        demon->setAttackMethods(Melee_Enemy);         // 设置为近战
+                    }
+                    else if (i == 2) {
+                        demon->setElement(CharacterElement::FIRE);   // 初始化属性
+                        demon->setAttackMethods(Ranged_Enemy);
+                    }
+                    // 计算出生点的屏幕坐标
+                    float adjustedX = mapOriginX + initposition[i].x; // 地图左下角 + 出生点的 x 偏移
+                    float adjustedY = mapOriginX + initposition[i].y; // 地图左下角 + 出生点的 y 偏移
 
-            if (demon2) {
-                demon2->setName("demon2"); // 设置角色名称
-                demon2->setAnchorPoint(Vec2(0.5f, 0.5f));
-                demon2->setPlayer(hero);  //设置玩家
-                demon2->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                demon2->setElement(CharacterElement::FIRE);   // 初始化属性
-                demon2->setAttackMethods(Melee_Enemy);
-                // 计算出生点的屏幕坐标
-                float adjustedX = mapOriginX + 550.0f; // 地图左下角 + 出生点的 x 偏移
-                float adjustedY = mapOriginY + 500.0f; // 地图左下角 + 出生点的 y 偏移
+                    // 设置人物位置
+                    demon->setPosition(Vec2(adjustedX, adjustedY));
 
-                // 设置人物位置
-                demon2->setPosition(Vec2(adjustedX, adjustedY));
-                demon2->setSpawnPoint(Vec2(adjustedX, adjustedY));
-                this->addChild(demon2);  // 将角色添加到场景中
-
+                    this->addChild(demon);  // 将角色添加到场景中
+                }
             }
         }
     }
