@@ -12,6 +12,17 @@
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
 
+// 定义近战与远程攻击
+const int Ranged_Enemy = 0;
+const int Melee_Enemy = 1;
+const int amount_of_healing = 10;
+
+enum class Direction 
+{
+    UP, DOWN, LEFT, RIGHT
+};
+
+
  //枚举敌人的状态
 enum class EnemyState
 {
@@ -42,6 +53,8 @@ public:
     void updateERLabel();
     void Freeze();
     void hideFreezeSprite(float dt);
+    void updateHero();
+    void updateHealthFill();
 
     // 存活状态相关
     bool isAlive() const;
@@ -52,7 +65,9 @@ public:
 
     // 敌人攻击方法
     virtual void attack()override;
-
+    void setAttackMethods(bool method);
+    void attackWithPunch();
+    void attackWithPistol();
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(cocos2d::Sprite* target);
 
@@ -65,18 +80,31 @@ public:
 
     //设置巡逻边界
     void setPatrolRange(float X, float Y);
+
+    // 回到出生点恢复生命值 
+    virtual void Recover(float delta)override;
+
     bool task_alive = 1;
 private:
     int m_health;
     int m_full_health;
     int m_attackPower;
     bool m_isAlive;
+    bool isRanged;
+
+    // 拳头的攻击范围
+    float attackRange;
+    // 拳头的攻击冷却时间
+    float attackCooldown;
+    // 剩余的攻击冷却时间
+    float remainingCooldown;
 
     //玩家变量
     Hero* player;
 
     //敌人状态
     EnemyState currentState;
+    Direction currentDirection;
 
     //搜索半径
     float radius;
@@ -87,6 +115,10 @@ private:
 
     //巡逻方向
     int dirX, dirY;
+
+    // 敌人血条
+    cocos2d::Sprite* healthBg;
+    cocos2d::Sprite* healthFill;
 
     //敌人的巡逻函数
     void patrol(float delta);
@@ -111,6 +143,9 @@ private:
 
 
     // 敌人的攻击逻辑，可根据需要扩展
+    void checkAndHandleCollision();
+    bool checkHeroCollision(cocos2d::Node* target);
+    void onCollisionWithHero(cocos2d::Node* player);
     void attackLogic();
 
 
@@ -131,6 +166,10 @@ private:
     cocos2d::Animation* createWalkLeftAnimation();
     cocos2d::Animation* createWalkRightAnimation();
     cocos2d::Animation* createDeathAnimation();
+    cocos2d::Animation* createAttackDownAnimation();
+    cocos2d::Animation* createAttackUpAnimation();
+    cocos2d::Animation* createAttackLeftAnimation();
+    cocos2d::Animation* createAttackRightAnimation();
 
 };
 

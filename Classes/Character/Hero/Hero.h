@@ -19,6 +19,7 @@
 #include <fstream>
 USING_NS_CC;
 
+class Enemy;
 class Hero : public CharacterBase {
 public:
     // 构造函数与析构函数
@@ -36,9 +37,17 @@ public:
     void moveBy(const cocos2d::Vec2& offset);
     virtual void Hero::update(float dt)override;
 
-    // 更新升级显示
+    // 更新各种显示
     void updateLevelUpLabel();
+    void takeDamage(float damage, Enemy* enemy);
+    void updateDamageLabel(int damage);
+    void updateERLabel();
+    void Freeze();
+    void hideFreezeSprite(float dt);
+    void updateRecoverLabel();
 
+    // 回到出生点恢复生命值 
+    virtual void Recover(float delta)override;
     // 背包相关
     void setInventory(Inventory* inventory);
     Inventory* getInventory() const;
@@ -117,7 +126,6 @@ public:
 
     cocos2d::Label* levelupLabel;
     cocos2d::Label* weaponLabel;
-
     //  角色存档相关
     void saveProfile(const std::string& filename);
     void loadProfile(const std::string& filename);

@@ -10,7 +10,6 @@
 #include "../Hero/Hero.h"
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
-
 #include <cmath>
 
 Enemy::Enemy()
@@ -20,10 +19,12 @@ Enemy::Enemy()
     , m_animationCache(cocos2d::AnimationCache::getInstance())
     , m_currentAnimate(nullptr)
     , currentState(EnemyState::PATROL)   //初始状态为巡逻
-    ,dirX(1) ,dirY(1)     //初始巡逻方向设为正方向
+    , dirX(1) ,dirY(1)     //初始巡逻方向设为正方向
+    , attackRange(50.0f)
+    , attackCooldown(1.5f)
+    , remainingCooldown(0.0f)
+    , m_attackPower(5)
 {
-    setMaxHealth(100);
-    setAttackPower(5);
 
 }
 
@@ -31,12 +32,10 @@ Enemy::Enemy()
 Enemy::~Enemy() {
 }
 
-
 bool Enemy::init(const cocos2d::Vec2& initPosition) {
     if (!Sprite::init()) {
         return false;
     }
-
 
     // 设置敌人初始位置
     setPosition(initPosition);
@@ -47,24 +46,55 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
     // 例如：setTexture("enemy_default.png");
     damageLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 24);
     cocos2d::Vec2 labelPos = this->getAnchorPoint();
-    labelPos.x += 30;
-    labelPos.y += 60;
-    damageLabel->setPosition(labelPos);
-    this->addChild(damageLabel);
-    damageLabel->setVisible(false);
+    if (damageLabel)
+    {
+        labelPos.x -= 20;
+        labelPos.y += 30;
+        damageLabel->setPosition(labelPos);
+        this->addChild(damageLabel);
+        damageLabel->setVisible(false);
+    }
 
     ERLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 20);
-    labelPos.x += 60;
-    labelPos.y -= 30;
-    ERLabel->setPosition(labelPos);
-    this->addChild(ERLabel);
-    ERLabel->setVisible(false);
+    if (ERLabel)
+    {
+        labelPos.x += 110;
+        ERLabel->setPosition(labelPos);
+        this->addChild(ERLabel);
+        ERLabel->setVisible(false);
+    }
 
     freezeSprite= cocos2d::Sprite::create("Character/ER/Crystal_Icon.png");
-    freezeSprite->setPosition(this->getPosition());
-    freezeSprite->setOpacity(150);
-    this->addChild(freezeSprite);
-    freezeSprite->setVisible(isControlled);
+    if (freezeSprite)
+    {
+        freezeSprite->setPosition(this->getPosition());
+        this->addChild(freezeSprite);
+        freezeSprite->setVisible(isControlled);
+        freezeSprite->setOpacity(150);
+    }
+
+    // 血条背景
+    healthBg = cocos2d::Sprite::create("Character/Enemy/health_bg.png");
+    if (healthBg) {
+        labelPos = this->getAnchorPoint();
+        labelPos.x += 30;
+        labelPos.y += 60;
+        healthBg->setPosition(labelPos);
+        healthBg->setVisible(true);
+        healthBg->setOpacity(120);
+        this->addChild(healthBg);
+    }
+
+    // 血条填充
+    healthFill = cocos2d::Sprite::create("Character/Enemy/health_Fill.png");
+    if (healthFill)
+    {
+        healthFill->setAnchorPoint(Vec2(0, 0.5));
+        healthFill->setPosition(Vec2(labelPos.x / 2 - 11, labelPos.y));
+        healthFill->setVisible(true);
+        healthBg->setOpacity(120);
+        this->addChild(healthFill);
+    }
 
     setTexture("Character/Enemy/Animation/hitman/WALK_DOWN_0.png");
     m_animationCache = cocos2d::AnimationCache::getInstance();
@@ -73,10 +103,12 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
     m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_enemy");
     m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_enemy");
     m_animationCache->addAnimation(createDeathAnimation(), "death_enemy");
-
+    m_animationCache->addAnimation(createAttackDownAnimation(), "attack_down_enemy");
+    m_animationCache->addAnimation(createAttackUpAnimation(), "attack_up_enemy");
+    m_animationCache->addAnimation(createAttackLeftAnimation(), "attack_left_enemy");
+    m_animationCache->addAnimation(createAttackRightAnimation(), "attack_right_enemy");
     return true;
 }
-
 
 Enemy* Enemy::create(const cocos2d::Vec2& initPosition)  {
     auto enemy = new (std::nothrow) Enemy();
@@ -92,6 +124,7 @@ Hero* Enemy::getPlayer()
 {
     return player;
 }
+
 bool Enemy::isAlive() const
 {
     return m_isAlive;
@@ -132,13 +165,25 @@ void Enemy::setDeath() {
 #endif
 }
 
+void Enemy::Recover(float delta)
+{
+    cocos2d::Vec2 distanceToSpawnPoint = spawnPoint - this->getPosition();
+    float distance = distanceToSpawnPoint.length();
+
+    if (distance < 10.0f)
+        this->setHealth(getHealth() + delta * amount_of_healing);
+}
+
 void Enemy::update(float delta) 
 {
+    updateHealthFill();
+
     if (isControlled)
         return;
 
     //判定范围内存在玩家再进行操作
-    
+    updateHero();
+
     if (isHeroExist(delta))
     {
         //aiLogic();
@@ -146,6 +191,11 @@ void Enemy::update(float delta)
         //attackLogic();
     }
 
+    if (remainingCooldown > 0) {
+        remainingCooldown -= delta;
+    }
+
+    Recover(delta);
 }
 
 // 简单的元素反应逻辑
@@ -385,16 +435,97 @@ void Enemy::hideFreezeSprite(float dt)
     freezeSprite->setVisible(false);
 }
 
+// 更新血条
+void Enemy::updateHealthFill()
+{
+    float healthRatio = this->getHealth() / float(this->getMaxHealth());
+    if (healthFill)
+    {
+        healthFill->setScaleX(healthRatio);
+    }
+}
+
 // 获取敌人元素
 CharacterElement Enemy::getElement()
 {
     return element;
 }
 
+void Enemy::setAttackMethods(bool method)
+{
+    isRanged = method;
+}
+
 void Enemy::attack() {
     // 敌人的攻击逻辑，可根据需要扩展，例如发射子弹、近战攻击等
     // 这里仅作示例，可添加具体的攻击实现
     CCLOG("Enemy attacks with power %d", m_attackPower);
+}
+
+void Enemy::attackWithPunch()
+{
+    if (remainingCooldown > 0) {
+        return;
+    }
+
+    // 播放动画
+    // 根据当前方向选择动画名称
+    std::string animationName;
+    switch (currentDirection) {
+        case Direction::UP:
+            animationName = "attack_up_enemy";
+            break;
+        case Direction::DOWN:
+            animationName = "attack_down_enemy";
+            break;
+        case Direction::LEFT:
+            animationName = "attack_left_enemy";
+            break;
+        case Direction::RIGHT:
+            animationName = "attack_right_enemy";
+            break;
+        default:
+            animationName = "attack_down_enemy";
+            break;
+    }
+
+    // 播放攻击动画，并设置完成回调
+    playAnimation(animationName);
+
+    checkAndHandleCollision();
+    // 重置冷却时间
+    remainingCooldown = attackCooldown;
+    CCLOG("Enemy attacks with power %d", m_attackPower);
+}
+
+void Enemy::attackWithPistol()
+{
+
+}
+
+void Enemy::checkAndHandleCollision()
+{
+    if (player&&player->isAlive()) {
+        if (this->checkCollision(player))
+        {
+            // 处理碰撞逻辑
+            onCollisionWithHero(player);
+        }
+    }
+}
+
+// 处理与玩家间的碰撞
+bool Enemy::checkHeroCollision(cocos2d::Node* target)
+{
+    float distance = this->getPosition().distance(target->getPosition());
+    float radius1 = this->getContentSize().width / 2;
+    float radius2 = target->getContentSize().width / 2;
+    return distance < (radius1 + radius2 - 2);
+}
+
+void Enemy::onCollisionWithHero(cocos2d::Node* player)
+{
+    static_cast<Hero*>(player)->takeDamage(m_attackPower, this);
 }
 
 bool Enemy::checkCollision(cocos2d::Sprite* target) {
@@ -413,6 +544,24 @@ void Enemy::setRadius(float radius = 100.0f)
     this->radius = radius;
 }
 
+void Enemy::updateHero()
+{
+    // 获取当前场景
+    cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
+
+    if (currentScene)
+    {
+        // 更新场景中的玩家
+        auto heros = currentScene->getChildren();
+        for (auto hero : heros)
+        {
+            auto temp = dynamic_cast<Hero*>(hero);
+            if (temp && temp->isAlive())
+                setPlayer(temp);
+        }
+    }
+}
+
 //判定范围内是否存在玩家
 bool Enemy::isHeroExist(float dt)
 {
@@ -422,7 +571,7 @@ bool Enemy::isHeroExist(float dt)
         cocos2d::Vec2 enemyPos = this->getPosition();
         cocos2d::Vec2 directionToPlayer = playerPos - enemyPos;
         float distanceToPlayer = directionToPlayer.length();
-
+       
         switch (currentState)
         {
             case EnemyState::PATROL:
@@ -461,13 +610,19 @@ void Enemy::chaseLogic(float& dt, cocos2d::Vec2& playerPos, cocos2d::Vec2& enemy
     }
     else
     {
-        if (distanceToPlayer > 10)
+        if(isRanged)
         {
-            handleChasingMovement(dt, directionToPlayer);
+            if (distanceToPlayer > 10)
+            {
+                handleChasingMovement(dt, directionToPlayer);
+            }
+            else
+            {
+                currentState = EnemyState::STAY;
+            }
         }
-        else
-        {
-            currentState = EnemyState::STAY;
+        else {
+            // 远程攻击函数
         }
     }
 }
@@ -480,7 +635,8 @@ void Enemy::stayLogic(float& distanceToPlayer)
     }
     else
     {
-        // 处理攻击逻辑
+        attackWithPunch();
+        // 处理近战攻击逻辑
     }
 }
 
@@ -498,6 +654,26 @@ void Enemy::handleChasingMovement(float& dt, cocos2d::Vec2& directionToPlayer)
 {
     directionToPlayer.normalize();
     cocos2d::Vec2 movement = directionToPlayer * m_moveSpeed * dt;
+
+    // 根据移动方向调整状态
+    if (std::abs(directionToPlayer.x) > std::abs(directionToPlayer.y)) {
+        if (directionToPlayer.x > 0) {
+            currentDirection = Direction::RIGHT;
+        }
+        else if (directionToPlayer.x < 0) {
+            currentDirection = Direction::LEFT;
+        }
+    }
+    else {
+        if (directionToPlayer.y > 0) {
+            currentDirection = Direction::UP;
+        }
+        else if (directionToPlayer.y < 0) {
+            currentDirection = Direction::DOWN;
+        }
+    }
+
+    CCLOG("directionToPlayer: (%.2f, %.2f)", directionToPlayer.x, directionToPlayer.y);
 
     CCLOG("Enemy position before move: (%.2f, %.2f)", this->getPositionX(), this->getPositionY());
     cocos2d::Vec2 targetPosition = this->getPosition() + movement;
@@ -729,6 +905,94 @@ cocos2d::Animation* Enemy::createDeathAnimation() {
 
     for (int i = 0; i <= 6; ++i) {
         std::string frameName = StringUtils::format("DEATH-%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+cocos2d::Animation* Enemy::createAttackDownAnimation()
+{
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_DOWN_ENEMY.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_DOWN_ENEMY.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 0; i <= 11; ++i) {
+        std::string frameName = StringUtils::format("ATTACK_DOWN_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+cocos2d::Animation* Enemy::createAttackUpAnimation()
+{
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_UP_ENEMY.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_UP_ENEMY.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 0; i <= 11; ++i) {
+        std::string frameName = StringUtils::format("ATTACK_UP_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+cocos2d::Animation* Enemy::createAttackLeftAnimation()
+{
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_LEFT_ENEMY.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_LEFT_ENEMY.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 0; i <= 11; ++i) {
+        std::string frameName = StringUtils::format("ATTACK_LEFT_%d.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+cocos2d::Animation* Enemy::createAttackRightAnimation()
+{
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_RIGHT_ENEMY.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Enemy/Animation/punch/ATTACK_RIGHT_ENEMY.png");
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 0; i <= 11; ++i) {
+        std::string frameName = StringUtils::format("ATTACK_RIGHT_%d.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);

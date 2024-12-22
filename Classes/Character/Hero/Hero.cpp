@@ -10,7 +10,6 @@
 #include "Weapon/RangedWeapon/Ammunition/Bullet.h"
 #include "Scene/OtherScene.h"
 
-
 Hero::Hero()
     : m_sleepiness(100)     // 初始睡意值
     , m_heroism(1000)       // 初始英雄度
@@ -66,6 +65,8 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     }
     setScale(0.8f); // 调整角色的缩放比例，默认设置为 1.0
 
+    spawnPoint = initPosition;
+
     // 初始化角色的动画缓存
     m_animationCache = cocos2d::AnimationCache::getInstance();
     m_animationCache->addAnimation(createWalkUpAnimation(), "walk_up_hero");
@@ -73,36 +74,69 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
     m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_hero");
 
-    // 创建升级标签
+    // 创建标签
     levelupLabel = Label::createWithSystemFont("Level UP!", "Arial", 24);
-    if (levelupLabel) {
-        cocos2d::Vec2 labelPos = this->getAnchorPoint();
+    cocos2d::Vec2 labelPos = this->getAnchorPoint();
+    if (levelupLabel)
+    {
         labelPos.x += 30;
         labelPos.y += 72;
         levelupLabel->setPosition(labelPos); // 设置合适的位置
         levelupLabel->setVisible(false); // 初始不可见
         this->addChild(levelupLabel);
     }
-    else {
-        CCLOG("Failed to create levelupLabel");
-    }
+    
     // 创建武器标签
     weaponLabel = Label::createWithSystemFont("", "Arial", 14);
     if (weaponLabel) {
-        cocos2d::Vec2 labelPos = this->getAnchorPoint();
         labelPos.x += 30;
         labelPos.y += 60;
-        weaponLabel->setPosition(labelPos); // 设置合适的位置
-        weaponLabel->setVisible(true); // 初始不可见
+        weaponLabel->setPosition(labelPos); 
+        weaponLabel->setVisible(false);
         this->addChild(weaponLabel);
     }
     else {
         CCLOG("Failed to create weaponLabel");
     }
 
+    recoverLabel= Label::createWithSystemFont("Recover", "Arial", 24);
+    if (recoverLabel)
+    {
+        recoverLabel->setPosition(labelPos); // 设置合适的位置
+        recoverLabel->setVisible(false); // 初始不可见
+        this->addChild(recoverLabel);
+    }
+
+    damageLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 24);
+    if (damageLabel)
+    {
+        labelPos.x -= 50;
+        labelPos.y -= 30;
+        damageLabel->setPosition(labelPos);
+        this->addChild(damageLabel);
+        damageLabel->setVisible(false);
+    }
+
+    ERLabel = cocos2d::Label::createWithTTF("", "fonts/arial.ttf", 20);
+    if (ERLabel)
+    {
+        labelPos.x += 100;
+        ERLabel->setPosition(labelPos);
+        this->addChild(ERLabel);
+        ERLabel->setVisible(false);
+    }
+
+    freezeSprite = cocos2d::Sprite::create("Character/ER/Crystal_Icon.png");
+    if (freezeSprite)
+    {
+        freezeSprite->setPosition(this->getPosition());
+        this->addChild(freezeSprite);
+        freezeSprite->setOpacity(150);
+        freezeSprite->setVisible(isControlled);
+    }
+
     return true;
 }
-
 
 // 移动到指定位置
 void Hero::moveTo(const cocos2d::Vec2& targetPosition) {
@@ -503,6 +537,280 @@ void Hero::updateLevelUpLabel()
     CCLOG("updateLevelUpLabel called");
 }
 
+void Hero::takeDamage(float damage, Enemy* enemy)
+{
+    if (!m_isAlive)
+        return;
+
+    switch (enemy->getElement())//元素附加伤害
+    {
+        case(CharacterElement::FIRE):
+            CCLOG("BURN!");
+            //火效果
+            switch (this->getElement())
+            {
+                //融化
+                case(CharacterElement::ICE):
+                    damage *= 2.0f;
+                    ERType = "Melt!";
+                    break;
+                    //蒸发
+                case(CharacterElement::WATER):
+                    damage *= 1.5f;
+                    ERType = "Evaporate!";
+                    break;
+                    //抵抗
+                case(CharacterElement::ROCK):
+                    damage *= 0.8f;
+                    ERType = "Resist!";
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case(CharacterElement::ICE):
+            CCLOG("FREEZE!");
+            //冰效果
+            switch (this->getElement())
+            {
+                //融化
+                case(CharacterElement::FIRE):
+                    damage *= 1.5f;
+                    ERType = "Melt!";
+                    break;
+                    //冻结
+                case(CharacterElement::WATER):
+                    ERType = "Freeze!";
+                    Freeze();
+                    break;
+                case(CharacterElement::ROCK):
+                    damage *= 0.8f;
+                    ERType = "Resist!";
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case(CharacterElement::WATER):
+            CCLOG("BE WATER MY FRIEND");
+            //水效果
+            switch (this->getElement())
+            {
+                //蒸发
+                case(CharacterElement::FIRE):
+                    damage *= 2.0f;
+                    ERType = "Evaporate!";
+                    break;
+                    //冻结
+                case(CharacterElement::ICE):
+                    ERType = "Freeze!";
+                    Freeze();
+                    break;
+                case(CharacterElement::ROCK):
+                    damage *= 0.8f;
+                    ERType = "Resist!";
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case(CharacterElement::ROCK):
+            CCLOG("YOU SHALL NOT PASS!");
+            //岩效果
+            // 碎冰
+            if (isControlled && freezeSprite->isVisible())
+                damage *= 3;
+            break;
+        default:
+            break;
+    }
+
+    if (this->getElement() == enemy->getElement())
+        damage = 0;
+
+    // 减少玩家的生命值
+    float health = this->getHealth() - damage;
+
+    // 更新伤害数字显示
+    updateDamageLabel(damage);
+    // 更新元素反应显示
+    updateERLabel();
+    
+    this->setHealth(health);
+    // 检查玩家是否死亡    
+    if (health < 0) {
+       
+    }
+
+}
+
+void Hero::updateDamageLabel(int damage)
+{
+    damageLabel->setString('-' + std::to_string(damage));
+    damageLabel->setVisible(true);
+    // 初始颜色
+    cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
+    damageLabel->setTextColor(initialColor);
+
+    // 闪烁颜色
+    cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
+    float blinkInterval = 0.05f;
+    int blinkTimes = 1;
+
+    // 闪烁动作
+    cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
+        cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
+        cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
+        nullptr
+    ), blinkTimes);
+
+    // 目标颜色
+    cocos2d::Color3B targetColor = cocos2d::Color3B::RED;
+
+    // 颜色渐变动作
+    cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
+
+    // 最终隐藏动作
+    cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
+        blinkAction,
+        colorAction,
+        cocos2d::CallFunc::create([=]() {
+            damageLabel->setVisible(false);
+            }),
+        nullptr
+    );
+
+    // 运行动作
+    damageLabel->runAction(hideAction);
+}
+
+// 更新元素反应显示
+void Hero::updateERLabel()
+{
+    ERLabel->setString(ERType);
+    ERLabel->setVisible(true);
+    // 初始颜色
+    cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
+    ERLabel->setTextColor(initialColor);
+
+    // 闪烁颜色
+    cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
+    float blinkInterval = 0.05f;
+    int blinkTimes = 1;
+
+    // 闪烁动作
+    cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
+        cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
+        cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
+        nullptr
+    ), blinkTimes);
+
+    // 目标颜色
+    cocos2d::Color3B targetColor = cocos2d::Color3B::WHITE;
+
+    if (ERType == "Melt!")
+        targetColor = cocos2d::Color3B::RED;
+    else if (ERType == "Freeze!")
+        targetColor = cocos2d::Color3B::BLUE;
+    else if (ERType == "Resist!")
+        targetColor = cocos2d::Color3B::GRAY;
+
+    // 颜色渐变动作
+    cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
+
+    // 最终隐藏动作
+    cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
+        blinkAction,
+        colorAction,
+        cocos2d::CallFunc::create([=]() {
+            ERLabel->setVisible(false);
+            }),
+        nullptr
+    );
+
+    // 运行动作
+    ERLabel->runAction(hideAction);
+}
+
+// 设置冰冻效果
+void Hero::Freeze()
+{
+    applyControl(FreezeTime);
+    cocos2d::Vec2 labelPos = this->getAnchorPoint();
+    labelPos.x += 30;
+    labelPos.y += 30;
+    freezeSprite->setPosition(labelPos);
+    freezeSprite->setVisible(isControlled);
+
+    // 使用scheduleOnce安排一个延迟任务
+    this->scheduleOnce(schedule_selector(Enemy::hideFreezeSprite), FreezeTime);
+
+    /*this->scheduleOnce([this](float dt) {
+        freezeSprite->setVisible(false);
+        }, FreezeTime);*/
+}
+
+// 添加回调函数
+void Hero::hideFreezeSprite(float dt)
+{
+    freezeSprite->setVisible(false);
+}
+
+void Hero::updateRecoverLabel()
+{
+    if (!recoverLabel)
+        return;
+    recoverLabel->setString("Level UP!");
+    recoverLabel->setVisible(true);
+    // 初始颜色
+    cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
+    recoverLabel->setTextColor(initialColor);
+
+    // 闪烁颜色
+    cocos2d::Color4B blinkColor = cocos2d::Color4B::BLACK;
+    float blinkInterval = 0.05f;
+    int blinkTimes = 1;
+
+    // 闪烁动作
+    cocos2d::ActionInterval* blinkAction = cocos2d::Repeat::create(cocos2d::Sequence::create(
+        cocos2d::TintTo::create(blinkInterval, blinkColor.r, blinkColor.g, blinkColor.b),
+        cocos2d::TintTo::create(blinkInterval, initialColor.r, initialColor.g, initialColor.b),
+        nullptr
+    ), blinkTimes);
+
+    // 目标颜色
+    cocos2d::Color3B targetColor = cocos2d::Color3B::GREEN;
+
+    // 颜色渐变动作
+    cocos2d::ActionInterval* colorAction = cocos2d::TintTo::create(0.25f, targetColor.r, targetColor.g, targetColor.b);
+
+    // 最终隐藏动作
+    cocos2d::ActionInterval* hideAction = cocos2d::Sequence::create(
+        blinkAction,
+        colorAction,
+        cocos2d::CallFunc::create([=]() {
+            recoverLabel->setVisible(false);
+            Upgrading = false;
+            }),
+        nullptr
+    );
+
+    // 运行动作
+    recoverLabel->runAction(hideAction);
+}
+
+void Hero::Recover(float delta)
+{
+    cocos2d::Vec2 distanceToSpawnPoint= spawnPoint- this->getPosition();
+    float distance = distanceToSpawnPoint.length();
+
+    if (distance < 10.0f)
+    {
+        m_health = m_full_health;
+        updateRecoverLabel();
+    }
+}
+
 bool Hero::isAlive()const 
 {
     return m_isAlive;
@@ -540,7 +848,7 @@ void Hero::update(float dt)
     }
 #endif
     // 恢复生命值
-    Recover();
+    Recover(dt);
 
     if(m_bayonet)
         m_bayonet->update(dt);
@@ -760,10 +1068,9 @@ void Hero::ChangeToBayonet()
         return;
     else
     {
-        weaponLabel->setString("Bayonet");
+        weaponLabel->setString("Bullet");
         if (!m_bayonet)
         {
-
             // 创建Bayonet实例
             m_bayonet = Bayonet::create("Weapon/bayonet.png");
             if (m_bayonet)
@@ -963,7 +1270,7 @@ void Hero::SkillX()
         runAction(cocos2d::Sequence::create(actions));
     }
     else
-    {  
+    {
         m_skillXCoolDownTime = 3.0f;
         m_isSkillXOnCoolDown = true;
         // 飞刀(实际为子弹)的半径
@@ -975,25 +1282,25 @@ void Hero::SkillX()
         // 动作序列
         cocos2d::Vector<cocos2d::FiniteTimeAction*> actions;
         // 发射一波弹幕的动作  
-        actions.pushBack(cocos2d::CallFunc::create([=]() {        
-            for (int i = 0; i < numBullets; ++i) 
-            {  
+        actions.pushBack(cocos2d::CallFunc::create([=]() {
+            for (int i = 0; i < numBullets; ++i)
+            {
                 // 计算飞刀的角度 
-                float angle = i * angleStep;   
+                float angle = i * angleStep;
                 // 将角度转换为弧度
                 float radian = angle * (M_PI / 180.0f);
                 // 计算飞刀的位置
-                cocos2d::Vec2 bulletPosition = getPosition() + cocos2d::Vec2(radius * cos(radian), radius * sin(radian));    
+                cocos2d::Vec2 bulletPosition = getPosition() + cocos2d::Vec2(radius * cos(radian), radius * sin(radian));
                 // 创建子弹
                 auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, m_level);
                 if (bullet)
-                    {                
-                    bullet->setTexture("Weapon/bayonet.png");          
+                {
+                    bullet->setTexture("Weapon/bayonet.png");
                     // 设置飞刀的锚点  
-                    bullet->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));           
+                    bullet->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
                     // 设置飞刀的位置            
-                    bullet->setPosition(bulletPosition);       
-                    bullet->setRotation(-angle);              
+                    bullet->setPosition(bulletPosition);
+                    bullet->setRotation(-angle);
                     // 计算飞刀的方向，使其沿着圆周的切线方向飞行 
                     cocos2d::Vec2 direction(cos(radian), sin(radian));
                     // 飞刀的速度
@@ -1013,11 +1320,12 @@ void Hero::SkillX()
                     // 添加飞刀到父节点
                     this->getParent()->addChild(bullet);
                 }
-            }   
+            }
             }));
         // 运行动作序列
         runAction(cocos2d::Sequence::create(actions));
     }
+
 }
 
 void Hero::SkillC()

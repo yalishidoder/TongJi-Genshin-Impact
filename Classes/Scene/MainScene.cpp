@@ -122,7 +122,6 @@ bool MainScene::init()
                 hero->setName("hero"); // 设置角色名称
                 hero->setCharacterName("CaiXuKun");
                 hero->setAnchorPoint(Vec2(0.5f, 0.15f));
-
                 // 设置元素力
                 hero->setElement(CharacterElement::ICE);
 
@@ -132,7 +131,7 @@ bool MainScene::init()
 
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
-                
+                hero->setSpawnPoint(Vec2(adjustedX, adjustedY)); 
                 this->addChild(hero);  // 将角色添加到场景中 
                 
                 // 创建玩家面板
@@ -160,7 +159,8 @@ bool MainScene::init()
             auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
             if (healthFill) {
                 healthFill->setName("healthFill"); // 设置名字
-                healthFill->setPosition(Vec2(500, 50));
+                healthFill->setAnchorPoint(Vec2(0, 0.5));
+                healthFill->setPosition(Vec2(225,50));
                 healthFill->setOpacity(128);
                 this->addChild(healthFill);
             }
@@ -184,6 +184,7 @@ bool MainScene::init()
                 demon->setRadius(200.0f);
                 demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
                 demon->setElement(CharacterElement::WATER);   // 初始化属性
+                demon->setAttackMethods(Melee_Enemy);         // 设置为近战
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移
@@ -285,6 +286,7 @@ bool MainScene::init()
     /////////////////////////////
     auto miniMap = MiniMap::create(map,file,visibleSize,this);
     this->addChild(miniMap, 1);
+
     /////////////////////////////
 // 添加迷雾区域
 /////////////////////////////
@@ -341,6 +343,7 @@ void MainScene::update(float dt)
     {
         completeTask2();
     }
+
 
     auto children = getChildren();
     for (auto child : children) {
@@ -656,17 +659,23 @@ bool MainScene::checkCollision(cocos2d::Vec2 position)
     // 获取瓦片层（假设墙壁层的名字为 "WallLayer"）
     TMXLayer* wallLayer = map->getLayer("WallLayer");
 
+    TMXLayer* wallLayer_desert = map->getLayer("WallLayer_desert");
+    TMXLayer* wallLayer_town = map->getLayer("WallLayer_town");
+
     // 获取目标位置的瓦片ID
     Vec2 tileCoord = tileCoordForPosition(position);
     int tileGID = wallLayer->getTileGIDAt(tileCoord);
+    int tileGID_desert = wallLayer_desert->getTileGIDAt(tileCoord);
+    int tileGID_town = wallLayer_town->getTileGIDAt(tileCoord);
 
     // 如果瓦片ID大于0，表示该位置有墙壁
-    if (tileGID != 0) {
+    if (tileGID != 0 ) {
         return true;  // 碰到墙壁
     }
+    return false;  // 没有碰到墙壁
 
     // 检查 fog_sand 层
-    if (fogSandLayer && !isTask1Completed) 
+    if (fogSandLayer && !isTask1Completed)
     {
         tileGID = fogSandLayer->getTileGIDAt(tileCoord);
         if (tileGID != 0) {
@@ -683,7 +692,8 @@ bool MainScene::checkCollision(cocos2d::Vec2 position)
     }
     return false;  // 没有碰到墙壁
 
-}cocos2d::Vec2 MainScene::tileCoordForPosition(Vec2 position)
+}
+cocos2d::Vec2 MainScene::tileCoordForPosition(Vec2 position)
 {
     float x = position.x;
     float y = position.y;
@@ -815,6 +825,7 @@ void MainScene::completeTask2()
         fogLowerLayer->setVisible(false);// 隐藏下层迷雾
     }
 }
+
 
 void MainScene::menuCloseCallback(Ref* pSender)
 {
