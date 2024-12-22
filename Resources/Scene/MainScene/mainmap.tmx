@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="35" nextobjectid="11">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="37" nextobjectid="11">
  <tileset firstgid="1" name="victorian-garden" tilewidth="16" tileheight="16" tilecount="4096" columns="32">
   <image source="victorian-garden.png" width="512" height="2048"/>
  </tileset>
@@ -27,6 +27,16 @@
  <tileset firstgid="30926" name="spring_town" tilewidth="16" tileheight="16" tilecount="2304" columns="32">
   <image source="spring_town.png" width="512" height="1152"/>
  </tileset>
+ <layer id="35" name="WallLayer_town" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz7ENADAMw7Cc23/7UL+IOpCAd2sGAAAAAADYcM/efvTrry366wct/fWDlv76QUt//aClv37Q0l8/aOmvH7T01w9a+usHLf31g5b++kFrs/8BDOs+wg==
+  </data>
+ </layer>
+ <layer id="36" name="WallLayer_desert" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz8EJACAAAzHHdWH3EYeQE0mg/94Y71qzftDSXz9o6a8ftPTXD1r66wct/fWDlv76QUt//aClv37Q0l8/aJ3+2wMAAAAAAAD+sQHWsDZ9
+  </data>
+ </layer>
  <layer id="1" name="land" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJyN1tGO2zAMRNG+5N+t+KfbArsAe/bS6YORQJJFcjic8Xn9+nX/ec6f5/31/P1/fa3Pvevr92Zv7n+vfe+/x3ONs/f4vcbviffecd/3+eshbuU466g659pFrDNinHgmfhO3WaN5bO/dPBsWnj+vf3E8xJk1zbjfe+JxjbOHuPbWvXnvWd4Xv+v1M5eZk3FmbWesbVy6Xt2vN2uFZcW7iHcixvwvr+zD9frZr4lJ9b1wNm/xc794LKYTo6e4s4/O2ez9RYxPcezvhocaVT2aedXMljbIJfXAeOqNNTrPn2KpI85FzX7Nsu86i/avemz/1YiJbfXbHldPi/8Tc/V00345Yt6b5skN+egMyiHzKC+Z9ap9G3/kgfdby3anPrjNb+Ux66uZLb28I/ab2PrjxEruzd+5Ps+q13Jn0yJr9mzV50zNGud8TK4/rW1c23qoz8hF+Tvv0VvNuTS/+jl7UBqt/1VPt7mbOnEirrlXraW74i131Ee5plaXLpQHFL76s3faX/mjvmw+KK5vfuVuacnFvaWf4qvPWHNhXtx68lY58uauqr3uNZ/q5VnuKb5uOlI6UHjYK/tcvjZxKJ4WHsV3NUpN93/xr/hRMQqTDdfNQ6YWv18/+7T1T4zkTdVib50Tc95mQh/dvgHEYWp/8XRyu7TcOi7eKY10Hq3bs9Y67y2M5vvF582P1V77I66ld3rpYa88Vw3UQ3x/nt38Vm8tnEpDzdMa60x58vyd62pJaezTbJdO2Z/yhfKpyQHrnHwQZ+tRI0885WnzXrFWg0p7vEddk2Olr9u6vLN29zbdrP7qkZ/q3b4RpobVTJTufZojeedMqmfbPDh39smcnF3z3nLQ22Yexd+psTNu6af8Vi9q3ktLS9tmLqW9xZnJwcpt+zYQX/2qPNcZcTY8o17ogXfEfbPuPaWRem75aX1vlGY+ze3Ewxilt089n5g7P9WvOZ/y/YkLE9PSTHlX3Hm6z5r0hcJGLfG+0uIn31b3p/6Ie3ncxE3u6R/qjB5WulY+rOc7A3K7vHLueU79/1/85rnyh+Jv/Zb3Ojv2yhzcP7xf2HvHzGXzKHu+1aYfinXppvojdqXvhYneYH7mYM56pzwu/72Ip85+0q8Zs/xHzzCX+obYZsu5rtrNqXLY8intnfg5LzOn4ru6VLpa+2JefX3Cact5aoJ92uam4szaKld98yxn1OOZ36bF5UVbD9R351HvmTwovXFtw8q85tlZg14rd+dT/lg6WD5h3+2RflNrh3smvsU165Znpb313tTEzfusTU2rdfnkTIml3jRnTf6oh4Wv2Di/G1dv4jprG17qsT5UfFaznr6bCsfNT+y159XNzffVRbEuL9IDre/mXOmEGrX1tL4jNq1WF0u3q46tv+ZfM6U2+/+p5/Lbd9SO0mZnavMF7ywN0FfLQ6YG6AfywrtqTmbcw37VfvFu+WfNhTNwLWdmH0q3aw7Pco+1enbGLx8uL60+V1/0PTVNLZdv9qD4om6W32wxnDF1t87XnNX79S3hXTM/15wf6yzdVOPk6OzVppfGENfio7F8ZrwZd9OU0vPC1TgX54pzs041UH7fca4wdU/NrG+NOVfmtnnd5OX2/hX3PPG4+iLHy5MKA7WpfFX/tQc1r3Jw08B5v/rxNNtP+W18du42H1VnnHF1WA8ojXAOfU8N9X45oifP/Eqbau5L7+W0eJd/lQaob2Jv/8oD7YMxjaHfFNefvK40VB9Qd815YlDzUPE3TfC+mtVP59Xa4rKaIfe2XjgvxXfxUCemDsx8qod/934DGUmuiw==
@@ -137,7 +147,7 @@
    </properties>
    <point/>
   </object>
-  <object id="3" name="desert" x="831.333" y="272">
+  <object id="3" name="desert" x="831.333" y="269">
    <properties>
     <property name="no_position" value="831 430"/>
     <property name="targetMap" value="desert.tmx"/>

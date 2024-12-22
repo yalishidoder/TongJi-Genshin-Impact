@@ -358,7 +358,7 @@ void MainScene::update(float dt)
             if (!switchPoint.isActive) continue;
 
             // 判断是否有弹窗正在显示&&判断地图传送点和人物是否碰撞
-            if (!isDialogActive && hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
+            if (!isDialogActive && hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 2.5, switchPoint.position.y - 2.5, 10, 10))) {
                 isDialogActive = true;
 
                 auto dialog = LayerColor::create(Color4B(0, 0, 0, 128));
@@ -632,13 +632,16 @@ bool MainScene::checkCollision(cocos2d::Vec2 position)
 
     // 获取瓦片层（假设墙壁层的名字为 "WallLayer"）
     TMXLayer* wallLayer = map->getLayer("WallLayer");
-
+    TMXLayer* wallLayer_desert = map->getLayer("WallLayer_desert");
+    TMXLayer* wallLayer_town = map->getLayer("WallLayer_town");
     // 获取目标位置的瓦片ID
     Vec2 tileCoord = tileCoordForPosition(position);
     int tileGID = wallLayer->getTileGIDAt(tileCoord);
+    int tileGID_desert = wallLayer_desert->getTileGIDAt(tileCoord);
+    int tileGID_town = wallLayer_town->getTileGIDAt(tileCoord);
 
     // 如果瓦片ID大于0，表示该位置有墙壁
-    if (tileGID != 0) {
+    if (tileGID != 0 || tileGID_desert != 0 || tileGID_town != 0) {
         return true;  // 碰到墙壁
     }
     return false;  // 没有碰到墙壁

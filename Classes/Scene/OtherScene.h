@@ -31,6 +31,7 @@ public:
 	void showSelectionPopup_positionSwitchPoints();
 	void showSelectionPopup_taskStartPosition();
 	void hidePopup();
+	int get_enemies_num();
 private:
 	cocos2d::TMXTiledMap* othermap;
 	std::string mapname;
@@ -63,6 +64,7 @@ private:
 	bool isKeyPressedB = false;
 	PlayerPanel* m_playerPanel = nullptr;
 	std::vector<Enemy*> enemies;  // ´æ´¢townµÐÈËµÄÈÝÆ÷
+	int enmies_num;
 
 };
 #endif // __OtherScene_SCENE_H__

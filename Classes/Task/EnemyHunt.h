@@ -58,6 +58,7 @@ public:
 
     // 清理UI
     void CleanupUI();
+    //int get_enemies_num(std::vector<Enemy*> enemies);
 
 private:
     cocos2d::Size visible_size_;          // 可视区域大小

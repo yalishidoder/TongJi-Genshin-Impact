@@ -84,7 +84,6 @@ void EnemyHunt::StartTask()
         0.1f,
         false,
         "enemy");  // 定时器ID为"enemy"
-   
 }
 
 // 更新任务状态
@@ -94,7 +93,7 @@ void EnemyHunt::Update()
     // 模拟击败敌人
     for (auto enemy : enemies_)
     {
-        if (!enemy->isAlive()&&enemy->task_alive==1)
+        if (!enemy->isAlive() && enemy->task_alive == 1)
         {
             enemy->task_alive = 0;
             DefeatEnemy(enemy);  // 每次调用 DefeatEnemy 函数时，都会增加一个击杀数并显示消息
@@ -158,7 +157,7 @@ void EnemyHunt::ShowMessage(const std::string& message)
         cocos2d::RemoveSelf::create(), nullptr));  // 移除标签
 }
 
-EnemyHunt ::TaskStatus EnemyHunt::GetTaskStatus() const
+EnemyHunt::TaskStatus EnemyHunt::GetTaskStatus() const
 {
     return task_status_;  // 返回当前任务状态
 }

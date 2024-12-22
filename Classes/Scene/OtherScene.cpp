@@ -161,9 +161,15 @@ bool OtherScene::init(const std::string& mapFile)
                 levelLabel->setPosition(Vec2(500, 100));
                 this->addChild(levelLabel);
             }
+            //创建敌人
+            std::vector<Vec2>initposition;//创建的敌人位置
+            if (mapname == "forest.tmx") {
+                initposition = {
+
+                };
+            }
             if (mapname == "town.tmx") {
-                //创建敌人
-                std::vector<Vec2>initposition = {
+                initposition = {
                     {300,178},
                     {370,358},
                     {380,546},
@@ -171,27 +177,27 @@ bool OtherScene::init(const std::string& mapFile)
                     {814,610},
                     {814,166}
                 };
-                for (int i = 0; i < 6; i++) {
-                    auto demon = Enemy::create(initposition[i]);
-                    if (demon) {
-                        demon->setName("demon"); // 设置角色名称
-                        demon->setAnchorPoint(Vec2(0.5f, 0.5f));
-                        demon->setPlayer(hero);  //设置玩家
-                        demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
-                        demon->setRadius(100.0f);
-                        demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                        demon->setElement(CharacterElement::WATER);   // 初始化属性
-                        // 计算出生点的屏幕坐标
-                        float adjustedX = othermapOriginX + initposition[i].x; // 地图左下角 + 出生点的 x 偏移
-                        float adjustedY = othermapOriginX + initposition[i].y; // 地图左下角 + 出生点的 y 偏移
+            }
+            for (int i = 0; i < initposition.size(); i++) {
+                auto demon = Enemy::create(initposition[i]);
+                if (demon) {
+                    demon->setName("demon"); // 设置角色名称
+                    demon->setAnchorPoint(Vec2(0.5f, 0.5f));
+                    demon->setPlayer(hero);  //设置玩家
+                    demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
+                    demon->setRadius(100.0f);
+                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                    demon->setElement(CharacterElement::WATER);   // 初始化属性
+                    // 计算出生点的屏幕坐标
+                    float adjustedX = othermapOriginX + initposition[i].x; // 地图左下角 + 出生点的 x 偏移
+                    float adjustedY = othermapOriginX + initposition[i].y; // 地图左下角 + 出生点的 y 偏移
 
-                        // 设置人物位置
-                        demon->setPosition(Vec2(adjustedX, adjustedY));
+                    // 设置人物位置
+                    demon->setPosition(Vec2(adjustedX, adjustedY));
 
-                        this->addChild(demon);  // 将角色添加到场景中
-                        // 将敌人对象添加到 enemies 向量中
-                        enemies.push_back(demon);
-                    }
+                    this->addChild(demon);  // 将角色添加到场景中
+                    // 将敌人对象添加到 enemies 向量中
+                    enemies.push_back(demon);
                 }
             }
         }
@@ -369,7 +375,6 @@ void OtherScene::update(float dt)
             character->update(dt);
             if (character) {
                 //更新角色相关的ui
-                // 
                 // 更新血条
                 float healthRatio = character->CharacterBase::getHealth() / float(character->CharacterBase::getMaxHealth());
                 auto healthFill = dynamic_cast<Sprite*>(this->getChildByName("healthFill"));
@@ -652,6 +657,10 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
         case cocos2d::EventKeyboard::KeyCode::KEY_P:
             isKeyPressedP = false;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_R:
+        case cocos2d::EventKeyboard::KeyCode::KEY_R:
+            isKeyPressedR =false;
+            break;
         case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_B:
         case cocos2d::EventKeyboard::KeyCode::KEY_B:
             isKeyPressedB = false;
@@ -865,8 +874,11 @@ void OtherScene::showSelectionPopup_taskStartPosition()
         }
         if (mapname == "town.tmx")
         {
-            auto enemy_hunt = EnemyHunt::create(Director::getInstance()->getVisibleSize(),othermap, player, enemies, 6);
+            int em = get_enemies_num();
+            CCLOG("######get_enemies_num: %d", em); // 输出当前敌人数
+            auto enemy_hunt = EnemyHunt::create(Director::getInstance()->getVisibleSize(),othermap, player, enemies, em);
             this->addChild(enemy_hunt, 10);
+
             enemy_hunt->StartTask();
             CCLOG("Start the Task...");
             // 获取任务状态(是否完成)
@@ -894,6 +906,22 @@ void OtherScene::hidePopup()
     // 隐藏弹窗
     this->removeChildByName("popupLayer");
     isPopupVisible = false;
+}
+
+int OtherScene::get_enemies_num()
+{
+    int num = 0;
+    auto children = getChildren();
+    for (auto child : children) {
+        auto enemy = dynamic_cast<Enemy*>(child);
+        if (enemy) {
+            if (enemy->isAlive() && enemy)
+            {
+                num++;
+            }
+        }
+    }
+    return num;
 }
 
 void OtherScene::returnToLastScene()
