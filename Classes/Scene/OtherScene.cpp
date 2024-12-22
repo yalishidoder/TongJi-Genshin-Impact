@@ -7,12 +7,21 @@
 #include "Task/Maze.h"
 #include "Task/TreasureHunt.h"
 #include "Task/EnemyHunt.h"
-
+#include "AudioEngine.h"
 USING_NS_CC;
 
 extern bool isTask1Completed;
 extern bool isTask2Completed ;
+OtherScene::OtherScene()
+    : musicID(-1), pauseButton(nullptr)  // 初始化 musicID 和按钮为 nullptr
+{
+}
 
+OtherScene::~OtherScene()
+{
+    // 清理音乐资源
+    cocos2d::experimental::AudioEngine::stop(musicID);
+}
 Scene* OtherScene::createScene(const std::string& mapFile)
 {
     OtherScene* ret = new OtherScene();
@@ -39,6 +48,25 @@ bool OtherScene::init(const std::string& mapFile)
     mapname = mapFile;
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    playBackgroundMusic();
+    // 创建暂停按钮
+    pauseButton = MenuItemImage::create(
+        "Scene/MainMenuScene/BGM_OFF.png",    // 音乐开启时的图标
+        "Scene/MainMenuScene/BGM_ON.png",  // 音乐关闭时的图标
+        CC_CALLBACK_1(OtherScene::pauseMusicCallback, this) // 点击回调
+    );
+
+    // 检查按钮是否加载成功
+    if (pauseButton)
+    {
+        float x = Director::getInstance()->getVisibleSize().width - pauseButton->getContentSize().width / 2 -16-40;
+        float y = pauseButton->getContentSize().height / 2 + 16;  // 视图右下角位置
+        pauseButton->setPosition(Vec2(x, y));
+
+        auto menu = Menu::create(pauseButton, nullptr);  // 创建菜单并将按钮添加进去
+        menu->setPosition(Vec2::ZERO);  // 菜单位置为默认
+        this->addChild(menu, 1);  // 添加菜单到场景中
+    }
     /////////////////////////////
     // 添加一个退出按钮    this->addChild(menu, 1);
     /////////////////////////////
@@ -55,8 +83,8 @@ bool OtherScene::init(const std::string& mapFile)
     }
     else
     {
-        float x = origin.x + visibleSize.width - closeItem->getContentSize().width / 2;
-        float y = origin.y + closeItem->getContentSize().height / 2;
+        float x = origin.x + visibleSize.width - closeItem->getContentSize().width / 2 - 16;
+        float y = origin.y + closeItem->getContentSize().height / 2 + 16;
         closeItem->setPosition(Vec2(x, y));
     }
 
@@ -440,6 +468,7 @@ void OtherScene::update(float dt)
                     dialog->removeFromParent();
                     isDialogActive = false; // 恢复标志位
                     if (switchPoint.targetMap == "mainmap.tmx") {
+                        stopBackgroundMusic();
                         Director::getInstance()->pushScene(MainScene::createScene());
                     }
                     });
@@ -953,4 +982,92 @@ void OtherScene::menuCloseCallback(Ref* pSender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
+}
+void OtherScene::playBackgroundMusic()
+{
+    if (musicID == -1) {
+        if (mapname == "forest.tmx") {
+            // 播放背景音乐
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_forest.mp3", true, 0.5f);
+        }
+        if (mapname == "desert.tmx") {
+            // 播放背景音乐
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_desert.mp3", true, 0.5f);
+        }
+        if (mapname == "town.tmx") {
+            // 播放背景音乐
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_town.mp3", true, 0.5f);
+        }
+        if (musicID != -1) {
+            CCLOG("Background music started playing with ID: %d", musicID);
+        }
+        else {
+            CCLOG("Failed to play background music.");
+        }
+    }
+}
+
+void OtherScene::pauseBackgroundMusic()
+{
+    auto state = cocos2d::experimental::AudioEngine::getState(musicID);
+    if (state == cocos2d::experimental::AudioEngine::AudioState::PLAYING)
+    {
+        cocos2d::experimental::AudioEngine::pause(musicID);
+        CCLOG("Background music paused.");
+    }
+    else
+    {
+        CCLOG("Background music is not playing, cannot pause.");
+    }
+}
+
+void OtherScene::resumeBackgroundMusic()
+{
+    auto state = cocos2d::experimental::AudioEngine::getState(musicID);
+    if (state == cocos2d::experimental::AudioEngine::AudioState::PAUSED)
+    {
+        cocos2d::experimental::AudioEngine::resume(musicID);
+        CCLOG("Background music resumed.");
+    }
+    else
+    {
+        CCLOG("Background music is not paused, cannot resume.");
+    }
+}
+
+void OtherScene::stopBackgroundMusic()
+{
+    auto state = cocos2d::experimental::AudioEngine::getState(musicID);
+    if (state == cocos2d::experimental::AudioEngine::AudioState::PLAYING ||
+        state == cocos2d::experimental::AudioEngine::AudioState::PAUSED)
+    {
+        cocos2d::experimental::AudioEngine::stop(musicID);
+        CCLOG("Background music stopped.");
+    }
+    else
+    {
+        CCLOG("Background music is not playing, cannot stop.");
+    }
+}
+
+void OtherScene::pauseMusicCallback(Ref* pSender)
+{
+    // 检查当前背景音乐的状态，进行暂停或恢复操作
+    auto state = cocos2d::experimental::AudioEngine::getState(musicID);
+    if (state == cocos2d::experimental::AudioEngine::AudioState::PLAYING)
+    {
+        pauseBackgroundMusic();
+        pauseButton->setNormalImage(Sprite::create("Scene/MainMenuScene/BGM_ON.png"));  // 改为恢复按钮图标
+        CCLOG("Background music paused.");
+    }
+    else if (state == cocos2d::experimental::AudioEngine::AudioState::PAUSED)
+    {
+        resumeBackgroundMusic();
+        pauseButton->setNormalImage(Sprite::create("Scene/MainMenuScene/BGM_OFF.png"));  // 改为暂停按钮图标
+        CCLOG("Background music resumed.");
+    }
+    else
+    {
+        CCLOG("Background music is neither playing nor paused.");
+    }
 }

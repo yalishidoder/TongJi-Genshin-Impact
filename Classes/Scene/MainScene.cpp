@@ -281,13 +281,13 @@ bool MainScene::init()
         }
     }
     /////////////////////////////
-// 添加小地图
-/////////////////////////////
+    // 添加小地图
+    /////////////////////////////
      miniMap = MiniMap::create(map, file, visibleSize, this);
     this->addChild(miniMap, 1);
     /////////////////////////////
-// 添加迷雾区域
-/////////////////////////////
+    // 添加迷雾区域
+    /////////////////////////////
     initFog();
     fogSandLayer = map->getLayer("WallLayer_desert");
     fogTownLayer = map->getLayer("WallLayer_town");

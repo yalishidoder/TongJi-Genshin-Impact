@@ -8,8 +8,16 @@
 class OtherScene : public cocos2d::Scene
 {
 public:
+	OtherScene();
+	~OtherScene();
 	static cocos2d::Scene* createScene(const std::string& mapFile);
+	//音频函数
+	void playBackgroundMusic();
+	void pauseBackgroundMusic();
+	void resumeBackgroundMusic();
+	void stopBackgroundMusic();
 
+	void pauseMusicCallback(Ref* pSender);  // 暂停音乐的回调函数
 	virtual bool init(const std::string& mapFile);
 	// a selector callback
 	void menuCloseCallback(cocos2d::Ref* pSender);
@@ -65,7 +73,8 @@ private:
 	PlayerPanel* m_playerPanel = nullptr;
 	std::vector<Enemy*> enemies;  // 存储town敌人的容器
 	int enmies_num;
-
+	int musicID;  // 用于控制背景音乐播放的 ID
+	MenuItemImage* pauseButton;  // 暂停/恢复按钮
 
 
 };
