@@ -232,7 +232,15 @@ bool OtherScene::init(const std::string& mapFile)
                     demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
                     demon->setRadius(100.0f);
                     demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                    demon->setElement(CharacterElement::WATER);   // 初始化属性
+                    if (i < initposition.size() / 2) {
+                        demon->setElement(CharacterElement::FIRE);   // 初始化属性
+                        demon->setAttackMethods(Melee_Enemy);         // 设置为近战
+                    }
+                    else {
+                        demon->setElement(CharacterElement::WATER);   // 初始化属性
+                        demon->setAttackMethods(Ranged_Enemy);         // 设置为远战
+
+                    }
                     // 计算出生点的屏幕坐标
                     float adjustedX = othermapOriginX + initposition[i].x; // 地图左下角 + 出生点的 x 偏移
                     float adjustedY = othermapOriginX + initposition[i].y; // 地图左下角 + 出生点的 y 偏移
@@ -421,12 +429,11 @@ void OtherScene::update(float dt)
             character->update(dt);
             if (character) {
                 //更新角色相关的ui
-                // 更新血条
+                /// 更新血条
                 float healthRatio = character->CharacterBase::getHealth() / float(character->CharacterBase::getMaxHealth());
                 auto healthFill = dynamic_cast<Sprite*>(this->getChildByName("healthFill"));
                 if (healthFill)
                     healthFill->setScaleX(healthRatio);
-
                 // 更新等级Label
                 auto levelLabel = dynamic_cast<Label*>(this->getChildByName("levelLabel"));
                 if (levelLabel)
@@ -1056,15 +1063,16 @@ void OtherScene::playBackgroundMusic()
     if (musicID == -1) {
         if (mapname == "forest.tmx") {
             // 播放背景音乐
-            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_forest.mp3", true, 0.5f);
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_forest.mp3", true, 0.3f);
         }
         if (mapname == "desert.tmx") {
             // 播放背景音乐
-            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_desert.mp3", true, 0.5f);
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_desert.mp3", true, 0.7f);
         }
         if (mapname == "town.tmx") {
             // 播放背景音乐
-            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_town.mp3", true, 0.5f);
+
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_town.mp3", true, 0.1f);
         }
         if (musicID != -1) {
             CCLOG("Background music started playing with ID: %d", musicID);

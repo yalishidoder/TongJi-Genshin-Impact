@@ -141,9 +141,12 @@ void EnemyHunt::CompleteTask()
 
     // 任务3完成，之后可以填写奖励
     isTask3Completed = true;
-    for (int i = 0; i++; i < 10) {
-        int m_expToLevelUp = hero_->calculateExpToLevelUp();
-        hero_->addExp(m_expToLevelUp);
+    int target_level = hero_->getLevel() + 10;
+    if (target_level >= 99) {
+        hero_->setLevel(99);
+    }
+    else {
+        hero_->setLevel(target_level);
     }
 }
 

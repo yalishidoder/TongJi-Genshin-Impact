@@ -219,6 +219,13 @@ void TreasureHunt::CompleteTask()
     // 完成任务2的奖励
     isTask2Completed = true;
     hero_->m_isXSkillUnlock = true;
+    int target_level = hero_->getLevel() + 2;
+    if (target_level >= 99) {
+        hero_->setLevel(99);
+    }
+    else {
+        hero_->setLevel(target_level);
+    }
 }
 
 // 任务失败

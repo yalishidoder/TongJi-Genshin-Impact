@@ -9,11 +9,11 @@ USING_NS_CC;
 
 // 定义全局变量，用于判断任务是否完成
 //任务1是森林迷宫任务
-bool isTask1Completed = false;
+bool isTask1Completed = 1;
 //任务2是沙漠寻宝任务
-bool isTask2Completed = false;
+bool isTask2Completed = 1;
 //任务3是城镇杀敌任务
-bool isTask3Completed = false;
+bool isTask3Completed = 1;
 
 Scene* MainScene::createScene()
 {
