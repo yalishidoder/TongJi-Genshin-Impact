@@ -10,6 +10,8 @@
 
 #include "Maze.h"
 #include "SimpleAudioEngine.h"
+#include "Character/Hero/Hero.h"
+
 extern bool isTask1Completed;
 
 
@@ -20,6 +22,7 @@ Maze::Maze()
     is_task_active_(false),      // 任务初始状态为未激活
     timer_label_(nullptr),       // 计时器标签指针初始化为空
     player_(nullptr),            // 玩家节点指针初始化为空
+    hero_(nullptr),                     // 角色初始化为空
     task_status_(false) {}
 
 // 析构函数
@@ -31,10 +34,10 @@ Maze::Maze()
 // 工厂方法：创建并初始化Maze对象
 Maze* Maze::Create(const std::string& maze_name, const cocos2d::Vec2& start,
     const cocos2d::Vec2& end, float time_limit,
-    const std::string& reward) 
+    const std::string& reward, Hero* hero)
 {
     Maze* maze = new (std::nothrow) Maze();
-    if (maze && maze->Init(maze_name, start, end, time_limit, reward)) 
+    if (maze && maze->Init(maze_name, start, end, time_limit, reward, hero))
     {
         maze->autorelease();  // 自动释放
         return maze;
@@ -46,7 +49,7 @@ Maze* Maze::Create(const std::string& maze_name, const cocos2d::Vec2& start,
 // 初始化方法，设置迷宫任务的基本参数
 bool Maze::Init(const std::string& maze_name, const cocos2d::Vec2& start,
     const cocos2d::Vec2& end, float time_limit,
-    const std::string& reward) 
+    const std::string& reward, Hero* hero)
 {
     if (!Node::init()) 
     {  // 检查Node初始化是否成功
@@ -59,7 +62,7 @@ bool Maze::Init(const std::string& maze_name, const cocos2d::Vec2& start,
     end_ = end;
     time_limit_ = time_limit;
     reward_ = reward;
-
+    hero_ = hero;                  // 设置角色
     // 获取屏幕尺寸
     visible_size_ = cocos2d::Director::getInstance()->getVisibleSize();
 
@@ -163,6 +166,7 @@ void Maze::CompleteTask()
 
     // 完成任务后，触发任务1的完成事件（奖励）
     isTask1Completed = true;
+    hero_->m_isBulletGet = true;
 }
 
 // 任务失败处理

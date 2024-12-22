@@ -11,7 +11,7 @@
 
 #include <string>
 #include "cocos2d.h"
-
+#include "Character/Hero/Hero.h"
 
 
 // Maze类，表示一个迷宫任务，继承自cocos2d::Node
@@ -30,12 +30,12 @@ public:
     // 创建Maze对象，使用工厂方法模式
     static Maze* Create(const std::string& maze_name, const cocos2d::Vec2& start,
         const cocos2d::Vec2& end, float time_limit,
-        const std::string& reward);
+        const std::string& reward, Hero* hero);
 
     // 初始化方法，配置迷宫任务的基本参数
     bool Init(const std::string& maze_name, const cocos2d::Vec2& start,
         const cocos2d::Vec2& end, float time_limit,
-        const std::string& reward);
+        const std::string& reward, Hero* hero);
 
     // 启动迷宫任务
     void StartTask();
@@ -97,6 +97,7 @@ private:
 
     // 玩家角色节点
     cocos2d::Node* player_;
+    Hero* hero_;             // 角色
 
     // 可见区域大小，用于显示UI
     cocos2d::Size visible_size_;
