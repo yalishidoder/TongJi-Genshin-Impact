@@ -2,6 +2,8 @@
 
 
 Bullet::Bullet()
+    :h_owner(nullptr)
+    ,e_owner(nullptr)
 {
     _velocity = cocos2d::Vec2::ZERO;
     _lifeTime = 0.0f;
@@ -53,6 +55,16 @@ bool Bullet::init(const cocos2d::Vec2& position, const cocos2d::Vec2& velocity,c
     this->scheduleUpdate();
 
     return true;
+}
+
+void Bullet::setOwner(Hero* player)
+{
+    h_owner = player;
+}
+
+void Bullet::setOwner(Enemy* enemy)
+{
+    e_owner = enemy;
 }
 
 void Bullet::update(float delta)
@@ -110,28 +122,54 @@ void Bullet::checkAndHandleCollision()
     cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
     if (currentScene)
     {
-        // 获取场景中的所有敌人
-        auto enemies = currentScene->getChildren();
-        for (auto enemy : enemies)
+        // 由玩家射出
+        if (h_owner)
         {
-            auto temp = dynamic_cast<Enemy*>(enemy);
-            if (temp && temp->isAlive())
+            // 获取场景中的所有敌人
+            auto enemies = currentScene->getChildren();
+            for (auto enemy : enemies)
             {
-                if (this->checkCollision(temp))
+                auto temp = dynamic_cast<Enemy*>(enemy);
+                if (temp && temp->isAlive())
+                {
+                    if (this->checkCollision(temp))
+                    {
+                        // 处理碰撞逻辑
+                        onCollisionWithEnemy(temp);
+                    }
+                }
+            }
+        }
+        // 子弹由敌人射出
+        else if (e_owner) {
+            if (e_owner->getPlayer()&& e_owner->getPlayer()->isAlive()) {
+                // 获取场景中的玩家
+                if (this->checkCollision(e_owner->getPlayer()))
                 {
                     // 处理碰撞逻辑
-                    onCollisionWithEnemy(temp);
+                    onCollisionWithEnemy(e_owner->getPlayer(), e_owner);
                 }
+
             }
         }
     }
 }
 
 // 碰撞处理逻辑
-void Bullet::onCollisionWithEnemy(cocos2d::Node* enemy)
+void Bullet::onCollisionWithEnemy(cocos2d::Node* targetEnemy, Enemy* attack_enemy)
 {
-    // 减少敌人的生命值
-    static_cast<Enemy*>(enemy)->takeDamage((this->getLevel()+1.5)*5);
+    auto enemy = dynamic_cast<Enemy*>(targetEnemy);
+    auto player = dynamic_cast<Hero*>(targetEnemy);
+    if(enemy)
+    {
+        // 减少敌人的生命值
+        enemy->takeDamage((this->getLevel() + 1.5) * 5);
+    }
+    else if (player) 
+    {
+        // 减少玩家的生命值
+        player->takeDamage((this->getLevel() + 1.5) * 2, attack_enemy);
+    }
 
     // 销毁子弹
     this->removeFromParentAndCleanup(true);

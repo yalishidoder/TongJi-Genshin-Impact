@@ -12,11 +12,14 @@
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
 
+
+
 // 定义近战与远程攻击
-const int Ranged_Enemy = 0;
-const int Melee_Enemy = 1;
+const int Ranged_Enemy = 1; // 远程
+const int Melee_Enemy = 0;  // 近战
 const int amount_of_healing = 10;
 
+// 敌人的移动状态
 enum class Direction 
 {
     UP, DOWN, LEFT, RIGHT
@@ -55,6 +58,7 @@ public:
     void hideFreezeSprite(float dt);
     void updateHero();
     void updateHealthFill();
+    void updatePistol();
 
     // 存活状态相关
     bool isAlive() const;
@@ -67,7 +71,7 @@ public:
     virtual void attack()override;
     void setAttackMethods(bool method);
     void attackWithPunch();
-    void attackWithPistol();
+    void attackWithPistol(const Vec2& position);
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(cocos2d::Sprite* target);
 
@@ -115,6 +119,9 @@ private:
 
     //巡逻方向
     int dirX, dirY;
+
+    // 敌人的手枪
+    cocos2d::Sprite* enemyPistol;
 
     // 敌人血条
     cocos2d::Sprite* healthBg;

@@ -8,6 +8,7 @@
 #include "Enemy.h"
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
+#include "Weapon/RangedWeapon/Ammunition/Bullet.h"
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 #include <cmath>
@@ -95,6 +96,15 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
         healthFill->setVisible(true);
         healthBg->setOpacity(120);
         this->addChild(healthFill);
+    }
+
+    // 手枪
+    enemyPistol = cocos2d::Sprite::create("Weapon/pistol.png");
+    if (enemyPistol)
+    {
+        enemyPistol->setRotation(180);
+        enemyPistol->setVisible(0);
+        this->addChild(enemyPistol);
     }
 
     setTexture("Character/Enemy/Animation/hitman/WALK_DOWN_0.png");
@@ -195,6 +205,9 @@ void Enemy::update(float delta)
     if (remainingCooldown > 0) {
         remainingCooldown -= delta;
     }
+
+    if (isRanged)
+        updatePistol();
 
     Recover(delta);
 }
@@ -464,6 +477,7 @@ void Enemy::attack() {
     CCLOG("Enemy attacks with power %d", m_attackPower);
 }
 
+// 拳头攻击的逻辑
 void Enemy::attackWithPunch()
 {
     if (remainingCooldown > 0) {
@@ -500,9 +514,101 @@ void Enemy::attackWithPunch()
     CCLOG("Enemy attacks with power %d", m_attackPower);
 }
 
-void Enemy::attackWithPistol()
+// 更新手枪的位置
+void Enemy::updatePistol()
 {
+    if (enemyPistol) {
+        enemyPistol->setAnchorPoint(this->getAnchorPoint());
+        Vec2 handpos = this->getPosition();
+        handpos.y += 30;
+        enemyPistol->setPosition(handpos);
+        enemyPistol->setVisible(0);
+    }
 
+    if(player)
+    {
+        if (player->getPosition() != cocos2d::Vec2::ZERO) {
+            // 计算手枪指向鼠标位置的角度
+            float angle = atan2(player->getPositionY() - enemyPistol->getPositionY(), player->getPositionX() - enemyPistol->getPositionX());
+            // 将角度转换为度数
+            angle = CC_RADIANS_TO_DEGREES(-angle);
+            // 设置手枪的旋转角度
+            enemyPistol->setRotation(angle);
+
+        }
+    }
+}
+
+// 手枪攻击的逻辑
+void Enemy::attackWithPistol(const Vec2& position)
+{
+    if (remainingCooldown > 0) {
+        return;
+    }
+
+    // 创建子弹
+    auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, this->getLevel());
+    if (bullet) {
+        bullet->setOwner(this);
+
+        // 加载子弹图形资源
+        switch (this->getElement()) {
+            case(CharacterElement::FIRE):
+                bullet->setTexture("Weapon/Ammunition/bullet_fire.png");
+                break;
+            case(CharacterElement::ICE):
+                bullet->setTexture("Weapon/Ammunition/bullet_ice.png");
+                break;
+            case(CharacterElement::WATER):
+                bullet->setTexture("Weapon/Ammunition/bullet_water.png");
+                break;
+            case(CharacterElement::ROCK):
+                bullet->setTexture("Weapon/Ammunition/bullet_rock.png");
+                break;
+            default:
+                bullet->setTexture("Weapon/Ammunition/bullet_default.png");
+                break;
+        }
+
+        // 设置锚点
+        bullet->setAnchorPoint(Vec2(0.5f, 0.5f));
+
+        // 设置子弹的位置为敌人的位置
+        bullet->setPosition(getPosition());
+        // 计算子弹的移动方向
+        Vec2 direction = position - getPosition();
+        float distanceToClick = direction.length();
+
+        // 设置最小移动距离
+        const float minDistance = 10.0f;
+        if (distanceToClick < minDistance) {
+            direction = Vec2(minDistance, 0);
+            distanceToClick = minDistance;
+        }
+
+        // 在攻击范围内
+        if (distanceToClick <= 1000.0f) {
+            float angle = std::atan2(direction.y, direction.x) * (180.0f / M_PI);
+            bullet->setRotation(-angle);
+            // 计算速度
+            float speed = 100.0f * (log10(bullet->getLevel()) + 3);
+            float time = distanceToClick / speed;
+
+            // 移动子弹到点击位置
+            auto moveAction = MoveTo::create(time, position);
+            auto removeAction = RemoveSelf::create();
+            bullet->runAction(Sequence::create(moveAction, removeAction, nullptr));
+            // 添加子弹到主场景
+            this->getParent()->addChild(bullet);
+            CCLOG("Angle: %f", angle);
+        }
+        CCLOG("Enemy position: %f, %f", getPosition().x, getPosition().y);
+        CCLOG("Player position: %f, %f", position.x, position.y);
+
+        // 重置冷却时间
+        remainingCooldown = attackCooldown;
+        CCLOG("Enemy attacks with power %d", m_attackPower);
+    }
 }
 
 void Enemy::checkAndHandleCollision()
@@ -612,7 +718,7 @@ void Enemy::chaseLogic(float& dt, cocos2d::Vec2& playerPos, cocos2d::Vec2& enemy
     }
     else
     {
-        if(isRanged)
+        if(!isRanged)
         {
             if (distanceToPlayer > 10)
             {
@@ -625,6 +731,12 @@ void Enemy::chaseLogic(float& dt, cocos2d::Vec2& playerPos, cocos2d::Vec2& enemy
         }
         else {
             // 远程攻击函数
+            if (distanceToPlayer > 150.0f)
+            {
+                handleChasingMovement(dt, directionToPlayer);
+            }
+            else
+                attackWithPistol(playerPos);
         }
     }
 }

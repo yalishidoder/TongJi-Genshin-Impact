@@ -15,6 +15,10 @@ public:
     // 初始化子弹
     bool init(const cocos2d::Vec2& position, const cocos2d::Vec2& velocity, const int level);
 
+    // 设置子弹攻击的发动者
+    void setOwner(Hero* player = nullptr);
+    void setOwner(Enemy* enemy = nullptr);
+
     // 更新子弹状态
     void update(float delta);
 
@@ -39,7 +43,7 @@ public:
     // 子弹碰撞相关
     void checkAndHandleCollision();
     bool checkCollision(cocos2d::Node* target);
-    void onCollisionWithEnemy(cocos2d::Node* enemy);
+    void onCollisionWithEnemy(cocos2d::Node* targetEnemy, Enemy* attack_enemy = nullptr);
     
 
 protected:
@@ -55,7 +59,9 @@ protected:
     // 子弹等级
     int _level;
 
-    
+    Hero* h_owner;
+    Enemy* e_owner;
+
 };
 
 #endif // __BULLET_H__

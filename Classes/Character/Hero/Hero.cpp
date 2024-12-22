@@ -361,6 +361,7 @@ void Hero::attackWithBullet(const Vec2& position)
     // 创建子弹
     auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO,this->getLevel());
     if (bullet) {
+        bullet->setOwner(this);
 
         // 加载子弹图形资源
         switch (this->getElement()) {

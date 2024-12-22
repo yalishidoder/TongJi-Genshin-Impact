@@ -1,6 +1,6 @@
 #ifndef __BAYONET_H__
 #define __BAYONET_H__
-#include "cocos2d.h"
+#include "cocos2d.h" 
 
 class Bayonet : public cocos2d::Sprite {
 public:

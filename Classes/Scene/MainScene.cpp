@@ -183,7 +183,7 @@ bool MainScene::init()
                 demon->setRadius(200.0f);
                 demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
                 demon->setElement(CharacterElement::WATER);   // 初始化属性
-                demon->setAttackMethods(Melee_Enemy);         // 设置为近战
+                demon->setAttackMethods(Ranged_Enemy);         // 设置为近战
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移
@@ -203,7 +203,8 @@ bool MainScene::init()
                 demon2->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
                 demon2->setRadius(200.0f);
                 demon2->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                demon2->setElement(CharacterElement::WATER);   // 初始化属性
+                demon2->setElement(CharacterElement::FIRE);   // 初始化属性
+                demon2->setAttackMethods(Melee_Enemy);
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 550.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 500.0f; // 地图左下角 + 出生点的 y 偏移
