@@ -192,7 +192,7 @@ void PlayerPanel::initUi()
         }
 
         // 创建修改按钮
-        auto changeButton = cocos2d::ui::Button::create("CloseNormal.png");
+        auto changeButton = cocos2d::ui::Button::create("Character/panel/Change_icon.png");
         if (changeButton) {
             changeButton->setPosition(cocos2d::Vec2(300, 300));
             changeButton->addClickEventListener([=](Ref* sender)
