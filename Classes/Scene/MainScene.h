@@ -4,6 +4,9 @@
 #include "cocos2d.h"
 #include "Character/PlayerPanel.h"
 
+
+
+
 struct SceneSwitchPoint {
     cocos2d::Vec2 position;    // 传送点位置
     std::string targetMap;    // 目标地图名称
@@ -47,6 +50,13 @@ public:
 
     CREATE_FUNC(MainScene);
 
+    // 生成迷雾
+    void initFog();
+    // 完成任务1
+    void completeTask1();
+    // 完成任务2
+    void completeTask2();
+
 private:
     cocos2d::TMXTiledMap* map;
 
@@ -69,6 +79,13 @@ private:
 
     // 面板
     PlayerPanel* m_playerPanel = nullptr;
+
+    // 迷雾层
+    cocos2d::Layer* fogLowerLayer = nullptr;
+    cocos2d::Layer* fogUpperLayer = nullptr;
+    // 迷雾层对应的碰撞层
+    TMXLayer* fogSandLayer = nullptr;
+    TMXLayer* fogTownLayer = nullptr;
 };
 
 #endif // __MainScene_SCENE_H__

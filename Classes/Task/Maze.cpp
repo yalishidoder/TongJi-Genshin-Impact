@@ -10,6 +10,9 @@
 
 #include "Maze.h"
 
+extern bool isTask1Completed;
+
+
  // 构造函数
 Maze::Maze()
     : time_limit_(30.0f),         // 设置默认时间限制为30秒
@@ -17,10 +20,10 @@ Maze::Maze()
     is_task_active_(false),      // 任务初始状态为未激活
     timer_label_(nullptr),       // 计时器标签指针初始化为空
     player_(nullptr),            // 玩家节点指针初始化为空
-    task_status_(TASK_IN_PROGRESS) {}
+    task_status_(false) {}
 
 // 析构函数
-Maze::~Maze() 
+ Maze::~Maze()
 {
     Cleanup();  // 清理计时器和UI元素
 }
@@ -71,7 +74,7 @@ void Maze::StartTask()
 
     is_task_active_ = true;
     elapsed_time_ = 0.0f;  // 重置已用时间
-    task_status_ = TASK_IN_PROGRESS;
+    task_status_ = false;
 
     // 获取玩家节点
     player_ = this->getParent()->getChildByName("hero");
@@ -127,7 +130,7 @@ void Maze::CheckCompletion()
     if (!player_) return;
 
     // 判断玩家当前位置是否与终点相近
-    if (player_->getPosition().distance(end_) < 10.0f) 
+    if (player_->getPosition().distance(end_) < 15.0f) 
     {  // 允许一定误差
         CompleteTask();  // 玩家到达终点，任务完成
     }
@@ -137,7 +140,7 @@ void Maze::CheckCompletion()
 void Maze::CompleteTask() 
 {
     is_task_active_ = false;  // 标记任务为未激活
-    task_status_ = TASK_COMPLETED;  // 设置任务状态为完成
+    task_status_ = true;  // 设置任务状态为完成
     this->unschedule(CC_SCHEDULE_SELECTOR(Maze::UpdateTask));  // 停止任务计时
 
     ShowMessage("Mission Success!");  // 显示任务成功信息
@@ -155,13 +158,17 @@ void Maze::CompleteTask()
     cocos2d::log("Maze task completed! Reward: %s", reward_.c_str());  // 输出奖励信息
 
     Cleanup();  // 清理UI元素
+
+    // 完成任务后，触发任务1的完成事件（奖励）
+    isTask1Completed = true;
 }
 
 // 任务失败处理
 void Maze::FailTask()
 {
     is_task_active_ = false;  // 标记任务为未激活
-    task_status_ = TASK_FAILED;  // 设置任务状态为失败
+    task_status_ = false;  // 设置任务状态为失败
+
     this->unschedule(CC_SCHEDULE_SELECTOR(Maze::UpdateTask));  // 停止任务计时
 
     ShowMessage("Mission Failed!");  // 显示任务失败信息
@@ -214,3 +221,9 @@ void Maze::Cleanup()
             nullptr));
     }
 }
+
+
+bool Maze::GetTaskStatus() const
+{
+    return task_status_;
+};

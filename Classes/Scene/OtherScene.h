@@ -66,5 +66,7 @@ private:
 	std::vector<Enemy*> enemies;  // ´æ´¢townµĞÈËµÄÈİÆ÷
 	int enmies_num;
 
+
+
 };
 #endif // __OtherScene_SCENE_H__

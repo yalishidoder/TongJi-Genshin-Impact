@@ -8,6 +8,14 @@
 
 USING_NS_CC;
 
+// 定义全局变量，用于判断任务是否完成
+//任务1是森林迷宫任务
+bool isTask1Completed = false;
+//任务2是沙漠寻宝任务
+bool isTask2Completed = false;
+//任务3是城镇杀敌任务
+bool isTask3Completed = false;
+
 Scene* MainScene::createScene()
 {
     return MainScene::create();
@@ -277,7 +285,12 @@ bool MainScene::init()
     /////////////////////////////
     auto miniMap = MiniMap::create(map,file,visibleSize,this);
     this->addChild(miniMap, 1);
-
+    /////////////////////////////
+// 添加迷雾区域
+/////////////////////////////
+    initFog();
+    fogSandLayer = map->getLayer("WallLayer_desert");
+    fogTownLayer = map->getLayer("WallLayer_town");
 
     // 添加键盘事件监听器
     auto listener = cocos2d::EventListenerKeyboard::create();
@@ -318,6 +331,16 @@ void MainScene::update(float dt)
     }
     Node::update(dt);
 
+
+    // 处理任务完成情况
+    if (isTask1Completed == true)
+    {
+        completeTask1();
+    }
+    if (isTask2Completed == true)
+    {
+        completeTask2();
+    }
 
     auto children = getChildren();
     for (auto child : children) {
@@ -632,22 +655,35 @@ bool MainScene::checkCollision(cocos2d::Vec2 position)
 
     // 获取瓦片层（假设墙壁层的名字为 "WallLayer"）
     TMXLayer* wallLayer = map->getLayer("WallLayer");
-    TMXLayer* wallLayer_desert = map->getLayer("WallLayer_desert");
-    TMXLayer* wallLayer_town = map->getLayer("WallLayer_town");
+
     // 获取目标位置的瓦片ID
     Vec2 tileCoord = tileCoordForPosition(position);
     int tileGID = wallLayer->getTileGIDAt(tileCoord);
-    int tileGID_desert = wallLayer_desert->getTileGIDAt(tileCoord);
-    int tileGID_town = wallLayer_town->getTileGIDAt(tileCoord);
 
     // 如果瓦片ID大于0，表示该位置有墙壁
-    if (tileGID != 0 || tileGID_desert != 0 || tileGID_town != 0) {
+    if (tileGID != 0) {
         return true;  // 碰到墙壁
+    }
+
+    // 检查 fog_sand 层
+    if (fogSandLayer && !isTask1Completed) 
+    {
+        tileGID = fogSandLayer->getTileGIDAt(tileCoord);
+        if (tileGID != 0) {
+            return true; // 碰到 fog_sand
+        }
+    }
+
+    // 检查 fog_town 层
+    if (fogTownLayer && !isTask2Completed) {
+        tileGID = fogTownLayer->getTileGIDAt(tileCoord);
+        if (tileGID != 0) {
+            return true; // 碰到 fog_town
+        }
     }
     return false;  // 没有碰到墙壁
 
-}
-cocos2d::Vec2 MainScene::tileCoordForPosition(Vec2 position)
+}cocos2d::Vec2 MainScene::tileCoordForPosition(Vec2 position)
 {
     float x = position.x;
     float y = position.y;
@@ -714,6 +750,69 @@ void MainScene::operatemyPanel()
         }
         else
             CCLOG("m_playerPanel is null!");
+    }
+}
+
+
+// 添加两个迷雾层，分别覆盖右半部分的上下两层，并且使用自定义的 PNG 图片作为阴影
+void MainScene::initFog()
+{
+    // 获取地图的右半部分的尺寸和位置
+    Size mapSize = map->getContentSize();
+    float mapOriginX = map->getPositionX() - (map->getContentSize().width * map->getScale() * map->getAnchorPoint().x);
+    float mapOriginY = map->getPositionY() - (map->getContentSize().height * map->getScale() * map->getAnchorPoint().y);
+
+    // 上层迷雾区域（使用PNG图片作为阴影）
+    fogUpperLayer = Layer::create();
+    fogUpperLayer->setContentSize(Size(mapSize.width / 2, mapSize.height / 2)); // 使图片稍微变窄
+    fogUpperLayer->setPosition(mapOriginX + mapSize.width / 2, mapOriginY + mapSize.height / 2);
+    this->addChild(fogUpperLayer, 2);  // 添加到场景，设置zOrder
+
+    // 下层迷雾区域（同样使用PNG图片作为阴影）
+    fogLowerLayer = Layer::create();
+    fogLowerLayer->setContentSize(Size(mapSize.width / 2, mapSize.height / 2));
+    fogLowerLayer->setPosition(mapOriginX + mapSize.width / 2, mapOriginY);
+    this->addChild(fogLowerLayer, 2);  // 添加到场景，设置zOrder
+
+    // 创建精灵节点来显示PNG图片
+    auto upperFogSprite = Sprite::create("Scene/MainScene/fogUpper.png");  // 上层迷雾的图片
+    fogUpperLayer->addChild(upperFogSprite);
+    upperFogSprite->setAnchorPoint(Vec2(0.1f, 0.2f)); // 设置锚点为中心，增大x向左移动，增大y向下移动
+    upperFogSprite->setOpacity(255); // 设置透明度，50%透明度
+    upperFogSprite->setContentSize(fogUpperLayer->getContentSize()); // 设置图片大小与迷雾层相同
+    upperFogSprite->setScale(1.5f); // 让迷雾图片变大，调整比例根据需要
+
+
+    auto lowerFogSprite = Sprite::create("Scene/MainScene/fogLower.png");  // 下层迷雾的图片
+    fogLowerLayer->addChild(lowerFogSprite);
+    lowerFogSprite->setAnchorPoint(Vec2(0.05f, 0.25f)); // 设置锚点为中心，增大x向右移动，增大y向下移动
+    lowerFogSprite->setOpacity(255); // 设置透明度，50%透明度
+    lowerFogSprite->setContentSize(fogLowerLayer->getContentSize()); // 设置图片大小与迷雾层相同
+    lowerFogSprite->setScale(1.8f); // 让迷雾图片变大，调整比例根据需要
+
+    // 设置迷雾初始为可见
+    fogUpperLayer->setVisible(true);
+    fogLowerLayer->setVisible(true);
+}
+
+
+// 完成任务1，隐藏 fog_sand 图层，隐藏上层迷雾
+void MainScene::completeTask1()
+{
+    if (fogSandLayer)
+    {
+        fogSandLayer->setVisible(false); // 隐藏 fog_sand 图层
+        fogUpperLayer->setVisible(false);// 隐藏上层迷雾
+    }
+}
+
+// 完成任务2，隐藏 fog_town 图层，隐藏下层迷雾
+void MainScene::completeTask2()
+{
+    if (fogTownLayer)
+    {
+        fogTownLayer->setVisible(false); // 隐藏 fog_town 图层
+        fogLowerLayer->setVisible(false);// 隐藏下层迷雾
     }
 }
 

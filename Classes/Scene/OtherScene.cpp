@@ -10,6 +10,9 @@
 
 USING_NS_CC;
 
+extern bool isTask1Completed;
+extern bool isTask2Completed ;
+
 Scene* OtherScene::createScene(const std::string& mapFile)
 {
     OtherScene* ret = new OtherScene();
@@ -844,15 +847,7 @@ void OtherScene::showSelectionPopup_taskStartPosition()
 
             // 启动任务
             maze->StartTask();
-
-            // 获取任务状态(是否完成)
-            if (maze->GetTaskStatus() == Maze::TASK_COMPLETED)
-            {
-                /////////////////
-                // 完成任务后的奖励
-                //////////////////
-
-            };
+            //任务的奖励在任务类中实现
         }
         if (mapname == "desert.tmx")
         {
@@ -863,14 +858,7 @@ void OtherScene::showSelectionPopup_taskStartPosition()
             // 启动任务
             treasure_hunt->StartTask();
 
-            // 获取任务状态(是否完成)
-            if (treasure_hunt->GetTaskStatus() == TreasureHunt::TASK_COMPLETED)
-            {
-                //////////////////
-                // 完成任务后的奖励
-                //////////////////
-
-            };
+            //任务的奖励在任务类中实现
         }
         if (mapname == "town.tmx")
         {
@@ -881,14 +869,7 @@ void OtherScene::showSelectionPopup_taskStartPosition()
 
             enemy_hunt->StartTask();
             CCLOG("Start the Task...");
-            // 获取任务状态(是否完成)
-            if (enemy_hunt->GetTaskStatus() == EnemyHunt::TASK_COMPLETED)
-            {
-                //////////////////
-                // 完成任务后的奖励
-                //////////////////
-
-            };
+            //任务的奖励在任务类中实现
         }
         CCLOG("Start the Task...");
         });

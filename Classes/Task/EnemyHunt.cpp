@@ -2,6 +2,8 @@
 #include "Character/Hero/Hero.h"
 #include "Character/Enemy/Enemy.h"
 
+
+extern bool isTask3Completed ;
 // 构造函数
 EnemyHunt::EnemyHunt()
     : visible_size_(cocos2d::Size::ZERO),  // 可视区域大小初始化为零
@@ -132,6 +134,9 @@ void EnemyHunt::CompleteTask()
     task_status_ = TASK_COMPLETED;  // 设置任务状态为完成
     ShowMessage("Mission Success!");  // 显示任务成功消息
     CleanupUI();  // 清理UI
+
+    // 任务3完成，之后可以填写奖励
+    isTask3Completed = true;
 }
 
 // 任务失败

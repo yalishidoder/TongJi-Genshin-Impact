@@ -8,6 +8,8 @@
 
 #include "TreasureHunt.h"
 
+extern bool isTask2Completed;
+
  // 构造函数
 TreasureHunt::TreasureHunt()
     : 
@@ -207,6 +209,9 @@ void TreasureHunt::CompleteTask()
     cocos2d::Director::getInstance()->getScheduler()->unschedule("treasure_hunt_timer", this);  // 取消定时器
     ShowMessage("Mission Success!");  // 显示任务成功消息
     CleanupUI();  // 清理UI
+
+    // 完成任务2的奖励
+    isTask2Completed = true;
 }
 
 // 任务失败

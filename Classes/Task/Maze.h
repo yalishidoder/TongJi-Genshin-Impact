@@ -41,12 +41,13 @@ public:
     void StartTask();
 
     // 获取任务状态（是否成功/失败）
-    TaskStatus GetTaskStatus() const { return task_status_; }
+    bool GetTaskStatus() const;
 
 private:
     // 私有构造函数和析构函数
     Maze();
-    ~Maze();
+
+    virtual ~Maze();
 
     // 更新任务逻辑（计时和检测玩家位置）
     void UpdateTask(float delta);
@@ -83,7 +84,7 @@ private:
     std::string reward_;
 
     // 任务状态
-    TaskStatus task_status_;
+    bool task_status_=false;
 
     // 是否任务正在运行
     bool is_task_active_;
