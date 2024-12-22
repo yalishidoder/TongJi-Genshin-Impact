@@ -1,4 +1,4 @@
-#include "OtherScene.h"
+ï»¿#include "OtherScene.h"
 #include "Scene/MainScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
@@ -13,13 +13,13 @@ USING_NS_CC;
 extern bool isTask1Completed;
 extern bool isTask2Completed ;
 OtherScene::OtherScene()
-    : musicID(-1), pauseButton(nullptr)  // ³õÊ¼»¯ musicID ºÍ°´Å¥Îª nullptr
+    : musicID(-1), pauseButton(nullptr)  // åˆå§‹åŒ– musicID å’ŒæŒ‰é’®ä¸º nullptr
 {
 }
 
 OtherScene::~OtherScene()
 {
-    // ÇåÀíÒôÀÖ×ÊÔ´
+    // æ¸…ç†éŸ³ä¹èµ„æº
     cocos2d::experimental::AudioEngine::stop(musicID);
 }
 Scene* OtherScene::createScene(const std::string& mapFile)
@@ -49,26 +49,26 @@ bool OtherScene::init(const std::string& mapFile)
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     playBackgroundMusic();
-    // ´´½¨ÔİÍ£°´Å¥
+    // åˆ›å»ºæš‚åœæŒ‰é’®
     pauseButton = MenuItemImage::create(
-        "Scene/MainMenuScene/BGM_OFF.png",    // ÒôÀÖ¿ªÆôÊ±µÄÍ¼±ê
-        "Scene/MainMenuScene/BGM_ON.png",  // ÒôÀÖ¹Ø±ÕÊ±µÄÍ¼±ê
-        CC_CALLBACK_1(OtherScene::pauseMusicCallback, this) // µã»÷»Øµ÷
+        "Scene/MainMenuScene/BGM_OFF.png",    // éŸ³ä¹å¼€å¯æ—¶çš„å›¾æ ‡
+        "Scene/MainMenuScene/BGM_ON.png",  // éŸ³ä¹å…³é—­æ—¶çš„å›¾æ ‡
+        CC_CALLBACK_1(OtherScene::pauseMusicCallback, this) // ç‚¹å‡»å›è°ƒ
     );
 
-    // ¼ì²é°´Å¥ÊÇ·ñ¼ÓÔØ³É¹¦
+    // æ£€æŸ¥æŒ‰é’®æ˜¯å¦åŠ è½½æˆåŠŸ
     if (pauseButton)
     {
         float x = Director::getInstance()->getVisibleSize().width - pauseButton->getContentSize().width / 2 -16-40;
-        float y = pauseButton->getContentSize().height / 2 + 16;  // ÊÓÍ¼ÓÒÏÂ½ÇÎ»ÖÃ
+        float y = pauseButton->getContentSize().height / 2 + 16;  // è§†å›¾å³ä¸‹è§’ä½ç½®
         pauseButton->setPosition(Vec2(x, y));
 
-        auto menu = Menu::create(pauseButton, nullptr);  // ´´½¨²Ëµ¥²¢½«°´Å¥Ìí¼Ó½øÈ¥
-        menu->setPosition(Vec2::ZERO);  // ²Ëµ¥Î»ÖÃÎªÄ¬ÈÏ
-        this->addChild(menu, 1);  // Ìí¼Ó²Ëµ¥µ½³¡¾°ÖĞ
+        auto menu = Menu::create(pauseButton, nullptr);  // åˆ›å»ºèœå•å¹¶å°†æŒ‰é’®æ·»åŠ è¿›å»
+        menu->setPosition(Vec2::ZERO);  // èœå•ä½ç½®ä¸ºé»˜è®¤
+        this->addChild(menu, 1);  // æ·»åŠ èœå•åˆ°åœºæ™¯ä¸­
     }
     /////////////////////////////
-    // Ìí¼ÓÒ»¸öÍË³ö°´Å¥    this->addChild(menu, 1);
+    // æ·»åŠ ä¸€ä¸ªé€€å‡ºæŒ‰é’®    this->addChild(menu, 1);
     /////////////////////////////
     auto closeItem = MenuItemImage::create(
         "CloseNormal.png",
@@ -93,7 +93,7 @@ bool OtherScene::init(const std::string& mapFile)
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
     /////////////////////
-    //¼ÓÔØµØÍ¼
+    //åŠ è½½åœ°å›¾
     ////////////////////
     std::string file = "Scene/othermap/" + mapFile;
     othermap = TMXTiledMap::create(file);
@@ -109,13 +109,13 @@ bool OtherScene::init(const std::string& mapFile)
 
     this->addChild(othermap);
     //////////////////////////
-    // µØÍ¼×óÏÂ½ÇÔÚÆÁÄ»ÉÏµÄÊµ¼ÊÎ»ÖÃ
+    // åœ°å›¾å·¦ä¸‹è§’åœ¨å±å¹•ä¸Šçš„å®é™…ä½ç½®
     float othermapOriginX = othermap->getPositionX() - (othermap->getContentSize().width * othermap->getScale() * othermap->getAnchorPoint().x);
     float othermapOriginY = othermap->getPositionY() - (othermap->getContentSize().height * othermap->getScale() * othermap->getAnchorPoint().y);
     /////////////////////////
 
     ///////////////////////////
-    // Ìí¼ÓÒ»¸ö±êÇ© 
+    // æ·»åŠ ä¸€ä¸ªæ ‡ç­¾ 
     //////////////////////////
     auto label = Label::createWithTTF(mapFile, "fonts/Marker Felt.ttf", 24);
     if (label == nullptr)
@@ -128,8 +128,11 @@ bool OtherScene::init(const std::string& mapFile)
             origin.y + visibleSize.height - label->getContentSize().height));
         this->addChild(label, 1);
     }
+
+    EnemyManager::getInstance()->setSceneID("OtherScene");
+
     //////////////////
-    //¼ÓÔØ½ÇÉ«
+    //åŠ è½½è§’è‰²
     //////////////////
     auto objectGroup_flag = othermap->getObjectGroup("flag");
     if (objectGroup_flag) {
@@ -138,25 +141,25 @@ bool OtherScene::init(const std::string& mapFile)
             float x = firstFlag["x"].asFloat();
             float y = firstFlag["y"].asFloat();
             CCLOG("Character spawn position: x = %.2f, y = %.2f", x, y);
-            // ´´½¨½ÇÉ«²¢·ÅÖÃÔÚ³öÉúÎ»ÖÃ
+            // åˆ›å»ºè§’è‰²å¹¶æ”¾ç½®åœ¨å‡ºç”Ÿä½ç½®
             auto hero = Hero::create(Vec2(500, 500));
             if (hero) {
                 hero->loadProfile("hero.txt");
-                hero->setName("hero"); // ÉèÖÃ½ÇÉ«Ãû³Æ
+                hero->setName("hero"); // è®¾ç½®è§’è‰²åç§°
                 hero->setCharacterName("CaiXuKun");
                 hero->setAnchorPoint(Vec2(0.5f, 0.15f));
-                // ÉèÖÃÔªËØÁ¦
+                // è®¾ç½®å…ƒç´ åŠ›
                 hero->setElement(CharacterElement::ICE);
 
-                // ½«½ÇÉ«´«ËÍµ½ firstflag µÄÎ»ÖÃ
-                // ¼ÆËã³öfirstflagµÄÆÁÄ»×ø±ê
-                float adjustedX = othermapOriginX + x * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-                float adjustedY = othermapOriginY + y * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+                // å°†è§’è‰²ä¼ é€åˆ° firstflag çš„ä½ç½®
+                // è®¡ç®—å‡ºfirstflagçš„å±å¹•åæ ‡
+                float adjustedX = othermapOriginX + x * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+                float adjustedY = othermapOriginY + y * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
 
                 hero->setPosition(Vec2(adjustedX, adjustedY));
-                this->addChild(hero);  // ½«½ÇÉ«Ìí¼Óµ½³¡¾°ÖĞ
+                this->addChild(hero);  // å°†è§’è‰²æ·»åŠ åˆ°åœºæ™¯ä¸­
 
-                // ´´½¨Íæ¼ÒÃæ°å
+                // åˆ›å»ºç©å®¶é¢æ¿
                 m_playerPanel = PlayerPanel::create();
                 if (m_playerPanel) {
                     m_playerPanel->setName("m_playerPanel");
@@ -167,47 +170,39 @@ bool OtherScene::init(const std::string& mapFile)
                     this->addChild(m_playerPanel, 11);
                 }
             }
-            // ´´½¨ÑªÌõ±³¾°
+            // åˆ›å»ºè¡€æ¡èƒŒæ™¯
             auto healthBg = Sprite::create("Character/Hero/health_bg.png");
             if (healthBg) {
-                healthBg->setName("healthBg"); // ÉèÖÃÃû×Ö
+                healthBg->setName("healthBg"); // è®¾ç½®åå­—
                 healthBg->setPosition(Vec2(500, 50));
                 healthBg->setOpacity(128);
                 this->addChild(healthBg);
             }
 
-            // ´´½¨ÑªÌõÌî³ä
+            // åˆ›å»ºè¡€æ¡å¡«å……
             auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
             if (healthFill) {
-                healthFill->setName("healthFill"); // ÉèÖÃÃû×Ö
+                healthFill->setName("healthFill"); // è®¾ç½®åå­—
                 healthFill->setPosition(Vec2(500, 50));
                 healthFill->setOpacity(128);
                 this->addChild(healthFill);
             }
 
-            // ´´½¨µÈ¼¶Label
+            // åˆ›å»ºç­‰çº§Label
             auto levelLabel = Label::createWithTTF("Lv 1", "fonts/Marker Felt.ttf", 24);
             if (levelLabel) {
-                levelLabel->setName("levelLabel"); // ÉèÖÃÃû×Ö
+                levelLabel->setName("levelLabel"); // è®¾ç½®åå­—
                 levelLabel->setPosition(Vec2(500, 100));
                 this->addChild(levelLabel);
             }
-            //´´½¨µĞÈË
-            std::vector<Vec2>initposition;//´´½¨µÄµĞÈËÎ»ÖÃ
+            //åˆ›å»ºæ•Œäºº
+            std::vector<Vec2>initposition;//åˆ›å»ºçš„æ•Œäººä½ç½®
             if (mapname == "forest.tmx") {
                 initposition = {
                     {940,268},
                     {436,608},
                     {570,232},
                     {370,742}
-                };
-            }
-            if (mapname == "desert.tmx") {
-                initposition = {
-                    {500,546},
-                    {500,136},
-                    {830,478},
-                    {840,138},
                 };
             }
             if (mapname == "town.tmx") {
@@ -220,25 +215,33 @@ bool OtherScene::init(const std::string& mapFile)
                     {814,166}
                 };
             }
+            if (mapname == "desert.tmx") {
+                initposition = {
+                    {500,546},
+                    {500,136},
+                    {830,478},
+                    {840,138},
+                };
+            }
             for (int i = 0; i < initposition.size(); i++) {
                 auto demon = Enemy::create(initposition[i]);
                 if (demon) {
-                    demon->setName("demon"); // ÉèÖÃ½ÇÉ«Ãû³Æ
+                    demon->setName("demon"); // è®¾ç½®è§’è‰²åç§°
                     demon->setAnchorPoint(Vec2(0.5f, 0.5f));
-                    demon->setPlayer(hero);  //ÉèÖÃÍæ¼Ò
-                    demon->setPatrolRange(150.0f, 300.0f);   //ÉèÖÃÑ²Âß·¶Î§
+                    demon->setPlayer(hero);  //è®¾ç½®ç©å®¶
+                    demon->setPatrolRange(150.0f, 300.0f);   //è®¾ç½®å·¡é€»èŒƒå›´
                     demon->setRadius(100.0f);
-                    demon->setInitData(10); //¸ù¾İµĞÈËµÈ¼¶³õÊ¼»¯Êı¾İ (±ğÌ«´ó£¬»áÒç³ö)
-                    demon->setElement(CharacterElement::WATER);   // ³õÊ¼»¯ÊôĞÔ
-                    // ¼ÆËã³öÉúµãµÄÆÁÄ»×ø±ê
-                    float adjustedX = othermapOriginX + initposition[i].x; // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-                    float adjustedY = othermapOriginX + initposition[i].y; // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+                    demon->setInitData(10); //æ ¹æ®æ•Œäººç­‰çº§åˆå§‹åŒ–æ•°æ® (åˆ«å¤ªå¤§ï¼Œä¼šæº¢å‡º)
+                    demon->setElement(CharacterElement::WATER);   // åˆå§‹åŒ–å±æ€§
+                    // è®¡ç®—å‡ºç”Ÿç‚¹çš„å±å¹•åæ ‡
+                    float adjustedX = othermapOriginX + initposition[i].x; // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+                    float adjustedY = othermapOriginX + initposition[i].y; // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
 
-                    // ÉèÖÃÈËÎïÎ»ÖÃ
+                    // è®¾ç½®äººç‰©ä½ç½®
                     demon->setPosition(Vec2(adjustedX, adjustedY));
 
-                    this->addChild(demon);  // ½«½ÇÉ«Ìí¼Óµ½³¡¾°ÖĞ
-                    // ½«µĞÈË¶ÔÏóÌí¼Óµ½ enemies ÏòÁ¿ÖĞ
+                    this->addChild(demon);  // å°†è§’è‰²æ·»åŠ åˆ°åœºæ™¯ä¸­
+                    // å°†æ•Œäººå¯¹è±¡æ·»åŠ åˆ° enemies å‘é‡ä¸­
                     enemies.push_back(demon);
                 }
             }
@@ -251,61 +254,61 @@ bool OtherScene::init(const std::string& mapFile)
         CCLOG("Failed to load objectGroup-flag");
     }
 
-    // ¶ÁÈ¡³¡¾°ÖĞµÄµØÍ¼´«ËÍµãÎ»ÖÃ
+    // è¯»å–åœºæ™¯ä¸­çš„åœ°å›¾ä¼ é€ç‚¹ä½ç½®
     auto objectGroup_SceneSwitchPoints = othermap->getObjectGroup("SceneSwitchPoints");
     if (objectGroup_SceneSwitchPoints) {
         for (auto& obj : objectGroup_SceneSwitchPoints->getObjects()) {
             Vec2 switchPos(obj.asValueMap()["x"].asFloat(), obj.asValueMap()["y"].asFloat());
             CCLOG("before Switch Position: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
-            //ÓÉÓÚµØÍ¼µÄÎ»ÖÃÔ­µãµÄ¸Ä±ä£¬ĞèÒª½«´Ótmx¶Á³öÀ´µÄ×ø±ê½øĞĞµ÷Õû
-            float adjustedX_sw = othermapOriginX + switchPos.x * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-            float adjustedY_sw = othermapOriginY + switchPos.y * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+            //ç”±äºåœ°å›¾çš„ä½ç½®åŸç‚¹çš„æ”¹å˜ï¼Œéœ€è¦å°†ä»tmxè¯»å‡ºæ¥çš„åæ ‡è¿›è¡Œè°ƒæ•´
+            float adjustedX_sw = othermapOriginX + switchPos.x * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+            float adjustedY_sw = othermapOriginY + switchPos.y * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
             switchPos.x = adjustedX_sw;
             switchPos.y = adjustedY_sw;
-            //Êä³ö´«ËÍµãÎ»ÖÃ
+            //è¾“å‡ºä¼ é€ç‚¹ä½ç½®
             CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
             
-            // ¶ÁÈ¡Ä¿±êµØÍ¼Ãû³Æ
+            // è¯»å–ç›®æ ‡åœ°å›¾åç§°
             std::string targetMap = obj.asValueMap()["targetMap"].asString();
-            // Êä³ö´«ËÍµãÄ¿µÄµØµ÷ÊÔĞÅÏ¢
+            // è¾“å‡ºä¼ é€ç‚¹ç›®çš„åœ°è°ƒè¯•ä¿¡æ¯
             CCLOG("targetMap: %s", targetMap.c_str());
 
-            // ¶ÁÈ¡ no_position ÊôĞÔ²¢½âÎöÎª Vec2
+            // è¯»å– no_position å±æ€§å¹¶è§£æä¸º Vec2
             std::string noPositionStr = obj.asValueMap()["no_position"].asString();
             CCLOG("noPositionStr: %s", noPositionStr.c_str());
             Vec2 noPosition;
             std::istringstream noPosStream(noPositionStr);
-            noPosStream >> noPosition.x >> noPosition.y; // Ê¹ÓÃ¿Õ¸ñ½âÎö³öÁ½¸ö×ø±êÖµ
+            noPosStream >> noPosition.x >> noPosition.y; // ä½¿ç”¨ç©ºæ ¼è§£æå‡ºä¸¤ä¸ªåæ ‡å€¼
             CCLOG("before No Position: x = %.2f, y = %.2f", noPosition.x, noPosition.y);
-            //ÓÉÓÚµØÍ¼µÄÎ»ÖÃÔ­µãµÄ¸Ä±ä£¬ĞèÒª½«´Ótmx¶Á³öÀ´µÄ×ø±ê½øĞĞµ÷Õû
-            float adjustedX_no = othermapOriginX + noPosition.x * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-            float adjustedY_no = othermapOriginY + noPosition.y * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+            //ç”±äºåœ°å›¾çš„ä½ç½®åŸç‚¹çš„æ”¹å˜ï¼Œéœ€è¦å°†ä»tmxè¯»å‡ºæ¥çš„åæ ‡è¿›è¡Œè°ƒæ•´
+            float adjustedX_no = othermapOriginX + noPosition.x * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+            float adjustedY_no = othermapOriginY + noPosition.y * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
             noPosition.x = adjustedX_no;
             noPosition.y = adjustedY_no;
-            // Êä³ö¾Ü¾ø´«ËÍºóµÄÎ»ÖÃµ÷ÊÔĞÅÏ¢
+            // è¾“å‡ºæ‹’ç»ä¼ é€åçš„ä½ç½®è°ƒè¯•ä¿¡æ¯
             CCLOG("actual No Position: x = %.2f, y = %.2f", noPosition.x, noPosition.y);
 
-            // ´æ´¢µ½ sceneSwitchPoints
+            // å­˜å‚¨åˆ° sceneSwitchPoints
             sceneSwitchPoints.push_back({ switchPos, targetMap, noPosition });
         }
     }
-    //** ¶ÁÈ¡³¡¾°ÖĞµÄÎ»ÖÃ´«ËÍµãÎ»ÖÃ
+    //** è¯»å–åœºæ™¯ä¸­çš„ä½ç½®ä¼ é€ç‚¹ä½ç½®
     auto objectGroup_PositionSwitchPoints = othermap->getObjectGroup("PositionSwitchPoints");
     if (objectGroup_PositionSwitchPoints) {
         for (auto& obj : objectGroup_PositionSwitchPoints->getObjects()) {
             Vec2 switchPos(obj.asValueMap()["x"].asFloat(), obj.asValueMap()["y"].asFloat());
-            //ÓÉÓÚµØÍ¼µÄÎ»ÖÃÔ­µãµÄ¸Ä±ä£¬ĞèÒª½«´Ótmx¶Á³öÀ´µÄ×ø±ê½øĞĞµ÷Õû
-            float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-            float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+            //ç”±äºåœ°å›¾çš„ä½ç½®åŸç‚¹çš„æ”¹å˜ï¼Œéœ€è¦å°†ä»tmxè¯»å‡ºæ¥çš„åæ ‡è¿›è¡Œè°ƒæ•´
+            float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+            float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
             switchPos.x = adjustedX;
             switchPos.y = adjustedY;
-            //Êä³ö´«ËÍµãÎ»ÖÃ
+            //è¾“å‡ºä¼ é€ç‚¹ä½ç½®
             CCLOG("PositionSwitchPoints: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
-            // ´æ´¢µ½ sceneSwitchPoints
+            // å­˜å‚¨åˆ° sceneSwitchPoints
             positionSwitchPoints.push_back({ switchPos });
         }
     }
-    // ´Ó MapManager ¼ÓÔØ´æµµµÄ´«ËÍµã×´Ì¬
+    // ä» MapManager åŠ è½½å­˜æ¡£çš„ä¼ é€ç‚¹çŠ¶æ€
     if (mapname == "forest.tmx") {
         auto savedSwitchPoints = MapManager::getInstance()->getforestSwitchPoints();
         for (size_t i = 0; i < savedSwitchPoints.size(); ++i) {
@@ -332,60 +335,60 @@ bool OtherScene::init(const std::string& mapFile)
         }
 
     }
-    //ÈÎÎñµã¶ÁÈ¡
+    //ä»»åŠ¡ç‚¹è¯»å–
     auto objectGroup_taskStartPosition = othermap->getObjectGroup("task_start");
     if (objectGroup_taskStartPosition) {
         ValueMap taskStartData = objectGroup_taskStartPosition->getObject("task_start");
         Vec2 switchPos(taskStartData["x"].asFloat(), taskStartData["y"].asFloat());
-        //ÓÉÓÚµØÍ¼µÄÎ»ÖÃÔ­µãµÄ¸Ä±ä£¬ĞèÒª½«´Ótmx¶Á³öÀ´µÄ×ø±ê½øĞĞµ÷Õû
-        float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-        float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+        //ç”±äºåœ°å›¾çš„ä½ç½®åŸç‚¹çš„æ”¹å˜ï¼Œéœ€è¦å°†ä»tmxè¯»å‡ºæ¥çš„åæ ‡è¿›è¡Œè°ƒæ•´
+        float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+        float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
         switchPos.x = adjustedX;
         switchPos.y = adjustedY;
-        //Êä³öÈÎÎñÁìÈ¡µãÎ»ÖÃ
+        //è¾“å‡ºä»»åŠ¡é¢†å–ç‚¹ä½ç½®
         CCLOG("PositionSwitchPoints: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
-        // ´æ´¢µ½ taskStartPosition
+        // å­˜å‚¨åˆ° taskStartPosition
         taskStartPosition = switchPos;
     }
-    //ÈÎÎñ½áÊøµã¶ÁÈ¡
+    //ä»»åŠ¡ç»“æŸç‚¹è¯»å–
     auto objectGroup_taskEndPosition = othermap->getObjectGroup("task_end");
     if (objectGroup_taskEndPosition) {
         ValueMap taskStartData = objectGroup_taskEndPosition->getObject("task_end");
         Vec2 switchPos(taskStartData["x"].asFloat(), taskStartData["y"].asFloat());
-        //ÓÉÓÚµØÍ¼µÄÎ»ÖÃÔ­µãµÄ¸Ä±ä£¬ĞèÒª½«´Ótmx¶Á³öÀ´µÄ×ø±ê½øĞĞµ÷Õû
-        float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ x Æ«ÒÆ
-        float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // µØÍ¼×óÏÂ½Ç + ³öÉúµãµÄ y Æ«ÒÆ
+        //ç”±äºåœ°å›¾çš„ä½ç½®åŸç‚¹çš„æ”¹å˜ï¼Œéœ€è¦å°†ä»tmxè¯»å‡ºæ¥çš„åæ ‡è¿›è¡Œè°ƒæ•´
+        float adjustedX = othermapOriginX + switchPos.x * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ x åç§»
+        float adjustedY = othermapOriginY + switchPos.y * othermap->getScale(); // åœ°å›¾å·¦ä¸‹è§’ + å‡ºç”Ÿç‚¹çš„ y åç§»
         switchPos.x = adjustedX;
         switchPos.y = adjustedY;
-        //Êä³öÈÎÎñ½áÊøµãÎ»ÖÃ
+        //è¾“å‡ºä»»åŠ¡ç»“æŸç‚¹ä½ç½®
         CCLOG("taskEndPosition: x = %.2f, y = %.2f", switchPos.x, switchPos.y);
-        // ´æ´¢µ½ taskEndPosition
+        // å­˜å‚¨åˆ° taskEndPosition
         taskEndPosition = switchPos;
     }
 
 
  //////////////////////////////
- // Ìí¼ÓĞ¡µØÍ¼
+ // æ·»åŠ å°åœ°å›¾
  /////////////////////////////
     auto miniMap = MiniMap::create(othermap, file, visibleSize, this);
     this->addChild(miniMap, 1);
 
-    // Ìí¼Ó¼üÅÌÊÂ¼ş¼àÌıÆ÷
+    // æ·»åŠ é”®ç›˜äº‹ä»¶ç›‘å¬å™¨
     auto listener = cocos2d::EventListenerKeyboard::create();
     listener->onKeyPressed = CC_CALLBACK_2(OtherScene::onKeyPressed, this);
     listener->onKeyReleased = CC_CALLBACK_2(OtherScene::onKeyReleased, this);
 
-    // ½«¼àÌıÆ÷Ìí¼Óµ½ÊÂ¼ş·Ö·¢Æ÷
+    // å°†ç›‘å¬å™¨æ·»åŠ åˆ°äº‹ä»¶åˆ†å‘å™¨
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-    // Ìí¼ÓÊó±êÊÂ¼ş¼àÌıÆ÷
+    // æ·»åŠ é¼ æ ‡äº‹ä»¶ç›‘å¬å™¨
     auto mouseListener = cocos2d::EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(OtherScene::onMouseDown, this);
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     mouseListener->onMouseMove = CC_CALLBACK_1(Hero::onMouseMove, hero);
 
-    // ½«¼àÌıÆ÷Ìí¼Óµ½ÊÂ¼ş·Ö·¢Æ÷
+    // å°†ç›‘å¬å™¨æ·»åŠ åˆ°äº‹ä»¶åˆ†å‘å™¨
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-    // ×¢²á update º¯Êı£¬ÈÃËüÃ¿Ò»Ö¡¶¼±»µ÷ÓÃ
+    // æ³¨å†Œ update å‡½æ•°ï¼Œè®©å®ƒæ¯ä¸€å¸§éƒ½è¢«è°ƒç”¨
     this->schedule([this](float dt) {
         this->update(dt);
         }, "update_key");
@@ -408,6 +411,7 @@ void OtherScene::update(float dt)
 #endif
     Node::update(dt);
 
+    EnemyManager::getInstance()->update(dt);
 
     auto children = getChildren();
     for (auto child : children) {
@@ -416,18 +420,18 @@ void OtherScene::update(float dt)
         if (character) {
             character->update(dt);
             if (character) {
-                //¸üĞÂ½ÇÉ«Ïà¹ØµÄui
-                // ¸üĞÂÑªÌõ
+                //æ›´æ–°è§’è‰²ç›¸å…³çš„ui
+                // æ›´æ–°è¡€æ¡
                 float healthRatio = character->CharacterBase::getHealth() / float(character->CharacterBase::getMaxHealth());
                 auto healthFill = dynamic_cast<Sprite*>(this->getChildByName("healthFill"));
                 if (healthFill)
                     healthFill->setScaleX(healthRatio);
 
-                // ¸üĞÂµÈ¼¶Label
+                // æ›´æ–°ç­‰çº§Label
                 auto levelLabel = dynamic_cast<Label*>(this->getChildByName("levelLabel"));
                 if (levelLabel)
                     levelLabel->setString(StringUtils::format("Lv %d", character->CharacterBase::getLevel()));
-                // Êä³öµ±Ç°½ÇÉ«µÈ¼¶
+                // è¾“å‡ºå½“å‰è§’è‰²ç­‰çº§
                 //CCLOG("hero level : %d", character->CharacterBase::getLevel());
             }
         }
@@ -436,16 +440,16 @@ void OtherScene::update(float dt)
         }
     }
     //////////////////////
-    //ÈËÎïÅöµ½µØÍ¼ÇĞ»»µã
+    //äººç‰©ç¢°åˆ°åœ°å›¾åˆ‡æ¢ç‚¹
     //////////////////////
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (hero) {
         for (auto& switchPoint : sceneSwitchPoints) {
-            //ÅĞ¶ÏµØÍ¼´«ËÍµãºÍÈËÎïÊÇ·ñÅö×²
-         // Ìø¹ıÎ´¼¤»îµÄ´«ËÍµã
+            //åˆ¤æ–­åœ°å›¾ä¼ é€ç‚¹å’Œäººç‰©æ˜¯å¦ç¢°æ’
+         // è·³è¿‡æœªæ¿€æ´»çš„ä¼ é€ç‚¹
             if (!switchPoint.isActive) continue;
 
-            // ÅĞ¶ÏÊÇ·ñÓĞµ¯´°ÕıÔÚÏÔÊ¾
+            // åˆ¤æ–­æ˜¯å¦æœ‰å¼¹çª—æ­£åœ¨æ˜¾ç¤º
             if (!isDialogActive && hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
                 isDialogActive = true;
 
@@ -468,35 +472,37 @@ void OtherScene::update(float dt)
                 noButton->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(50, -20));
                 dialog->addChild(noButton);
 
-                // Yes °´Å¥µÄ»Øµ÷
+                // Yes æŒ‰é’®çš„å›è°ƒ
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
+                    EnemyManager::getInstance()->clearScene("OtherScene");
+
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
                     CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
-                    // ²¥·Åµã»÷ÒôĞ§
+                    // æ’­æ”¾ç‚¹å‡»éŸ³æ•ˆ
                     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
 
                     hero->saveProfile("hero.txt");
                     dialog->removeFromParent();
-                    isDialogActive = false; // »Ö¸´±êÖ¾Î»
+                    isDialogActive = false; // æ¢å¤æ ‡å¿—ä½
                     if (switchPoint.targetMap == "mainmap.tmx") {
                         stopBackgroundMusic();
                         Director::getInstance()->pushScene(MainScene::createScene());
                     }
                     });
 
-                // No °´Å¥µÄ»Øµ÷
+                // No æŒ‰é’®çš„å›è°ƒ
                 noButton->addClickEventListener([=, &switchPoint](Ref* sender) {
                     CCLOG("User selected NO. Dialog removed.");
-                    // ²¥·Åµã»÷ÒôĞ§
+                    // æ’­æ”¾ç‚¹å‡»éŸ³æ•ˆ
                     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
 
                     if (dialog) {
                         dialog->removeFromParent();
-                        // »Ö¸´±êÖ¾Î»
+                        // æ¢å¤æ ‡å¿—ä½
                         isDialogActive = false;
                     }
 
-                    // ½«½ÇÉ«ÒÆ³ö´«ËÍµã·¶Î§
+                    // å°†è§’è‰²ç§»å‡ºä¼ é€ç‚¹èŒƒå›´
                     //float offset = 100.0f;
                     hero->setPosition(switchPoint.no_position.x, switchPoint.no_position.y);
                     CCLOG("Hero moved out of teleport area to position (%.2f, %.2f)", hero->getPositionX(), hero->getPositionY());
@@ -506,22 +512,22 @@ void OtherScene::update(float dt)
         }
     }
     ////////////////////
-    //ÈËÎïÅöµ½Î»ÖÃ´«ËÍµã
+    //äººç‰©ç¢°åˆ°ä½ç½®ä¼ é€ç‚¹
     ////////////////////
     auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (player) {
-        // ÉèÖÃ´¥·¢·¶Î§°ë¾¶
+        // è®¾ç½®è§¦å‘èŒƒå›´åŠå¾„
         float triggerRadius = 50.0f;
-        Vec2 currentPosition = player->getPosition();  // »ñÈ¡½ÇÉ«µ±Ç°Î»ÖÃ
+        Vec2 currentPosition = player->getPosition();  // è·å–è§’è‰²å½“å‰ä½ç½®
         bool isInRange = false;
-        // ¼ì²â½ÇÉ«ÊÇ·ñ½øÈëÈÎºÎÒ»¸öspotµÄ·¶Î§
+        // æ£€æµ‹è§’è‰²æ˜¯å¦è¿›å…¥ä»»ä½•ä¸€ä¸ªspotçš„èŒƒå›´
         for (auto& spot : positionSwitchPoints) {
             if (currentPosition.distance(spot.position) < triggerRadius) {
                 isInRange = true;
 
-                // Èç¹û´«ËÍµãÎ´½âËø£¬½âËø¸Ã´«ËÍµã
+                // å¦‚æœä¼ é€ç‚¹æœªè§£é”ï¼Œè§£é”è¯¥ä¼ é€ç‚¹
                 if (!spot.isActive) {
-                    spot.isActive = true;  // ½âËø
+                    spot.isActive = true;  // è§£é”
                     if (mapname == "forest.tmx") {
                         MapManager::getInstance()->saveforestSwitchPoints(positionSwitchPoints);
                     }
@@ -536,43 +542,43 @@ void OtherScene::update(float dt)
                 break;
             }
         }
-        // Èç¹û½ÇÉ«½øÈë·¶Î§²¢°´ÏÂÁË E ¼ü
+        // å¦‚æœè§’è‰²è¿›å…¥èŒƒå›´å¹¶æŒ‰ä¸‹äº† E é”®
         if (isInRange && isKeyPressedE) {
             if (!isPopupVisible) {
-                // Èç¹ûµ¯´°Î´ÏÔÊ¾£¬ÔòÏÔÊ¾µ¯´°
+                // å¦‚æœå¼¹çª—æœªæ˜¾ç¤ºï¼Œåˆ™æ˜¾ç¤ºå¼¹çª—
                 showSelectionPopup_positionSwitchPoints();
-                isPopupVisible = true;  // ÉèÖÃµ¯´°Îª¿É¼û
+                isPopupVisible = true;  // è®¾ç½®å¼¹çª—ä¸ºå¯è§
                 CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
 
             }
         }
         else if (isPopupVisible && !isKeyPressedE) {
-            // Èç¹ûµ¯´°ÒÑÏÔÊ¾ÇÒÍæ¼ÒÃ»ÓĞ°´ÏÂE¼ü£¬Ôò¼ÌĞø¼àÌıE¼ü¹Ø±Õµ¯´°
+            // å¦‚æœå¼¹çª—å·²æ˜¾ç¤ºä¸”ç©å®¶æ²¡æœ‰æŒ‰ä¸‹Eé”®ï¼Œåˆ™ç»§ç»­ç›‘å¬Eé”®å…³é—­å¼¹çª—
             if (isKeyPressedE) {
-                hidePopup();  // Òş²Øµ¯´°
-                isPopupVisible = false;  // ÉèÖÃµ¯´°Îª²»¿É¼û
+                hidePopup();  // éšè—å¼¹çª—
+                isPopupVisible = false;  // è®¾ç½®å¼¹çª—ä¸ºä¸å¯è§
             }
         }
 
 
     }
     ////////////////////
-    //ÈËÎïÅöµ½ÈÎÎñ´¥·¢µã
+    //äººç‰©ç¢°åˆ°ä»»åŠ¡è§¦å‘ç‚¹
     ////////////////////
     auto player_task = dynamic_cast<Hero*>(this->getChildByName("hero"));
     if (player_task) {
-        // ÉèÖÃ´¥·¢·¶Î§°ë¾¶
+        // è®¾ç½®è§¦å‘èŒƒå›´åŠå¾„
         float triggerRadius = 50.0f;
-        Vec2 currentPosition = player_task->getPosition();  // »ñÈ¡½ÇÉ«µ±Ç°Î»ÖÃ
+        Vec2 currentPosition = player_task->getPosition();  // è·å–è§’è‰²å½“å‰ä½ç½®
         bool isInRange = false;
-        // ¼ì²â½ÇÉ«ÊÇ·ñ½øÈëÈÎÎñµãµÄ·¶Î§
+        // æ£€æµ‹è§’è‰²æ˜¯å¦è¿›å…¥ä»»åŠ¡ç‚¹çš„èŒƒå›´
         if (currentPosition.distance(taskStartPosition) < triggerRadius) {
             isInRange = true;
         }
-        // Èç¹û½ÇÉ«½øÈë·¶Î§²¢°´ÏÂÁË R ¼ü
+        // å¦‚æœè§’è‰²è¿›å…¥èŒƒå›´å¹¶æŒ‰ä¸‹äº† R é”®
         if (isInRange && isKeyPressedR&&!tasking) {
             if (!isTaskVisible) {
-                // ²¥·Åµã»÷ÒôĞ§
+                // æ’­æ”¾ç‚¹å‡»éŸ³æ•ˆ
                 if (mapname == "forest.tmx") {
                     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/npc_forest.mp3");
                 }
@@ -582,35 +588,41 @@ void OtherScene::update(float dt)
                 if (mapname == "town.tmx") {
                     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/npc_forest.mp3");
                 }
-                // Èç¹ûµ¯´°Î´ÏÔÊ¾£¬ÔòÏÔÊ¾µ¯´°
+                // å¦‚æœå¼¹çª—æœªæ˜¾ç¤ºï¼Œåˆ™æ˜¾ç¤ºå¼¹çª—
                 showSelectionPopup_taskStartPosition();
-                isTaskVisible = true;  // ÉèÖÃµ¯´°Îª¿É¼û
+                isTaskVisible = true;  // è®¾ç½®å¼¹çª—ä¸ºå¯è§
             }
         }
     }
     ////////////////////
-    //ÈËÎïÅöµ½ÈÎÎñ½áÊøµã
+    //äººç‰©ç¢°åˆ°ä»»åŠ¡ç»“æŸç‚¹
     ////////////////////
     if (mapname == "forest.tmx" || mapname == "desert.tmx") {
         auto player_taskend = dynamic_cast<Hero*>(this->getChildByName("hero"));
         if (player_taskend) {
-            // ÉèÖÃ´¥·¢·¶Î§°ë¾¶
+            // è®¾ç½®è§¦å‘èŒƒå›´åŠå¾„
             float triggerRadius = 50.0f;
-            Vec2 currentPosition = player_taskend->getPosition();  // »ñÈ¡½ÇÉ«µ±Ç°Î»ÖÃ
+            Vec2 currentPosition = player_taskend->getPosition();  // è·å–è§’è‰²å½“å‰ä½ç½®
             bool isInRange = false;
-            // ¼ì²â½ÇÉ«ÊÇ·ñ½øÈëÈÎÎñ½áÊøµãµÄ·¶Î§
+            // æ£€æµ‹è§’è‰²æ˜¯å¦è¿›å…¥ä»»åŠ¡ç»“æŸç‚¹çš„èŒƒå›´
             if (currentPosition.distance(taskEndPosition) < triggerRadius) {
                 isInRange = true;
             }
             if (isInRange && tasking) {
-                tasking = false;// ÈÎÎñ½áÊø
+                tasking = false;// ä»»åŠ¡ç»“æŸ
                 ///////////////////
-                //Ìí¼Ó·¢·Å½±Àø´úÂë
+                //æ·»åŠ å‘æ”¾å¥–åŠ±ä»£ç 
                 ///////////////////
                 if (mapname == "forest.tmx") {
                     positionSwitchPoints[2].isActive = true;
                 }
             }
+        }
+    }
+    auto protagonist = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (protagonist) {
+        if (isKeyPressedP) {
+            operatemyPanel();
         }
     }
 }
@@ -734,6 +746,8 @@ void OtherScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero && !(hero->m_isBulletChosen) && hero->m_isBulletGet)
+            hero->ChangeToBullet();
         if (hero && hero->m_isBulletChosen) {
             hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
         }
@@ -752,41 +766,41 @@ cocos2d::Vec2 OtherScene::TranslatePos(cocos2d::Vec2 origin)
     //auto map = dynamic_cast<TMXTiledMap*>(this->getChildByName("map"));
     float mapOriginX = othermap->getPositionX() - (othermap->getContentSize().width * othermap->getScale() * othermap->getAnchorPoint().x);
     float mapOriginY = othermap->getPositionY() - (othermap->getContentSize().height * othermap->getScale() * othermap->getAnchorPoint().y);
-    res.x = -mapOriginX + origin.x; // µØÍ¼×óÏÂ½Ç x Æ«ÒÆĞŞÕı
-    res.y = -origin.y + 768;           // µØÍ¼×óÏÂ½Ç y Æ«ÒÆĞŞÕı
+    res.x = -mapOriginX + origin.x; // åœ°å›¾å·¦ä¸‹è§’ x åç§»ä¿®æ­£
+    res.y = -origin.y + 768;           // åœ°å›¾å·¦ä¸‹è§’ y åç§»ä¿®æ­£
     return res;
 }
 
 bool OtherScene::checkCollision(cocos2d::Vec2 position)
 {
 
-    // »ñÈ¡ÍßÆ¬²ã£¨¼ÙÉèÇ½±Ú²ãµÄÃû×ÖÎª "WallLayer"£©
+    // è·å–ç“¦ç‰‡å±‚ï¼ˆå‡è®¾å¢™å£å±‚çš„åå­—ä¸º "WallLayer"ï¼‰
     TMXLayer* wallLayer = othermap->getLayer("WallLayer");
 
-    // »ñÈ¡Ä¿±êÎ»ÖÃµÄÍßÆ¬ID
+    // è·å–ç›®æ ‡ä½ç½®çš„ç“¦ç‰‡ID
     Vec2 tileCoord = tileCoordForPosition(position);
     int tileGID = wallLayer->getTileGIDAt(tileCoord);
 
-    // Èç¹ûÍßÆ¬ID´óÓÚ0£¬±íÊ¾¸ÃÎ»ÖÃÓĞÇ½±Ú
+    // å¦‚æœç“¦ç‰‡IDå¤§äº0ï¼Œè¡¨ç¤ºè¯¥ä½ç½®æœ‰å¢™å£
     if (tileGID != 0) {
-        return true;  // Åöµ½Ç½±Ú
+        return true;  // ç¢°åˆ°å¢™å£
     }
-    return false;  // Ã»ÓĞÅöµ½Ç½±Ú
+    return false;  // æ²¡æœ‰ç¢°åˆ°å¢™å£
 }
 cocos2d::Vec2 OtherScene::tileCoordForPosition(Vec2 position)
 {
     float x = position.x;
     float y = position.y;
 
-    // ¼ÙÉèÃ¿¸öÍßÆ¬µÄ´óĞ¡ÊÇ 16x16
-    int tileWidth = 16;  // Ã¿¸öÍßÆ¬µÄ¿í¶È
-    int tileHeight = 16; // Ã¿¸öÍßÆ¬µÄ¸ß¶È
+    // å‡è®¾æ¯ä¸ªç“¦ç‰‡çš„å¤§å°æ˜¯ 16x16
+    int tileWidth = 16;  // æ¯ä¸ªç“¦ç‰‡çš„å®½åº¦
+    int tileHeight = 16; // æ¯ä¸ªç“¦ç‰‡çš„é«˜åº¦
 
-    // ¼ÆËãÍßÆ¬×ø±ê
+    // è®¡ç®—ç“¦ç‰‡åæ ‡
     int tileX = (int)(x / tileWidth);
     int tileY = (int)((othermap->getMapSize().height * tileHeight - y) / tileHeight);
 
-    // Êä³öÍßÆ¬×ø±ê
+    // è¾“å‡ºç“¦ç‰‡åæ ‡
     CCLOG("Converting position (%.2f, %.2f) to tile coordinates: (%.2f, %.2f)", x, y, tileX, tileY);
 
     return Vec2(tileX, tileY);
@@ -796,77 +810,77 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
 {
 
     auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    auto popupLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // °ëÍ¸Ã÷ºÚÉ«±³¾°
-    this->addChild(popupLayer, 10);  // ½«Í¼²ãÌí¼Óµ½³¡¾°£¬²¢ÉèÖÃÏÔÊ¾ÓÅÏÈ¼¶
-    // ±éÀúËùÓĞspot£¬Éú³É°´Å¥
+    auto popupLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // åŠé€æ˜é»‘è‰²èƒŒæ™¯
+    this->addChild(popupLayer, 10);  // å°†å›¾å±‚æ·»åŠ åˆ°åœºæ™¯ï¼Œå¹¶è®¾ç½®æ˜¾ç¤ºä¼˜å…ˆçº§
+    // éå†æ‰€æœ‰spotï¼Œç”ŸæˆæŒ‰é’®
     for (const auto& spot : positionSwitchPoints) {
-        // Ö»ÓĞisActiveÎªtrueÊ±£¬²ÅÏÔÊ¾°´Å¥
+        // åªæœ‰isActiveä¸ºtrueæ—¶ï¼Œæ‰æ˜¾ç¤ºæŒ‰é’®
         if (spot.isActive) {
-            // ´´½¨°´Å¥£¬Ê¹ÓÃÍ¼Æ¬×÷Îª°´Å¥µÄ±³¾°
+            // åˆ›å»ºæŒ‰é’®ï¼Œä½¿ç”¨å›¾ç‰‡ä½œä¸ºæŒ‰é’®çš„èƒŒæ™¯
             auto button=cocos2d::MenuItemImage::create();
             if (mapname == "forest.tmx") {
                 auto button_forest = cocos2d::MenuItemImage::create(
-                    "Transfer_switch/Transfer_normal_forest.png",  // ÆÕÍ¨×´Ì¬µÄ°´Å¥Í¼Æ¬
-                    "Transfer_switch/Transfer_selected_forest.png",  // °´ÏÂ×´Ì¬µÄ°´Å¥Í¼Æ¬
-                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // ²¶»ñ player
+                    "Transfer_switch/Transfer_normal_forest.png",  // æ™®é€šçŠ¶æ€çš„æŒ‰é’®å›¾ç‰‡
+                    "Transfer_switch/Transfer_selected_forest.png",  // æŒ‰ä¸‹çŠ¶æ€çš„æŒ‰é’®å›¾ç‰‡
+                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // æ•è· player
                         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
 
-                        player->setPosition(spot.position);  // ´«ËÍ½ÇÉ«
-                        popupLayer->removeFromParent();  // Òş²Øµ¯´°
-                        isPopupVisible = false;  // ÉèÖÃµ¯´°Îª²»¿É¼û
+                        player->setPosition(spot.position);  // ä¼ é€è§’è‰²
+                        popupLayer->removeFromParent();  // éšè—å¼¹çª—
+                        isPopupVisible = false;  // è®¾ç½®å¼¹çª—ä¸ºä¸å¯è§
                     }
                 );
                 button = button_forest;
             }
             else if (mapname == "desert.tmx") {
                 auto button_desert = cocos2d::MenuItemImage::create(
-                    "Transfer_switch/Transfer_normal_desert.png",  // ÆÕÍ¨×´Ì¬µÄ°´Å¥Í¼Æ¬
-                    "Transfer_switch/Transfer_select_desert.png",  // °´ÏÂ×´Ì¬µÄ°´Å¥Í¼Æ¬
-                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // ²¶»ñ player
+                    "Transfer_switch/Transfer_normal_desert.png",  // æ™®é€šçŠ¶æ€çš„æŒ‰é’®å›¾ç‰‡
+                    "Transfer_switch/Transfer_select_desert.png",  // æŒ‰ä¸‹çŠ¶æ€çš„æŒ‰é’®å›¾ç‰‡
+                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // æ•è· player
                         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
 
-                        player->setPosition(spot.position);  // ´«ËÍ½ÇÉ«
-                        popupLayer->removeFromParent();  // Òş²Øµ¯´°
-                        isPopupVisible = false;  // ÉèÖÃµ¯´°Îª²»¿É¼û
+                        player->setPosition(spot.position);  // ä¼ é€è§’è‰²
+                        popupLayer->removeFromParent();  // éšè—å¼¹çª—
+                        isPopupVisible = false;  // è®¾ç½®å¼¹çª—ä¸ºä¸å¯è§
                     }
                 );
                 button = button_desert;
             }
             else if (mapname == "town.tmx") {
                 auto button_town = cocos2d::MenuItemImage::create(
-                    "Transfer_switch/Transfer_normal_town.png",  // ÆÕÍ¨×´Ì¬µÄ°´Å¥Í¼Æ¬
-                    "Transfer_switch/Transfer_selected_town.png",  // °´ÏÂ×´Ì¬µÄ°´Å¥Í¼Æ¬
-                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // ²¶»ñ player
+                    "Transfer_switch/Transfer_normal_town.png",  // æ™®é€šçŠ¶æ€çš„æŒ‰é’®å›¾ç‰‡
+                    "Transfer_switch/Transfer_selected_town.png",  // æŒ‰ä¸‹çŠ¶æ€çš„æŒ‰é’®å›¾ç‰‡
+                    [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // æ•è· player
                         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
 
-                        player->setPosition(spot.position);  // ´«ËÍ½ÇÉ«
-                        popupLayer->removeFromParent();  // Òş²Øµ¯´°
-                        isPopupVisible = false;  // ÉèÖÃµ¯´°Îª²»¿É¼û
+                        player->setPosition(spot.position);  // ä¼ é€è§’è‰²
+                        popupLayer->removeFromParent();  // éšè—å¼¹çª—
+                        isPopupVisible = false;  // è®¾ç½®å¼¹çª—ä¸ºä¸å¯è§
                     }
                 );
                 button = button_town;
             }
-            // ÉèÖÃ°´Å¥Î»ÖÃ
-            button->setPosition(spot.position);  // ½«°´Å¥Î»ÖÃÉèÖÃÎª´«ËÍµãµÄÎ»ÖÃ
+            // è®¾ç½®æŒ‰é’®ä½ç½®
+            button->setPosition(spot.position);  // å°†æŒ‰é’®ä½ç½®è®¾ç½®ä¸ºä¼ é€ç‚¹çš„ä½ç½®
 
-            // ´´½¨²Ëµ¥²¢½«°´Å¥Ìí¼Óµ½²Ëµ¥
+            // åˆ›å»ºèœå•å¹¶å°†æŒ‰é’®æ·»åŠ åˆ°èœå•
             auto menu = cocos2d::Menu::create(button, nullptr);
-            menu->setPosition(cocos2d::Vec2::ZERO);  // ½«²Ëµ¥µÄÔ­µãÉèÖÃÎª(0, 0)
-            popupLayer->addChild(menu);  // ½«²Ëµ¥Ìí¼Óµ½popupLayer
+            menu->setPosition(cocos2d::Vec2::ZERO);  // å°†èœå•çš„åŸç‚¹è®¾ç½®ä¸º(0, 0)
+            popupLayer->addChild(menu);  // å°†èœå•æ·»åŠ åˆ°popupLayer
         }
     }
 
-    // ÏÔÊ¾µ¯´°
+    // æ˜¾ç¤ºå¼¹çª—
     isPopupVisible = true;
 }
 
 void OtherScene::showSelectionPopup_taskStartPosition()
 {
     auto player = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    auto dialog = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // °ëÍ¸Ã÷ºÚÉ«±³¾°
-    this->addChild(dialog, 10);  // ½«Í¼²ãÌí¼Óµ½³¡¾°£¬²¢ÉèÖÃÏÔÊ¾ÓÅÏÈ¼¶
+    auto dialog = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // åŠé€æ˜é»‘è‰²èƒŒæ™¯
+    this->addChild(dialog, 10);  // å°†å›¾å±‚æ·»åŠ åˆ°åœºæ™¯ï¼Œå¹¶è®¾ç½®æ˜¾ç¤ºä¼˜å…ˆçº§
     Label* label = nullptr;
-    // ¸ù¾İ mapname ÉèÖÃ²»Í¬µÄ±êÇ©ÄÚÈİ
+    // æ ¹æ® mapname è®¾ç½®ä¸åŒçš„æ ‡ç­¾å†…å®¹
     if (mapname == "forest.tmx") {
         label = Label::createWithSystemFont("Do you want to start the task:\nComplete the maze within the time limit", "fonts/Marker Felt.ttf", 40);
     }
@@ -874,7 +888,7 @@ void OtherScene::showSelectionPopup_taskStartPosition()
         label = Label::createWithSystemFont("Do you want to start the task:\nCollect enough gems within a limited time", "fonts/Marker Felt.ttf", 40);
     }
     else if (mapname == "town.tmx") {
-        label = Label::createWithSystemFont("The town has been overrun by the bad guys T.T \nWarrior! would you like to help me save the town", "fonts/Marker Felt.ttf", 40); // Ä¬ÈÏ±êÇ©
+        label = Label::createWithSystemFont("The town has been overrun by the bad guys T.T \nWarrior! would you like to help me save the town", "fonts/Marker Felt.ttf", 40); // é»˜è®¤æ ‡ç­¾
     }
     label->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(0, 50));
     dialog->addChild(label);
@@ -891,70 +905,113 @@ void OtherScene::showSelectionPopup_taskStartPosition()
     noButton->setPosition(Director::getInstance()->getVisibleSize() / 2 + Size(50, -20));
     dialog->addChild(noButton);
 
-    // Yes °´Å¥µÄ»Øµ÷
+    // Yes æŒ‰é’®çš„å›è°ƒ
     yesButton->addClickEventListener([=](Ref* sender) {
-        // ²¥·Åµã»÷ÒôĞ§
+        // æ’­æ”¾ç‚¹å‡»éŸ³æ•ˆ
         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
         CCLOG("User selected YES. Starting the task...");
         tasking = true;
-        dialog->removeFromParent();  // ÒÆ³ı¶Ô»°¿ò
-        isTaskVisible = false;  // »Ö¸´±êÖ¾Î»
-        //**±íÊ¾ÊÇ·ñÔÚÈÎÎñ×´Ì¬
+        dialog->removeFromParent();  // ç§»é™¤å¯¹è¯æ¡†
+        isTaskVisible = false;  // æ¢å¤æ ‡å¿—ä½
+        //**è¡¨ç¤ºæ˜¯å¦åœ¨ä»»åŠ¡çŠ¶æ€
         tasking == true;
         /////////////////////////////
-        // ÕâÀï¿ªÊ¼ÈÎÎñ
+        // è¿™é‡Œå¼€å§‹ä»»åŠ¡
         /////////////////////////////
         if (mapname == "forest.tmx")
         {
-            // ´´½¨ÃÔ¹¬ÈÎÎñ½Úµã
-            // ÔÚ20ÃëÄÚÍê³ÉÃÔ¹¬ÈÎÎñ£¬¼´¿É»ñµÃ½±Àø
+            // åˆ›å»ºè¿·å®«ä»»åŠ¡èŠ‚ç‚¹
+            // åœ¨20ç§’å†…å®Œæˆè¿·å®«ä»»åŠ¡ï¼Œå³å¯è·å¾—å¥–åŠ±
             auto maze = Maze::Create("Forest Maze", taskStartPosition, taskEndPosition, 20.0f, "Unlock a new map! Get ranged weapons!", player);
             this->addChild(maze,10);
 
-            // Æô¶¯ÈÎÎñ
+            // å¯åŠ¨ä»»åŠ¡
             maze->StartTask();
-            //ÈÎÎñµÄ½±ÀøÔÚÈÎÎñÀàÖĞÊµÏÖ
+            //ä»»åŠ¡çš„å¥–åŠ±åœ¨ä»»åŠ¡ç±»ä¸­å®ç°
         }
         if (mapname == "desert.tmx")
         {
-            // ´´½¨ÃÔ¹¬ÈÎÎñ½Úµã
+            // åˆ›å»ºè¿·å®«ä»»åŠ¡èŠ‚ç‚¹
             auto treasure_hunt = TreasureHunt::create(Director::getInstance()->getVisibleSize(), othermap, player, taskStartPosition, taskEndPosition, 30,30.0f);
             this->addChild(treasure_hunt, 10);
 
-            // Æô¶¯ÈÎÎñ
+            // å¯åŠ¨ä»»åŠ¡
             treasure_hunt->StartTask();
 
-            //ÈÎÎñµÄ½±ÀøÔÚÈÎÎñÀàÖĞÊµÏÖ
+            //ä»»åŠ¡çš„å¥–åŠ±åœ¨ä»»åŠ¡ç±»ä¸­å®ç°
         }
         if (mapname == "town.tmx")
         {
             int em = get_enemies_num();
-            CCLOG("######get_enemies_num: %d", em); // Êä³öµ±Ç°µĞÈËÊı
+            CCLOG("######get_enemies_num: %d", em); // è¾“å‡ºå½“å‰æ•Œäººæ•°
             auto enemy_hunt = EnemyHunt::create(Director::getInstance()->getVisibleSize(),othermap, player, enemies, em);
             this->addChild(enemy_hunt, 10);
 
             enemy_hunt->StartTask();
             CCLOG("Start the Task...");
-            //ÈÎÎñµÄ½±ÀøÔÚÈÎÎñÀàÖĞÊµÏÖ
+            //ä»»åŠ¡çš„å¥–åŠ±åœ¨ä»»åŠ¡ç±»ä¸­å®ç°
         }
         CCLOG("Start the Task...");
         });
 
-    // No °´Å¥µÄ»Øµ÷
+    // No æŒ‰é’®çš„å›è°ƒ
     noButton->addClickEventListener([=](Ref* sender) {
-        // ²¥·Åµã»÷ÒôĞ§
+        // æ’­æ”¾ç‚¹å‡»éŸ³æ•ˆ
         CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
         CCLOG("User selected NO. Dialog removed.");
-        dialog->removeFromParent();  // ÒÆ³ı¶Ô»°¿ò
-        isTaskVisible = false;  // »Ö¸´±êÖ¾Î»
+        dialog->removeFromParent();  // ç§»é™¤å¯¹è¯æ¡†
+        isTaskVisible = false;  // æ¢å¤æ ‡å¿—ä½
         });
 }
 
 void OtherScene::hidePopup()
 {
-    // Òş²Øµ¯´°
+    // éšè—å¼¹çª—
     this->removeChildByName("popupLayer");
     isPopupVisible = false;
+}
+
+void OtherScene::showmyPanel()
+{
+    auto PanelLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½
+    PanelLayer->setName("PanelLayer");
+    this->addChild(PanelLayer, 10);
+}
+
+void OtherScene::hidemyPanel()
+{
+    this->removeChildByName("PanelLayer");
+    m_playerPanel->setVisible(!m_playerPanel->isVisible());
+    isPanelVisible = (m_playerPanel->isVisible());
+}
+
+void OtherScene::operatemyPanel()
+{
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (hero) {
+        if (m_playerPanel) {
+            m_playerPanel->setHero(hero);
+            //m_playerPanel->initUi();
+            m_playerPanel->updateInfo();
+            m_playerPanel->setVisible(!m_playerPanel->isVisible());
+            isPanelVisible = (m_playerPanel->isVisible());
+            CCLOG("Panel visibility set to: %d", m_playerPanel->isVisible());
+
+            showmyPanel();
+
+            auto closeButton_ = cocos2d::ui::Button::create("Character/panel/Close_Icon.png");
+            if (closeButton_) {
+                closeButton_->setPosition(Vec2(550, 550));
+                closeButton_->addClickEventListener([=](Ref* sender)
+                    {
+                        this->hidemyPanel();
+                    });
+                m_playerPanel->addChild(closeButton_);
+            }
+        }
+        else
+            CCLOG("m_playerPanel is null!");
+    }
 }
 
 int OtherScene::get_enemies_num()
@@ -975,7 +1032,7 @@ int OtherScene::get_enemies_num()
 
 void OtherScene::returnToLastScene()
 {
-    // Ê¹ÓÃ popScene ·µ»Øµ½Ö®Ç°µÄ³¡¾°
+    // ä½¿ç”¨ popScene è¿”å›åˆ°ä¹‹å‰çš„åœºæ™¯
     Director::getInstance()->popScene();
 }
 
@@ -998,15 +1055,15 @@ void OtherScene::playBackgroundMusic()
 {
     if (musicID == -1) {
         if (mapname == "forest.tmx") {
-            // ²¥·Å±³¾°ÒôÀÖ
+            // æ’­æ”¾èƒŒæ™¯éŸ³ä¹
             musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_forest.mp3", true, 0.5f);
         }
         if (mapname == "desert.tmx") {
-            // ²¥·Å±³¾°ÒôÀÖ
+            // æ’­æ”¾èƒŒæ™¯éŸ³ä¹
             musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_desert.mp3", true, 0.5f);
         }
         if (mapname == "town.tmx") {
-            // ²¥·Å±³¾°ÒôÀÖ
+            // æ’­æ”¾èƒŒæ™¯éŸ³ä¹
             musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_town.mp3", true, 0.5f);
         }
         if (musicID != -1) {
@@ -1063,18 +1120,18 @@ void OtherScene::stopBackgroundMusic()
 
 void OtherScene::pauseMusicCallback(Ref* pSender)
 {
-    // ¼ì²éµ±Ç°±³¾°ÒôÀÖµÄ×´Ì¬£¬½øĞĞÔİÍ£»ò»Ö¸´²Ù×÷
+    // æ£€æŸ¥å½“å‰èƒŒæ™¯éŸ³ä¹çš„çŠ¶æ€ï¼Œè¿›è¡Œæš‚åœæˆ–æ¢å¤æ“ä½œ
     auto state = cocos2d::experimental::AudioEngine::getState(musicID);
     if (state == cocos2d::experimental::AudioEngine::AudioState::PLAYING)
     {
         pauseBackgroundMusic();
-        pauseButton->setNormalImage(Sprite::create("Scene/MainMenuScene/BGM_ON.png"));  // ¸ÄÎª»Ö¸´°´Å¥Í¼±ê
+        pauseButton->setNormalImage(Sprite::create("Scene/MainMenuScene/BGM_ON.png"));  // æ”¹ä¸ºæ¢å¤æŒ‰é’®å›¾æ ‡
         CCLOG("Background music paused.");
     }
     else if (state == cocos2d::experimental::AudioEngine::AudioState::PAUSED)
     {
         resumeBackgroundMusic();
-        pauseButton->setNormalImage(Sprite::create("Scene/MainMenuScene/BGM_OFF.png"));  // ¸ÄÎªÔİÍ£°´Å¥Í¼±ê
+        pauseButton->setNormalImage(Sprite::create("Scene/MainMenuScene/BGM_OFF.png"));  // æ”¹ä¸ºæš‚åœæŒ‰é’®å›¾æ ‡
         CCLOG("Background music resumed.");
     }
     else

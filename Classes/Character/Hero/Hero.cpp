@@ -90,10 +90,10 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     weaponLabel = Label::createWithSystemFont("", "Arial", 14);
     if (weaponLabel) {
         labelPos.x += 30;
-        labelPos.y -= 20;
+        labelPos.y -= 20;;
         if (m_isBayonetChosen)
             weaponLabel->setString("Bayonet");
-        else
+        if (m_isBulletChosen && m_isBulletGet)
             weaponLabel->setString("Bullet");
         weaponLabel->setPosition(labelPos); 
         weaponLabel->setVisible(true);
@@ -422,8 +422,10 @@ void Hero::attackWithBullet(const Vec2& position)
 
 void Hero::attackWithBayonet(float angle)
 {
+    weaponLabel->setString("Bayonet");
     if (!m_bayonet)
     {
+       
         // 创建Bayonet实例
         m_bayonet = Bayonet::create("Weapon/bayonet.png");
         if (m_bayonet)
@@ -1068,11 +1070,12 @@ void Hero::ChangeToBayonet()
 {
     if (!m_isBayonetGet)
         return;
+    weaponLabel->setString("Bayonet");
     if (m_isBayonetChosen)
         return;
     else
     {
-        weaponLabel->setString("Bayonet");
+        
         if (!m_bayonet)
         {
             // 创建Bayonet实例
@@ -1210,6 +1213,7 @@ void Hero::SkillX()
 
                     if (bullet)
                     {
+                        bullet->setOwner(this);
                         // 为子弹设置纹理
                         switch (this->getElement()) {
                         case(CharacterElement::FIRE):
@@ -1299,6 +1303,7 @@ void Hero::SkillX()
                 auto bullet = Bullet::create(cocos2d::Vec2::ZERO, cocos2d::Vec2::ZERO, m_level);
                 if (bullet)
                 {
+                    bullet->setOwner(this);
                     bullet->setTexture("Weapon/bayonet.png");
                     // 设置飞刀的锚点  
                     bullet->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
@@ -1382,7 +1387,6 @@ void Hero::loadProfile(const std::string& filename) {
         file >> m_isBulletGet;
         file >> m_isBayonetChosen;
         file >> m_isBulletChosen;
-        file >> m_isXSkillUnlock;
         // 加载其他需要的信息
         file.close();
         CCLOG("Profile loaded successfully.");

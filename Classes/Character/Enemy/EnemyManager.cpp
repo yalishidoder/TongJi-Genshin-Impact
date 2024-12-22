@@ -1,6 +1,5 @@
 #include "EnemyManager.h"
 
-// 初始化单例实例
 EnemyManager* EnemyManager::s_instance = nullptr;
 
 EnemyManager* EnemyManager::getInstance() {
@@ -17,7 +16,7 @@ void EnemyManager::destroyInstance() {
     }
 }
 
-EnemyManager::EnemyManager() {
+EnemyManager::EnemyManager() : currentSceneID("") {
     // 初始化逻辑
 }
 
@@ -25,8 +24,20 @@ EnemyManager::~EnemyManager() {
     // 清理逻辑
 }
 
+void EnemyManager::setSceneID(const std::string& sceneID) {
+    currentSceneID = sceneID;
+}
+
+void EnemyManager::clearScene(const std::string& sceneID) {
+    spawnInfoMap.erase(sceneID);
+}
+
 void EnemyManager::registerEnemyDeath(Enemy* enemy) {
-    // 记录敌人死亡信息
+    if (currentSceneID.empty()) {
+        // 如果没有设置场景ID，不记录敌人死亡信息
+        return;
+    }
+
     EnemySpawnInfo info;
     info.position = enemy->getSpawnPoint();
     info.level = enemy->getLevel();
@@ -36,18 +47,22 @@ void EnemyManager::registerEnemyDeath(Enemy* enemy) {
     info.respawnTime = 5.0f; // 假设敌人5秒后重生
     info.elapsedTime = 0.0f;
 
-    spawnInfoList.push_back(info);
+    spawnInfoMap[currentSceneID].push_back(info);
 }
 
 void EnemyManager::update(float delta) {
-    // 遍历所有需要刷新的敌人
-    for (auto it = spawnInfoList.begin(); it != spawnInfoList.end(); ) {
+    if (currentSceneID.empty()) {
+        // 如果没有设置场景ID，不进行更新
+        return;
+    }
+
+    auto& spawnList = spawnInfoMap[currentSceneID];
+    for (auto it = spawnList.begin(); it != spawnList.end();) {
         it->elapsedTime += delta;
 
-        // 如果时间到了，生成敌人
         if (it->elapsedTime >= it->respawnTime) {
             spawnEnemy(*it);
-            it = spawnInfoList.erase(it); // 移除已经刷新的敌人信息
+            it = spawnList.erase(it); // 移除已经刷新的敌人信息
         }
         else {
             ++it;
@@ -56,14 +71,12 @@ void EnemyManager::update(float delta) {
 }
 
 void EnemyManager::spawnEnemy(const EnemySpawnInfo& info) {
-    // 创建并初始化敌人
     Enemy* enemy = Enemy::create(info.position);
     enemy->setInitData(info.level);
     enemy->setElement(info.element);
     enemy->setAttackMethods(info.attackMethod);
     enemy->setPlayer(info.player);
 
-    // 获取当前场景并添加敌人
     cocos2d::Scene* currentScene = cocos2d::Director::getInstance()->getRunningScene();
     if (currentScene) {
         currentScene->addChild(enemy);

@@ -112,7 +112,7 @@ public:
     
     // X技能相关
     void SkillX();
-    bool m_isXSkillUnlock = 0;
+    bool m_isXSkillUnlock = 1;
     float m_skillXCoolDownTime;     //冷却时间
     bool m_isSkillXOnCoolDown;      //是否冷却完毕
 

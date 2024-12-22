@@ -498,6 +498,8 @@ void Enemy::attackWithPunch()
         return;
     }
 
+    isAttacking = true;
+
     // 播放动画
     // 根据当前方向选择动画名称
     std::string animationName;
@@ -515,14 +517,16 @@ void Enemy::attackWithPunch()
             animationName = "attack_right_enemy";
             break;
         default:
-            animationName = "attack_down_enemy";
+            animationName = "walk_up_enemy";
             break;
     }
 
     // 播放攻击动画，并设置完成回调
     playAnimation(animationName);
-
     checkAndHandleCollision();
+
+    isAttacking = false;
+
     // 重置冷却时间
     remainingCooldown = attackCooldown;
     CCLOG("Enemy attacks with power %d", m_attackPower);
@@ -763,9 +767,9 @@ void Enemy::stayLogic(float& distanceToPlayer)
     {
         currentState = EnemyState::PATROL;
     }
-    else
+    else 
     {
-        attackWithPunch();
+       attackWithPunch();
         // 处理近战攻击逻辑
     }
 }
@@ -802,6 +806,30 @@ void Enemy::handleChasingMovement(float& dt, cocos2d::Vec2& directionToPlayer)
             currentDirection = Direction::DOWN;
         }
     }
+
+    // 播放动画
+   // 根据当前方向选择动画名称
+    std::string animationName;
+    switch (currentDirection) {
+        case Direction::UP:
+            animationName = "walk_up_enemy";
+            break;
+        case Direction::DOWN:
+            animationName = "walk_up_enemy";
+            break;
+        case Direction::LEFT:
+            animationName = "walk_left_enemy";
+            break;
+        case Direction::RIGHT:
+            animationName = "walk_right_enemy";
+            break;
+        default:
+            animationName = "walk_up_enemy";
+            break;
+    }
+
+    // 播放攻击动画，并设置完成回调
+    playAnimation(animationName);
 
     CCLOG("directionToPlayer: (%.2f, %.2f)", directionToPlayer.x, directionToPlayer.y);
 
@@ -874,6 +902,7 @@ void Enemy::patrol(float delta)
 
     cocos2d::Vec2 moveDirection = cocos2d::Vec2(dirX * m_moveSpeed * delta, 0);
     cocos2d::Vec2 targetPosition = getPosition() + moveDirection;
+    playAnimation("walk_right_enemy");
 
     // 获取当前场景进行碰撞检测
     bool collision = checkCollisionWithScene(targetPosition);
@@ -885,11 +914,13 @@ void Enemy::patrol(float delta)
     if (this->getPositionX() >= spawnPoint.x + rangedX)
     {
         dirX = -1;
+        playAnimation("walk_left_enemy");
     }
     //小于左边界，则规定向右移动
     else if (this->getPositionX() <= spawnPoint.x - rangedX)
     {
         dirX = 1;
+        playAnimation("walk_right_enemy");
     }
 
     // 如果没有碰撞，执行移动
@@ -904,11 +935,13 @@ void Enemy::patrol(float delta)
         if (dirX == 1)
         {
             dirX = -1;
+            playAnimation("walk_left_enemy");
         }
         // 向左移动碰到墙壁，反向向右
         else if (dirX == -1)
         {
             dirX = 1;
+            playAnimation("walk_right_enemy");
         }
     }
 }
