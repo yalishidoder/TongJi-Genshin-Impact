@@ -196,7 +196,10 @@ bool OtherScene::init(const std::string& mapFile)
             std::vector<Vec2>initposition;//创建的敌人位置
             if (mapname == "forest.tmx") {
                 initposition = {
-
+                    {940,268},
+                    {436,608},
+                    {570,232},
+                    {370,742}
                 };
             }
             if (mapname == "town.tmx") {
@@ -897,7 +900,7 @@ void OtherScene::showSelectionPopup_taskStartPosition()
         {
             // 创建迷宫任务节点
             // 在20秒内完成迷宫任务，即可获得奖励
-            auto maze = Maze::Create("Forest Maze", taskStartPosition, taskEndPosition, 20.0f, "Unlock a new map! Get ranged weapons!");
+            auto maze = Maze::Create("Forest Maze", taskStartPosition, taskEndPosition, 20.0f, "Unlock a new map! Get ranged weapons!", player);
             this->addChild(maze,10);
 
             // 启动任务
