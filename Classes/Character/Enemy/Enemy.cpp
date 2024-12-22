@@ -11,6 +11,7 @@
 #include "Scene/MainScene.h"
 #include "Scene/OtherScene.h"
 #include <cmath>
+#include "AudioEngine.h"
 
 Enemy::Enemy()
     : m_isAlive(true)
@@ -149,7 +150,7 @@ void Enemy::setDeath() {
 
     m_isAlive = false;
     currentState = EnemyState::STAY;
-
+    cocos2d::experimental::AudioEngine::play2d("Audio/death.mp3", false, 0.5f);
 #if 1
     // 播放死亡动画
     playAnimation("death_enemy");
@@ -309,9 +310,10 @@ void Enemy::takeDamage(float damage)
     // 更新元素反应显示
     updateERLabel();
     player->addExp(log10(damage + 10) * lv_gap / 10 + 10);  // 伤害经验
-
+    cocos2d::experimental::AudioEngine::play2d("Audio/enemy_hit.mp3", false, 0.5f);
     // 检查敌人是否死亡    
     if (health < 0) {
+        
         player->addExp(std::pow(1.2, lv_gap) * 5 + 50);  // 击杀等级经验
         this->setDeath();
     }

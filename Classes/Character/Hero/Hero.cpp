@@ -90,9 +90,13 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     weaponLabel = Label::createWithSystemFont("", "Arial", 14);
     if (weaponLabel) {
         labelPos.x += 30;
-        labelPos.y += 60;
+        labelPos.y -= 20;
+        if (m_isBayonetChosen)
+            weaponLabel->setString("Bayonet");
+        else
+            weaponLabel->setString("Bullet");
         weaponLabel->setPosition(labelPos); 
-        weaponLabel->setVisible(false);
+        weaponLabel->setVisible(true);
         this->addChild(weaponLabel);
     }
     else {
@@ -111,7 +115,7 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     if (damageLabel)
     {
         labelPos.x -= 50;
-        labelPos.y -= 30;
+        labelPos.y -= 10;
         damageLabel->setPosition(labelPos);
         this->addChild(damageLabel);
         damageLabel->setVisible(false);
@@ -635,7 +639,6 @@ void Hero::takeDamage(float damage, Enemy* enemy)
     updateDamageLabel(damage);
     // 更新元素反应显示
     updateERLabel();
-    
     this->setHealth(health);
     // 检查玩家是否死亡    
     if (health < 0) {
@@ -1068,7 +1071,7 @@ void Hero::ChangeToBayonet()
         return;
     else
     {
-        weaponLabel->setString("Bullet");
+        weaponLabel->setString("Bayonet");
         if (!m_bayonet)
         {
             // 创建Bayonet实例
