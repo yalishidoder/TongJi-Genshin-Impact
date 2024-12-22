@@ -167,6 +167,13 @@ void Maze::CompleteTask()
     // 完成任务后，触发任务1的完成事件（奖励）
     isTask1Completed = true;
     hero_->m_isBulletGet = true;
+    int target_level = hero_->getLevel() + 2;
+    if (target_level >= 99) {
+        hero_->setLevel(99);
+    }
+    else {
+        hero_->setLevel(target_level);
+    }
 }
 
 // 任务失败处理
