@@ -70,6 +70,11 @@ void CharacterBase::setSpawnPoint(const cocos2d::Vec2& position)
     spawnPoint = position;
 }
 
+cocos2d::Vec2 CharacterBase::getSpawnPoint()const
+{
+    return spawnPoint;
+}
+
 void CharacterBase::Recover(float delta)
 {
     // 对于怪物而言，同时需要不被玩家攻击才能回血

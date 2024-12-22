@@ -179,8 +179,6 @@ bool MainScene::init()
                 demon->setName("demon"); // 设置角色名称
                 demon->setAnchorPoint(Vec2(0.5f, 0.5f));
                 demon->setPlayer(hero);  //设置玩家
-                demon->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
-                demon->setRadius(200.0f);
                 demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
                 demon->setElement(CharacterElement::WATER);   // 初始化属性
                 demon->setAttackMethods(Ranged_Enemy);         // 设置为近战
@@ -190,7 +188,7 @@ bool MainScene::init()
 
                 // 设置人物位置
                 demon->setPosition(Vec2(adjustedX, adjustedY));
-
+                demon->setSpawnPoint(Vec2(adjustedX, adjustedY));
                 this->addChild(demon);  // 将角色添加到场景中
 
             }
@@ -200,8 +198,6 @@ bool MainScene::init()
                 demon2->setName("demon2"); // 设置角色名称
                 demon2->setAnchorPoint(Vec2(0.5f, 0.5f));
                 demon2->setPlayer(hero);  //设置玩家
-                demon2->setPatrolRange(200.0f, 300.0f);   //设置巡逻范围
-                demon2->setRadius(200.0f);
                 demon2->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
                 demon2->setElement(CharacterElement::FIRE);   // 初始化属性
                 demon2->setAttackMethods(Melee_Enemy);
@@ -211,7 +207,7 @@ bool MainScene::init()
 
                 // 设置人物位置
                 demon2->setPosition(Vec2(adjustedX, adjustedY));
-
+                demon2->setSpawnPoint(Vec2(adjustedX, adjustedY));
                 this->addChild(demon2);  // 将角色添加到场景中
 
             }
@@ -333,6 +329,8 @@ void MainScene::update(float dt)
     }
     Node::update(dt);
 
+    // 更新敌人管理器
+    EnemyManager::getInstance()->update(dt);
 
     // 处理任务完成情况
     if (isTask1Completed == true)

@@ -1,6 +1,7 @@
 ﻿#include "AppDelegate.h"
 #include "../Scene/MainScene.h"
 #include "../Scene/MainMenuScene.h"
+#include "Character/Enemy/EnemyManager.h"
 
 // #define USE_AUDIO_ENGINE 1
 // #define USE_SIMPLE_AUDIO_ENGINE 1
@@ -93,6 +94,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
         director->setContentScaleFactor(MIN(smallResolutionSize.height / designResolutionSize.height, smallResolutionSize.width / designResolutionSize.width));
     }
 
+    // 初始化敌人管理器
+    EnemyManager::getInstance();
+
     // 设置场景
     auto scene = MainMenuScene::createScene();
 
@@ -106,7 +110,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 // This function will be called when the app is inactive. Note, when receiving a phone call it is invoked.
 void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->stopAnimation();
-
+    // 清理敌人管理器
+    EnemyManager::destroyInstance();
 #if USE_AUDIO_ENGINE
     AudioEngine::pauseAll();
 #elif USE_SIMPLE_AUDIO_ENGINE

@@ -30,6 +30,7 @@ public:
     virtual std::string getCharacterName();
 
     void setSpawnPoint(const cocos2d::Vec2& position);
+    cocos2d::Vec2 getSpawnPoint()const;
 
     // 角色更新方法
     virtual void update(float delta) = 0;

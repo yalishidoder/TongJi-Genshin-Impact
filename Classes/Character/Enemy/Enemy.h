@@ -35,6 +35,8 @@ enum class EnemyState
     STAY      //停止
 };
 
+class EnemyManager;
+
 class Enemy : public CharacterBase {
 public:
     // 构造函数与析构函数
@@ -70,6 +72,7 @@ public:
     // 敌人攻击方法
     virtual void attack()override;
     void setAttackMethods(bool method);
+    bool getAttackMethod()const;
     void attackWithPunch();
     void attackWithPistol(const Vec2& position);
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
@@ -98,7 +101,7 @@ private:
 
     // 拳头的攻击范围
     float attackRange;
-    // 拳头的攻击冷却时间
+    // 攻击冷却时间
     float attackCooldown;
     // 剩余的攻击冷却时间
     float remainingCooldown;

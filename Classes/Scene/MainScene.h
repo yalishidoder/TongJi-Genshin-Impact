@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include "Character/PlayerPanel.h"
 #include "MiniMap.h"
-
+#include "Character/Enemy/EnemyManager.h"
 
 
 struct SceneSwitchPoint {

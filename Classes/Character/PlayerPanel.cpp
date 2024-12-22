@@ -183,17 +183,6 @@ void PlayerPanel::initUi()
             this->addChild(fullHealthLabel);
         }
 
-        // 显示已装备的武器信息
-        auto equippedWeapon = m_hero->getEquippedWeapon();
-        if (equippedWeapon) {
-            auto weaponLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
-            if (weaponLabel) {
-                weaponLabel->setName("weaponLabel");
-                weaponLabel->setPosition(cocos2d::Vec2(110, 100));
-                this->addChild(weaponLabel);
-            }
-        }
-
         // 显示攻击力信息
         auto attackLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
         if (attackLabel) {
@@ -288,15 +277,6 @@ void PlayerPanel::updateInfo()
         auto fullHealthLabel = dynamic_cast<Label*>(this->getChildByName("fullHealthLabel"));
         if (fullHealthLabel) {
             fullHealthLabel->setString(StringUtils::format("MaxHealth: %d", m_hero->CharacterBase::getMaxHealth()));
-        }
-
-        // 显示已装备的武器信息
-        auto equippedWeapon = m_hero->getEquippedWeapon();
-        if (equippedWeapon) {
-            auto weaponLabel = dynamic_cast<Label*>(this->getChildByName("weaponLabel"));
-            if (weaponLabel) {
-                weaponLabel->setString("equippedWeapon: ");// + equippedWeapon->getName());
-            }
         }
 
         // 显示攻击力信息

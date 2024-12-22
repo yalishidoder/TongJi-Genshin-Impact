@@ -5,7 +5,7 @@
  * Author:        kfx
  * Update Date:   2024.12.10
  ****************************************************************/
-#include "Enemy.h"
+#include "EnemyManager.h"
 #include "Character/CharacterBase.h"
 #include "../Hero/Hero.h"
 #include "Weapon/RangedWeapon/Ammunition/Bullet.h"
@@ -22,10 +22,13 @@ Enemy::Enemy()
     , m_currentAnimate(nullptr)
     , currentState(EnemyState::PATROL)   //初始状态为巡逻
     , dirX(1) ,dirY(1)     //初始巡逻方向设为正方向
+    , rangedX(200.0f)
+    , rangedY(300.0f)
     , attackRange(50.0f)
     , attackCooldown(1.5f)
     , remainingCooldown(0.0f)
     , m_attackPower(5)
+    , radius(200.0f)
 {
 
 }
@@ -100,9 +103,12 @@ bool Enemy::init(const cocos2d::Vec2& initPosition) {
 
     // 手枪
     enemyPistol = cocos2d::Sprite::create("Weapon/pistol.png");
-    if (enemyPistol)
-    {
-        enemyPistol->setRotation(180);
+    if (enemyPistol) {
+        enemyPistol->setAnchorPoint(Vec2(-0.1f, 0.5f));
+        enemyPistol->setName("enemyPistol");
+        Vec2 handpos = getPosition();
+        handpos.y += 10;
+        enemyPistol->setPosition(handpos);
         enemyPistol->setVisible(0);
         this->addChild(enemyPistol);
     }
@@ -172,6 +178,9 @@ void Enemy::setDeath() {
         });
     auto sequence = cocos2d::Sequence::create(delay, remove, nullptr);
     runAction(sequence);
+
+    // 注册敌人死亡事件
+    EnemyManager::getInstance()->registerEnemyDeath(this);
     
 #endif
 }
@@ -471,6 +480,11 @@ void Enemy::setAttackMethods(bool method)
     isRanged = method;
 }
 
+bool Enemy::getAttackMethod()const 
+{
+    return isRanged;
+}
+
 void Enemy::attack() {
     // 敌人的攻击逻辑，可根据需要扩展，例如发射子弹、近战攻击等
     // 这里仅作示例，可添加具体的攻击实现
@@ -518,22 +532,24 @@ void Enemy::attackWithPunch()
 void Enemy::updatePistol()
 {
     if (enemyPistol) {
-        enemyPistol->setAnchorPoint(this->getAnchorPoint());
-        Vec2 handpos = this->getPosition();
-        handpos.y += 30;
+        enemyPistol->setAnchorPoint(Vec2(-0.1f, 0.5f));
+        Vec2 handpos = getPosition();
+        handpos.x -= 250;
+        handpos.y -= 275;
         enemyPistol->setPosition(handpos);
-        enemyPistol->setVisible(0);
+        enemyPistol->setVisible(isRanged);
     }
 
-    if(player)
+    if (player)
     {
         if (player->getPosition() != cocos2d::Vec2::ZERO) {
-            // 计算手枪指向鼠标位置的角度
-            float angle = atan2(player->getPositionY() - enemyPistol->getPositionY(), player->getPositionX() - enemyPistol->getPositionX());
+            // 计算手枪指向玩家位置的角度
+            float angle = atan2(player->getPositionY() - this->getPositionY(), player->getPositionX() - this->getPositionX());
             // 将角度转换为度数
             angle = CC_RADIANS_TO_DEGREES(-angle);
             // 设置手枪的旋转角度
-            enemyPistol->setRotation(angle);
+            if (currentState == EnemyState::CHASE)
+                enemyPistol->setRotation(-angle);
 
         }
     }
