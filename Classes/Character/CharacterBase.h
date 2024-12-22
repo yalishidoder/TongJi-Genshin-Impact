@@ -13,7 +13,7 @@ enum class CharacterElement
     ROCK    //岩
 };
 
-const float FreezeTime = 2.0f;
+const float FreezeTime = 1.0f;
 
 class CharacterBase : public cocos2d::Sprite
 {
@@ -28,6 +28,9 @@ public:
     // 获取和设置名字
     virtual void setCharacterName(const std::string& Name);
     virtual std::string getCharacterName();
+
+    void setSpawnPoint(const cocos2d::Vec2& position);
+
     // 角色更新方法
     virtual void update(float delta) = 0;
 
@@ -56,7 +59,7 @@ public:
     virtual void setElement(CharacterElement Elementpower);
 
     // 回到出生点恢复生命值 
-    virtual void Recover();
+    virtual void Recover(float delta);
 
     // 设置控制时间与控制状态
     virtual void applyControl(float duration);
@@ -93,6 +96,9 @@ protected:
 
     // 元素反应标签
     cocos2d::Label* ERLabel;
+
+    // 元素反应标签
+    cocos2d::Label* recoverLabel;
 
     cocos2d::Sprite* freezeSprite;
 };

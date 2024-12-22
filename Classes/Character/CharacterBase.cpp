@@ -65,7 +65,12 @@ int CharacterBase::getMaxHealth() const
     return m_full_health;
 }
 
-void CharacterBase::Recover()
+void CharacterBase::setSpawnPoint(const cocos2d::Vec2& position)
+{
+    spawnPoint = position;
+}
+
+void CharacterBase::Recover(float delta)
 {
     // 对于怪物而言，同时需要不被玩家攻击才能回血
     if (this->getPosition() == spawnPoint)
