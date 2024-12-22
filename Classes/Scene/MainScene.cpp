@@ -9,11 +9,11 @@ USING_NS_CC;
 
 // 定义全局变量，用于判断任务是否完成
 //任务1是森林迷宫任务
-bool isTask1Completed = 1;
+bool isTask1Completed = false;
 //任务2是沙漠寻宝任务
-bool isTask2Completed = 1;
+bool isTask2Completed = false;
 //任务3是城镇杀敌任务
-bool isTask3Completed = 1;
+bool isTask3Completed = false;
 
 Scene* MainScene::createScene()
 {
@@ -103,9 +103,6 @@ bool MainScene::init()
             origin.y + visibleSize.height - label->getContentSize().height));
         this->addChild(label, 1);
     }
-
-    EnemyManager::getInstance()->setSceneID("MainScene");
-
     //////////////////////////
     //加载角色 add 0
     //////////////////////////
@@ -409,7 +406,6 @@ void MainScene::update(float dt)
 
                 // Yes 按钮的回调
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
-                    EnemyManager::getInstance()->clearScene("MainScene");
                     // 播放点击音效
                     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
                     hero->saveProfile("hero.txt");//存储角色信息
@@ -604,16 +600,12 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-        if (hero && !(hero->m_isBulletChosen)&&hero->m_isBulletGet)
-            hero->ChangeToBullet();
         if (hero && hero->m_isBulletChosen) {
             hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
         }
     }
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-        if (hero && !(hero->m_isBayonetChosen))
-            hero->ChangeToBayonet();
         if (hero && hero->m_isBayonetChosen) {
             hero->attackWithBayonet();
         }
