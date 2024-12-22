@@ -2,7 +2,6 @@
 #include "Scene/OtherScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
-#include "Scene/MiniMap.h"
 #include "Scene/MapManager.h"
 
 
@@ -10,11 +9,11 @@ USING_NS_CC;
 
 // 定义全局变量，用于判断任务是否完成
 //任务1是森林迷宫任务
-bool isTask1Completed = true;
+bool isTask1Completed = false;
 //任务2是沙漠寻宝任务
-bool isTask2Completed = true;
+bool isTask2Completed = false;
 //任务3是城镇杀敌任务
-bool isTask3Completed = true;
+bool isTask3Completed = false;
 
 Scene* MainScene::createScene()
 {
@@ -282,17 +281,17 @@ bool MainScene::init()
         }
     }
     /////////////////////////////
-    // 添加小地图
-    /////////////////////////////
-    auto miniMap = MiniMap::create(map,file,visibleSize,this);
+// 添加小地图
+/////////////////////////////
+     miniMap = MiniMap::create(map, file, visibleSize, this);
     this->addChild(miniMap, 1);
-
     /////////////////////////////
 // 添加迷雾区域
 /////////////////////////////
     initFog();
     fogSandLayer = map->getLayer("WallLayer_desert");
     fogTownLayer = map->getLayer("WallLayer_town");
+
 
     // 添加键盘事件监听器
     auto listener = cocos2d::EventListenerKeyboard::create();

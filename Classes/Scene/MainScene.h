@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 #include "Character/PlayerPanel.h"
-
+#include "MiniMap.h"
 
 
 
@@ -80,12 +80,14 @@ private:
     // 面板
     PlayerPanel* m_playerPanel = nullptr;
 
+    // 小地图
+    MiniMap* miniMap = nullptr;
     // 迷雾层
     cocos2d::Layer* fogLowerLayer = nullptr;
     cocos2d::Layer* fogUpperLayer = nullptr;
     // 迷雾层对应的碰撞层
-    TMXLayer* fogSandLayer = nullptr;
-    TMXLayer* fogTownLayer = nullptr;
+    cocos2d::TMXLayer* fogSandLayer = nullptr;
+    cocos2d::TMXLayer* fogTownLayer = nullptr;
 };
 
 #endif // __MainScene_SCENE_H__

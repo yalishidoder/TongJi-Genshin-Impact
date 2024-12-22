@@ -50,6 +50,12 @@ public:
 
     // 更新敌人位置
     void updateDemonMarkers();
+    
+    // 在小地图上显示迷雾
+    void initFogOnMiniMap();
+    // 在放大窗口上显示迷雾
+    void initFogOnExpandedWindow();
+
 private:
     // 主地图
     TMXTiledMap* map_;
@@ -104,6 +110,15 @@ private:
     Vec2 dragStartPos_;
     // 鼠标按下时的地图位置
     Vec2 dragStartMapPos_;
+
+    // 小地图上的上层迷雾
+    cocos2d::Layer* miniFogUpperLayer=nullptr;
+    // 小地图上的下层迷雾
+    cocos2d::Layer* miniFogLowerLayer=nullptr;
+    // 放大窗口上的上层迷雾
+    cocos2d::Layer* expandedWindowFogUpperLayer=nullptr;
+    // 放大窗口上的下层迷雾
+    cocos2d::Layer* expandedWindowFogLowerLayer=nullptr;
 
 
 };

@@ -10,6 +10,9 @@
 
 USING_NS_CC;
 
+extern bool isTask1Completed;
+extern bool isTask2Completed;
+
 // 创建 MiniMap 对象的工厂方法
 MiniMap* MiniMap::create(TMXTiledMap* map, std::string file, Size visibleSize, Scene* scene) {
     MiniMap* ret = new (std::nothrow) MiniMap();
@@ -80,6 +83,10 @@ bool MiniMap::init(TMXTiledMap* map, std::string file, Size visibleSize, Scene* 
         miniMapCenter_.y - miniMapBackground_->getContentSize().height * miniMapScale_ / 2));
     clipper_->addChild(miniMapBackground_);
 
+    if (file == "Scene/MainScene/mainmap.tmx")
+    {
+        initFogOnMiniMap(); // 初始化小地图迷雾层
+    }
 
     scene_->addChild(clipper_, 6); // 添加裁剪节点到场景中
 
@@ -107,6 +114,52 @@ bool MiniMap::init(TMXTiledMap* map, std::string file, Size visibleSize, Scene* 
 
     return true;
 }
+
+// 添加两个迷雾层，分别覆盖右半部分的上下两层，并且使用自定义的 PNG 图片作为阴影
+void MiniMap::initFogOnMiniMap() 
+{
+    // 获取小地图背景的尺寸
+    Size miniMapSize = miniMapBackground_->getContentSize();
+    float miniMapOriginX = miniMapBackground_->getPositionX();
+    float miniMapOriginY = miniMapBackground_->getPositionY();
+
+    // 上层迷雾区域（右上半部分）
+    miniFogUpperLayer = Layer::create();
+    miniFogUpperLayer->setContentSize(Size(miniMapSize.width / 2, miniMapSize.height / 2));
+    miniFogUpperLayer->setPosition(Vec2(miniMapOriginX + miniMapSize.width / 2,
+        miniMapOriginY + miniMapSize.height / 2));
+    miniFogUpperLayer->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT); // 锚点为左下角
+    miniMapBackground_->addChild(miniFogUpperLayer, 10);
+
+    // 加载上层迷雾的图片
+    auto upperFogSprite = Sprite::create("Scene/MainScene/fogUpper.png");
+    upperFogSprite->setContentSize(miniFogUpperLayer->getContentSize());
+    upperFogSprite->setAnchorPoint(Vec2(-0.1f, 1.0f)); // 设置锚点为中心，增大x向左移动，增大y向下移动
+    upperFogSprite->setOpacity(255); // 半透明
+    upperFogSprite->setScale(1.5f); // 让迷雾图片变大，调整比例根据需要
+    miniFogUpperLayer->addChild(upperFogSprite,2);
+
+    // 下层迷雾区域（右下半部分）
+    miniFogLowerLayer = Layer::create();
+    miniFogLowerLayer->setContentSize(Size(miniMapSize.width / 2, miniMapSize.height / 2));
+    miniFogLowerLayer->setPosition(Vec2(miniMapOriginX + miniMapSize.width / 2,
+        miniMapOriginY));
+    miniFogLowerLayer->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+    miniMapBackground_->addChild(miniFogLowerLayer, 10);
+
+    // 加载下层迷雾的图片
+    auto lowerFogSprite = Sprite::create("Scene/MainScene/fogLower.png");
+    lowerFogSprite->setContentSize(miniFogLowerLayer->getContentSize());
+    lowerFogSprite->setAnchorPoint(Vec2(0, 0.8f)); // 设置锚点为中心，增大x向右移动，增大y向下移动
+    lowerFogSprite->setOpacity(255); // 半透明
+    lowerFogSprite->setScale(1.8f); // 让迷雾图片变大，调整比例根据需要
+    miniFogLowerLayer->addChild(lowerFogSprite,2);
+
+    // 设置初始迷雾层可见性
+    miniFogUpperLayer->setVisible(true);
+    miniFogLowerLayer->setVisible(true);
+}
+
 void MiniMap::setCharacter()
 {
     // 同步主地图角色到小地图
@@ -131,6 +184,35 @@ void MiniMap::setCharacter()
 // 更新小地图标记位置
 void MiniMap::update(float dt)
 {
+    if (isExpanded_) {
+        auto hero = dynamic_cast<Hero*>(scene_->getChildByName("hero"));
+        hero->m_moveUp = false;
+        hero->m_moveDown = false;
+        hero->m_moveLeft = false;
+        hero->m_moveRight = false;
+    }
+    Node::update(dt);
+
+    // 若任务一完成
+    if (isTask1Completed == true && file_ == "Scene/MainScene/mainmap.tmx")
+    {
+   
+            // 设置小地图上层迷雾不可见
+            miniFogUpperLayer->setVisible(false);
+        // 设置放大窗口上层迷雾不可见
+        if (isExpanded_)
+            expandedWindowFogUpperLayer->setVisible(false);
+    }
+    // 若任务二完成
+    if (isTask2Completed == true && file_ == "Scene/MainScene/mainmap.tmx")
+    {
+        // 设置小地图下层迷雾不可见
+        miniFogLowerLayer->setVisible(false);
+        // 设置放大窗口下层迷雾不可见
+        if (isExpanded_)
+            expandedWindowFogLowerLayer->setVisible(false);
+    }
+
     // 检查必要的变量是否初始化
     if (!map_ || !heroMarker_)
     {
@@ -205,11 +287,13 @@ void MiniMap::updateDemonMarkers()
     }
 }
 
+
 void MiniMap::expandMiniMap()
 {
     if (isExpanded_) return; // 防止重复执行
     isExpanded_ = true;
 
+    
     // 创建放大的窗口背景
     expandedWindow_ = Node::create();
     if (expandedWindow_ == nullptr)
@@ -266,6 +350,10 @@ void MiniMap::expandMiniMap()
     // 绘制矩形边框，颜色为白色
     border->drawRect(Vec2::ZERO, expandedWindow_->getContentSize(), Color4F::WHITE);
     expandedWindow_->addChild(border);  // 将边框添加到窗口中
+    if (file_ == "Scene/MainScene/mainmap.tmx")
+    {
+        initFogOnExpandedWindow(); // 初始化放大窗口的迷雾层
+    }
 
     // 将放大的窗口添加到场景中
     scene_->addChild(expandedWindow_, 10);
@@ -286,6 +374,50 @@ void MiniMap::expandMiniMap()
     scene_->addChild(shadowLayer_, 4); // 添加阴影层
 }
 
+// 添加两个迷雾层，分别覆盖右半部分的上下两层，并且使用自定义的 PNG 图片作为阴影
+void MiniMap::initFogOnExpandedWindow()
+{
+    // 获取小地图背景的尺寸
+    Size expandedWindowMapSize = miniMapBackground_2_->getContentSize();
+    float miniMapOriginX = miniMapBackground_2_->getPositionX();
+    float miniMapOriginY = miniMapBackground_2_->getPositionY();
+
+    // 上层迷雾区域（右上半部分）
+    expandedWindowFogUpperLayer = Layer::create();
+    expandedWindowFogUpperLayer->setContentSize(Size(visibleSize_.width * 0.9f/2, visibleSize_.height * 0.9f/2));
+    expandedWindowFogUpperLayer->setPosition(Vec2(miniMapOriginX + expandedWindowMapSize.width / 2,
+        miniMapOriginY + expandedWindowMapSize.height / 2));
+    expandedWindowFogUpperLayer->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT); // 锚点为左下角
+    miniMapBackground_2_->addChild(expandedWindowFogUpperLayer, 10);
+
+    // 加载上层迷雾的图片
+    auto upperFogSprite = Sprite::create("Scene/MainScene/fogUpper.png");
+    upperFogSprite->setContentSize(expandedWindowFogUpperLayer->getContentSize());
+    upperFogSprite->setAnchorPoint(Vec2(0.1f, 0.1f)); // 设置锚点为中心，增大x向左移动，增大y向下移动
+    upperFogSprite->setOpacity(255); // 半透明
+    upperFogSprite->setScale(1.5f); // 让迷雾图片变大，调整比例根据需要
+    expandedWindowFogUpperLayer->addChild(upperFogSprite, 1);
+
+    // 下层迷雾区域（右下半部分）
+    expandedWindowFogLowerLayer = Layer::create();
+    expandedWindowFogLowerLayer->setContentSize(Size(visibleSize_.width * 0.9f/2, visibleSize_.height * 0.9f/2));
+    expandedWindowFogLowerLayer->setPosition(Vec2(miniMapOriginX + expandedWindowMapSize.width / 2,
+        miniMapOriginY));
+    expandedWindowFogLowerLayer->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+    miniMapBackground_2_->addChild(expandedWindowFogLowerLayer, 10);
+
+    // 加载下层迷雾的图片
+    auto lowerFogSprite = Sprite::create("Scene/MainScene/fogLower.png");
+    lowerFogSprite->setContentSize(expandedWindowFogLowerLayer->getContentSize());
+    lowerFogSprite->setAnchorPoint(Vec2(0.2f, 0.15f)); // 设置锚点为中心，增大x向右移动，增大y向下移动
+    lowerFogSprite->setOpacity(255); // 半透明
+    lowerFogSprite->setScale(1.8f); // 让迷雾图片变大，调整比例根据需要
+    expandedWindowFogLowerLayer->addChild(lowerFogSprite, 1);
+
+    // 设置初始迷雾层可见性
+    expandedWindowFogUpperLayer->setVisible(true);
+    expandedWindowFogLowerLayer->setVisible(true);
+}
 
 
 // 关闭放大的小地图
