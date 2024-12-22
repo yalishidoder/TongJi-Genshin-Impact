@@ -219,7 +219,6 @@ void TreasureHunt::CompleteTask()
     // 完成任务2的奖励
     isTask2Completed = true;
     hero_->m_isXSkillUnlock = true;
-    
 }
 
 // 任务失败

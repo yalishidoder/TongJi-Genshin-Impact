@@ -167,7 +167,6 @@ void Maze::CompleteTask()
     // 完成任务后，触发任务1的完成事件（奖励）
     isTask1Completed = true;
     hero_->m_isBulletGet = true;
-    
 }
 
 // 任务失败处理

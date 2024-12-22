@@ -604,12 +604,16 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero && !(hero->m_isBulletChosen)&&hero->m_isBulletGet)
+            hero->ChangeToBullet();
         if (hero && hero->m_isBulletChosen) {
             hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
         }
     }
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (hero && !(hero->m_isBayonetChosen))
+            hero->ChangeToBayonet();
         if (hero && hero->m_isBayonetChosen) {
             hero->attackWithBayonet();
         }
