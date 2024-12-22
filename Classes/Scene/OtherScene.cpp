@@ -128,6 +128,9 @@ bool OtherScene::init(const std::string& mapFile)
             origin.y + visibleSize.height - label->getContentSize().height));
         this->addChild(label, 1);
     }
+
+    EnemyManager::getInstance()->setSceneID("OtherScene");
+
     //////////////////
     //加载角色
     //////////////////
@@ -200,14 +203,6 @@ bool OtherScene::init(const std::string& mapFile)
                     {436,608},
                     {570,232},
                     {370,742}
-                };
-            }
-            if (mapname == "desert.tmx") {
-                initposition = {
-                    {500,546},
-                    {500,136},
-                    {830,478},
-                    {840,138},
                 };
             }
             if (mapname == "town.tmx") {
@@ -408,6 +403,8 @@ void OtherScene::update(float dt)
 #endif
     Node::update(dt);
 
+    // 更新敌人管理器
+    EnemyManager::getInstance()->update(dt);
 
     auto children = getChildren();
     for (auto child : children) {
@@ -470,6 +467,8 @@ void OtherScene::update(float dt)
 
                 // Yes 按钮的回调
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
+                    EnemyManager::getInstance()->clearScene("OtherScene");
+
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
                     CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
                     // 播放点击音效
@@ -613,6 +612,15 @@ void OtherScene::update(float dt)
             }
         }
     }
+
+
+    // 玩家面板的显示
+    auto protagonist = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (protagonist) {
+        if (isKeyPressedP) {
+            operatemyPanel();
+        }
+    }
 }
 
 void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
@@ -734,8 +742,6 @@ void OtherScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-        if (hero && !(hero->m_isBulletChosen) && hero->m_isBulletGet)
-            hero->ChangeToBullet();
         if (hero && hero->m_isBulletChosen) {
             hero->attackWithBullet(TranslatePos(mouseEvent->getLocation()));
         }
@@ -860,6 +866,8 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
 
     // 显示弹窗
     isPopupVisible = true;
+
+    
 }
 
 void OtherScene::showSelectionPopup_taskStartPosition()
@@ -957,6 +965,50 @@ void OtherScene::hidePopup()
     // 隐藏弹窗
     this->removeChildByName("popupLayer");
     isPopupVisible = false;
+}
+
+void OtherScene::showmyPanel()
+{
+    auto PanelLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 150)); // 半透明黑色背景
+    PanelLayer->setName("PanelLayer");
+    this->addChild(PanelLayer, 10);
+}
+
+void OtherScene::hidemyPanel()
+{
+    this->removeChildByName("PanelLayer");
+    m_playerPanel->setVisible(!m_playerPanel->isVisible());
+    isPanelVisible = (m_playerPanel->isVisible());
+}
+
+void OtherScene::operatemyPanel()
+{
+    auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (hero) {
+        if (m_playerPanel) {
+            m_playerPanel->setHero(hero);
+            //m_playerPanel->initUi();
+            m_playerPanel->updateInfo();
+            m_playerPanel->setVisible(!m_playerPanel->isVisible());
+            isPanelVisible = (m_playerPanel->isVisible());
+            CCLOG("Panel visibility set to: %d", m_playerPanel->isVisible());
+
+            showmyPanel();
+
+            // 创建关闭按钮
+            auto closeButton_ = cocos2d::ui::Button::create("Character/panel/Close_Icon.png");
+            if (closeButton_) {
+                closeButton_->setPosition(Vec2(550, 550));
+                closeButton_->addClickEventListener([=](Ref* sender)
+                    {
+                        this->hidemyPanel();
+                    });
+                m_playerPanel->addChild(closeButton_);
+            }
+        }
+        else
+            CCLOG("m_playerPanel is null!");
+    }
 }
 
 int OtherScene::get_enemies_num()

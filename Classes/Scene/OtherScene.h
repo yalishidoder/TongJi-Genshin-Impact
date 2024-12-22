@@ -35,11 +35,15 @@ public:
 	bool checkCollision(cocos2d::Vec2 position);
 	//窗口到瓦片地图坐标转化
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
-	void operatemyPanel();
 	void showSelectionPopup_positionSwitchPoints();
 	void showSelectionPopup_taskStartPosition();
 	void hidePopup();
 	int get_enemies_num();
+
+	// 对玩家面板的操作
+	void operatemyPanel();
+	void showmyPanel();
+	void hidemyPanel();
 private:
 	cocos2d::TMXTiledMap* othermap;
 	std::string mapname;
