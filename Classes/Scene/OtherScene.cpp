@@ -202,6 +202,14 @@ bool OtherScene::init(const std::string& mapFile)
                     {370,742}
                 };
             }
+            if (mapname == "desert.tmx") {
+                initposition = {
+                    {500,546},
+                    {500,136},
+                    {830,478},
+                    {840,138},
+                };
+            }
             if (mapname == "town.tmx") {
                 initposition = {
                     {300,178},
