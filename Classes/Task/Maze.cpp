@@ -9,7 +9,7 @@
 
 
 #include "Maze.h"
-
+#include "SimpleAudioEngine.h"
 extern bool isTask1Completed;
 
 
@@ -142,6 +142,8 @@ void Maze::CompleteTask()
     is_task_active_ = false;  // 标记任务为未激活
     task_status_ = true;  // 设置任务状态为完成
     this->unschedule(CC_SCHEDULE_SELECTOR(Maze::UpdateTask));  // 停止任务计时
+    //任务完成音效
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/task_finish.mp3");
 
     ShowMessage("Mission Success!");  // 显示任务成功信息
     // 创建一个显示任务状态的标签
@@ -170,6 +172,8 @@ void Maze::FailTask()
     task_status_ = false;  // 设置任务状态为失败
 
     this->unschedule(CC_SCHEDULE_SELECTOR(Maze::UpdateTask));  // 停止任务计时
+    //任务失败音效
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/task_fail.mp3");
 
     ShowMessage("Mission Failed!");  // 显示任务失败信息
     Cleanup();  // 清理UI元素

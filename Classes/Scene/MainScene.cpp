@@ -10,11 +10,11 @@ USING_NS_CC;
 
 // 定义全局变量，用于判断任务是否完成
 //任务1是森林迷宫任务
-bool isTask1Completed = false;
+bool isTask1Completed = true;
 //任务2是沙漠寻宝任务
-bool isTask2Completed = false;
+bool isTask2Completed = true;
 //任务3是城镇杀敌任务
-bool isTask3Completed = false;
+bool isTask3Completed = true;
 
 Scene* MainScene::createScene()
 {
@@ -408,6 +408,8 @@ void MainScene::update(float dt)
 
                 // Yes 按钮的回调
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
+                    // 播放点击音效
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
                     hero->saveProfile("hero.txt");//存储角色信息
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
                     CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
@@ -418,6 +420,8 @@ void MainScene::update(float dt)
 
                 // No 按钮的回调
                 noButton->addClickEventListener([=, &switchPoint](Ref* sender) {
+                    // 播放点击音效
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
                     CCLOG("User selected NO. Dialog removed.");
                     if (dialog) {
                         dialog->removeFromParent();
@@ -463,12 +467,15 @@ void MainScene::update(float dt)
             if (!isPopupVisible) {
                 // 如果弹窗未显示，则显示弹窗
                 showSelectionPopup();
+                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+               
                 isPopupVisible = true;  // 设置弹窗为可见
             }
         }
         else if (isPopupVisible && !isKeyPressedE) {
             // 如果弹窗已显示且玩家没有按下E键，则继续监听E键关闭弹窗
             if (isKeyPressedE) {
+                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
                 hidePopup();  // 隐藏弹窗
                 isPopupVisible = false;  // 设置弹窗为不可见
             }
@@ -632,6 +639,7 @@ void MainScene::showSelectionPopup()
                 "Transfer_switch/Transfer_normal.png",  // 普通状态的按钮图片
                 "Transfer_switch/Transfer_selected.png",  // 按下状态的按钮图片
                 [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
                     player->setPosition(spot.position);  // 传送角色
                     popupLayer->removeFromParent();  // 隐藏弹窗
                     isPopupVisible = false;  // 设置弹窗为不可见

@@ -7,7 +7,7 @@
  ****************************************************************/
 
 #include "TreasureHunt.h"
-
+#include "SimpleAudioEngine.h"
 extern bool isTask2Completed;
 
  // 构造函数
@@ -127,6 +127,9 @@ void TreasureHunt::StartTask()
                 // 判断角色是否在宝石图层上
                 if (IsHeroOnGemLayer())
                 {
+                    //采集矿石音效
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/get_gem.mp3");
+
                     CollectGem(hero_->getPosition());  // 执行采集矿石
                 }
             }
@@ -207,6 +210,9 @@ void TreasureHunt::CompleteTask()
     is_task_active_ = false;  // 设置任务为未激活状态
     task_status_ = TASK_COMPLETED;  // 设置任务状态为完成
     cocos2d::Director::getInstance()->getScheduler()->unschedule("treasure_hunt_timer", this);  // 取消定时器
+    //任务完成音效
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/task_finish.mp3");
+
     ShowMessage("Mission Success!");  // 显示任务成功消息
     CleanupUI();  // 清理UI
 
@@ -220,6 +226,9 @@ void TreasureHunt::FailTask()
     is_task_active_ = false;  // 设置任务为未激活状态
     task_status_ = TASK_FAILED;  // 设置任务状态为失败
     cocos2d::Director::getInstance()->getScheduler()->unschedule("treasure_hunt_timer", this);  // 取消定时器
+    //任务失败音效
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/task_fail.mp3");
+
     ShowMessage("Mission Failed!");  // 显示任务失败消息
     CleanupUI();  // 清理UI
 }

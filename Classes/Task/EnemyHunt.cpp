@@ -1,6 +1,7 @@
 #include "EnemyHunt.h"
 #include "Character/Hero/Hero.h"
 #include "Character/Enemy/Enemy.h"
+#include "SimpleAudioEngine.h"
 
 
 extern bool isTask3Completed ;
@@ -132,6 +133,9 @@ void EnemyHunt::CompleteTask()
 {
     is_task_active_ = false;  // 设置任务为未激活状态
     task_status_ = TASK_COMPLETED;  // 设置任务状态为完成
+    //任务完成音效
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/task_finish.mp3");
+
     ShowMessage("Mission Success!");  // 显示任务成功消息
     CleanupUI();  // 清理UI
 

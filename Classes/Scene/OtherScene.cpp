@@ -433,6 +433,9 @@ void OtherScene::update(float dt)
                 yesButton->addClickEventListener([=, &switchPoint](Ref* sender) {
                     CCLOG("User selected YES. Teleporting to %s.", switchPoint.targetMap.c_str());
                     CCLOG("actual Switch Position: x = %.2f, y = %.2f", switchPoint.position.x, switchPoint.position.y);
+                    // 播放点击音效
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
+
                     hero->saveProfile("hero.txt");
                     dialog->removeFromParent();
                     isDialogActive = false; // 恢复标志位
@@ -444,6 +447,9 @@ void OtherScene::update(float dt)
                 // No 按钮的回调
                 noButton->addClickEventListener([=, &switchPoint](Ref* sender) {
                     CCLOG("User selected NO. Dialog removed.");
+                    // 播放点击音效
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
+
                     if (dialog) {
                         dialog->removeFromParent();
                         // 恢复标志位
@@ -496,6 +502,8 @@ void OtherScene::update(float dt)
                 // 如果弹窗未显示，则显示弹窗
                 showSelectionPopup_positionSwitchPoints();
                 isPopupVisible = true;  // 设置弹窗为可见
+                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+
             }
         }
         else if (isPopupVisible && !isKeyPressedE) {
@@ -524,6 +532,16 @@ void OtherScene::update(float dt)
         // 如果角色进入范围并按下了 R 键
         if (isInRange && isKeyPressedR&&!tasking) {
             if (!isTaskVisible) {
+                // 播放点击音效
+                if (mapname == "forest.tmx") {
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/npc_forest.mp3");
+                }
+                if (mapname == "desert.tmx") {
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/npc_desert.mp3");
+                }
+                if (mapname == "town.tmx") {
+                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/npc_forest.mp3");
+                }
                 // 如果弹窗未显示，则显示弹窗
                 showSelectionPopup_taskStartPosition();
                 isTaskVisible = true;  // 设置弹窗为可见
@@ -751,6 +769,8 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     "Transfer_switch/Transfer_normal_forest.png",  // 普通状态的按钮图片
                     "Transfer_switch/Transfer_selected_forest.png",  // 按下状态的按钮图片
                     [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+
                         player->setPosition(spot.position);  // 传送角色
                         popupLayer->removeFromParent();  // 隐藏弹窗
                         isPopupVisible = false;  // 设置弹窗为不可见
@@ -763,6 +783,8 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     "Transfer_switch/Transfer_normal_desert.png",  // 普通状态的按钮图片
                     "Transfer_switch/Transfer_select_desert.png",  // 按下状态的按钮图片
                     [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+
                         player->setPosition(spot.position);  // 传送角色
                         popupLayer->removeFromParent();  // 隐藏弹窗
                         isPopupVisible = false;  // 设置弹窗为不可见
@@ -775,6 +797,8 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     "Transfer_switch/Transfer_normal_town.png",  // 普通状态的按钮图片
                     "Transfer_switch/Transfer_selected_town.png",  // 按下状态的按钮图片
                     [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
+                        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+
                         player->setPosition(spot.position);  // 传送角色
                         popupLayer->removeFromParent();  // 隐藏弹窗
                         isPopupVisible = false;  // 设置弹窗为不可见
@@ -829,6 +853,8 @@ void OtherScene::showSelectionPopup_taskStartPosition()
 
     // Yes 按钮的回调
     yesButton->addClickEventListener([=](Ref* sender) {
+        // 播放点击音效
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
         CCLOG("User selected YES. Starting the task...");
         tasking = true;
         dialog->removeFromParent();  // 移除对话框
@@ -876,6 +902,8 @@ void OtherScene::showSelectionPopup_taskStartPosition()
 
     // No 按钮的回调
     noButton->addClickEventListener([=](Ref* sender) {
+        // 播放点击音效
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
         CCLOG("User selected NO. Dialog removed.");
         dialog->removeFromParent();  // 移除对话框
         isTaskVisible = false;  // 恢复标志位
