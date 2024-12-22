@@ -165,6 +165,8 @@ void Enemy::setDeath() {
     if (!m_isAlive) return;
 
     m_isAlive = false;
+    isControlled = true;
+
     //currentState = EnemyState::STAY;
     cocos2d::experimental::AudioEngine::play2d("Audio/death.mp3", false, 0.5f);
 #if 1
