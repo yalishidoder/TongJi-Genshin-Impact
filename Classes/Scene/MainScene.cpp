@@ -184,7 +184,7 @@ bool MainScene::init()
                 demon->setPlayer(hero);  //设置玩家
                 demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
                 demon->setElement(CharacterElement::WATER);   // 初始化属性
-                demon->setAttackMethods(Ranged_Enemy);         // 设置为近战
+                demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + 250.0f; // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + 300.0f; // 地图左下角 + 出生点的 y 偏移

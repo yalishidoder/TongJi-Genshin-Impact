@@ -1360,6 +1360,7 @@ void Hero::saveProfile(const std::string& filename) {
         file << m_isBulletGet << std::endl;
         file << m_isBayonetChosen << std::endl;
         file << m_isBulletChosen << std::endl;
+        file << m_isXSkillUnlock << std::endl;
         // 保存其他需要的信息
         file.close();
         CCLOG("Profile saved successfully.");
@@ -1387,6 +1388,8 @@ void Hero::loadProfile(const std::string& filename) {
         file >> m_isBulletGet;
         file >> m_isBayonetChosen;
         file >> m_isBulletChosen;
+        file >> m_isXSkillUnlock;
+
         // 加载其他需要的信息
         file.close();
         CCLOG("Profile loaded successfully.");
@@ -1394,4 +1397,11 @@ void Hero::loadProfile(const std::string& filename) {
     else {
         CCLOG("Unable to open file for loading.");
     }
+    if (!getGender()) {
+        setTexture("Character/Hero/Animation/female/female_default.png");
+    }
+    else {
+        setTexture("Character/Hero/Animation/male/male_default.png");
+    }
+    resetAnimationCache();
 }

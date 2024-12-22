@@ -183,7 +183,8 @@ bool OtherScene::init(const std::string& mapFile)
             auto healthFill = Sprite::create("Character/Hero/health_fillg.png");
             if (healthFill) {
                 healthFill->setName("healthFill"); // 设置名字
-                healthFill->setPosition(Vec2(500, 50));
+                healthFill->setAnchorPoint(Vec2(0, 0.5));
+                healthFill->setPosition(Vec2(225, 50));
                 healthFill->setOpacity(128);
                 this->addChild(healthFill);
             }
@@ -232,7 +233,14 @@ bool OtherScene::init(const std::string& mapFile)
                     demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
                     demon->setRadius(100.0f);
                     demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
-                    demon->setElement(CharacterElement::WATER);   // 初始化属性
+                    if (i < initposition.size() / 2) {
+                        demon->setElement(CharacterElement::WATER);   // 初始化属性
+                        demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
+                    }
+                    else {
+                        demon->setElement(CharacterElement::FIRE);   // 初始化属性
+                        demon->setAttackMethods(Melee_Enemy);         // 设置为近战
+                    }
                     // 计算出生点的屏幕坐标
                     float adjustedX = othermapOriginX + initposition[i].x; // 地图左下角 + 出生点的 x 偏移
                     float adjustedY = othermapOriginX + initposition[i].y; // 地图左下角 + 出生点的 y 偏移
