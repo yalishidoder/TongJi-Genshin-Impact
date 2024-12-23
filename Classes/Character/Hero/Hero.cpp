@@ -9,6 +9,7 @@
 #include <cmath>
 #include "Weapon/RangedWeapon/Ammunition/Bullet.h"
 #include "Scene/OtherScene.h"
+#include "AudioEngine.h"
 
 Hero::Hero()
     : m_sleepiness(100)     // 初始睡意值
@@ -73,7 +74,7 @@ bool Hero::init(const cocos2d::Vec2& initPosition) {
     m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_hero");
     m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
     m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_hero");
-
+    m_animationCache->addAnimation(createDeathAnimation(), "death_hero");
     // 创建标签
     levelupLabel = Label::createWithSystemFont("Level UP!", "Arial", 24);
     cocos2d::Vec2 labelPos = this->getAnchorPoint();
@@ -269,6 +270,38 @@ cocos2d::Animation* Hero::createWalkRightAnimation() {
             frameName = StringUtils::format("WALK_RIGHT_%dF.png", i);
         else
             frameName = StringUtils::format("WALK_RIGHT_%dM.png", i);
+        cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+        if (frame) {
+            animFrames.pushBack(frame);
+        }
+        else {
+            log("Failed to load frame: %s", frameName.c_str());
+        }
+    }
+    // 创建动画，设置帧间隔为 frameDelay 秒
+    cocos2d::Animation* animation = cocos2d::Animation::createWithSpriteFrames(animFrames, 0.1f);
+    //animation->setLoops(-1);
+    return animation;
+}
+
+// 创建死亡动画
+cocos2d::Animation* Hero::createDeathAnimation() {
+    if (!m_ismale) {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/DEATH_FEMALE.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/female/DEATH_FEMALE.png");
+    }
+    else {
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/DEATH_MALE.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Character/Hero/Animation/male/DEATH_MALE.png");
+    }
+    cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
+
+    for (int i = 0; i <= 6; ++i) {
+        std::string frameName;
+        if (!m_ismale)
+            frameName = StringUtils::format("HERO_DEATH_FEMALE-%d.png", i);
+        else
+            frameName = StringUtils::format("HERO_DEATH_MALE-%d.png", i);
         cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
         if (frame) {
             animFrames.pushBack(frame);
@@ -645,9 +678,48 @@ void Hero::takeDamage(float damage, Enemy* enemy)
     this->setHealth(health);
     // 检查玩家是否死亡    
     if (health < 0) {
-       
+        setHealth(0);
+        setDeath();
     }
 
+}
+
+void Hero::setDeath()
+{
+    if (!m_isAlive) return;
+    stopAllActions();
+    remove("hero.txt");
+    m_isAlive = false;
+    m_isBayonetChosen = false;
+    m_isBulletChosen = false;
+    weaponLabel->setVisible(0);
+    if (m_bayonet)
+        m_bayonet->setVisible(0);
+    isControlled = true;
+    // 播放死亡音效
+    if (getGender())
+        cocos2d::experimental::AudioEngine::play2d("Audio/hero_male_death.mp3", false, 0.5f);
+    else
+        cocos2d::experimental::AudioEngine::play2d("Audio/hero_female_death.mp3", false, 0.5f);
+    // 播放死亡动画
+    playAnimation("death_hero");
+    // 创建一个全屏的黑色矩形
+    cocos2d::LayerColor* fadeLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 0));
+    cocos2d::Director::getInstance()->getRunningScene()->addChild(fadeLayer,100);
+    // 创建一个渐暗的动作序列
+    cocos2d::FadeTo* fadeToAction = cocos2d::FadeTo::create(6.0f, 244); // 6秒内将透明度从0渐变为244
+    // 运行动作
+    fadeLayer->runAction(fadeToAction);
+    // 播放背景音乐
+    cocos2d::experimental::AudioEngine::play2d("Audio/RIP.mp3", false, 0.5f);
+    // 延时退出
+    cocos2d::DelayTime* delay = cocos2d::DelayTime::create(27.0f);
+    cocos2d::CallFunc* endGame = cocos2d::CallFunc::create([]() {
+        cocos2d::Director::getInstance()->end();
+        });
+    cocos2d::Sequence* sequence = cocos2d::Sequence::create(delay, endGame, nullptr);
+    cocos2d::Director::getInstance()->getRunningScene()->runAction(sequence);
+    
 }
 
 void Hero::updateDamageLabel(int damage)
@@ -837,22 +909,16 @@ void Hero::resetAnimationCache()
         m_animationCache->addAnimation(createWalkDownAnimation(), "walk_down_hero");
         m_animationCache->addAnimation(createWalkLeftAnimation(), "walk_left_hero");
         m_animationCache->addAnimation(createWalkRightAnimation(), "walk_right_hero");
+        m_animationCache->addAnimation(createDeathAnimation(), "death_hero");
     }
 }
 
 void Hero::update(float dt) 
 {
-    if (isControlled)
+
+    if (isControlled|| !m_isAlive)
         return;
-#if 0
-    // 根据性别修改模型
-    if (!this->getGender()) {
-        this->setTexture("Character/Hero/Animation/female/female_default.png");
-    }
-    else {
-        this->setTexture("Character/Hero/Animation/male/male_default.png");
-    }
-#endif
+
     // 恢复生命值
     Recover(dt);
 
@@ -1346,7 +1412,7 @@ void Hero::saveProfile(const std::string& filename) {
     std::ofstream file(filename);
     if (file.is_open()) {
         file << m_sleepiness << std::endl;
-        file << m_heroism << std::endl;
+        file << m_health << std::endl;
         file << m_speed << std::endl;
         file << m_ismale << std::endl;
         file << MaxLevel << std::endl;
@@ -1374,7 +1440,7 @@ void Hero::loadProfile(const std::string& filename) {
     std::ifstream file(filename);
     if (file.is_open()) {
         file >> m_sleepiness;
-        file >> m_heroism;
+        file >> m_health;
         file >> m_speed;
         file >> m_ismale;
         file >> MaxLevel;

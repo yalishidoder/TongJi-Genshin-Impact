@@ -1,4 +1,5 @@
-﻿#include "OtherScene.h"
+﻿#include <cstdio>
+#include "OtherScene.h"
 #include "Scene/MainScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
@@ -8,6 +9,7 @@
 #include "Task/TreasureHunt.h"
 #include "Task/EnemyHunt.h"
 #include "AudioEngine.h"
+
 USING_NS_CC;
 
 extern bool isTask1Completed;
@@ -754,6 +756,8 @@ void OtherScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (!hero->isAlive())
+            return;
         if (hero && !(hero->m_isBulletChosen) && hero->m_isBulletGet)
             hero->ChangeToBullet();
         if (hero && hero->m_isBulletChosen) {
@@ -762,6 +766,10 @@ void OtherScene::onMouseDown(cocos2d::EventMouse* event)
     }
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (!hero->isAlive())
+            return;
+        if (hero && !(hero->m_isBayonetChosen))
+            hero->ChangeToBayonet();
         if (hero && hero->m_isBayonetChosen) {
             hero->attackWithBayonet();
         }
@@ -1048,7 +1056,7 @@ void OtherScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    if (hero)
+    if (hero && hero->isAlive())
         hero->saveProfile("hero.txt");
     Director::getInstance()->end();
 

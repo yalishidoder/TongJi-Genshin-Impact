@@ -644,6 +644,8 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
         return;
     if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (!hero->isAlive())
+            return;
         if (hero && !(hero->m_isBulletChosen)&&hero->m_isBulletGet)
             hero->ChangeToBullet();
         if (hero && hero->m_isBulletChosen) {
@@ -652,9 +654,11 @@ void MainScene::onMouseDown(cocos2d::EventMouse* event)
     }
     else if (mouseEvent && mouseEvent->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
         auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
+        if (!hero->isAlive())
+            return;
         if (hero && !(hero->m_isBayonetChosen))
             hero->ChangeToBayonet();
-        if (hero && hero->m_isBayonetChosen) {
+        if (hero && hero->m_isBayonetChosen&&hero->isAlive()) {
             hero->attackWithBayonet();
         }
     }
@@ -884,7 +888,7 @@ void MainScene::menuCloseCallback(Ref* pSender)
 {
     //Close the cocos2d-x game scene and quit the application
     auto hero = dynamic_cast<Hero*>(this->getChildByName("hero"));
-    if (hero)
+    if (hero && hero->isAlive())
         hero->saveProfile("hero.txt");
     Director::getInstance()->end();
 

@@ -496,7 +496,7 @@ void Enemy::attack() {
 // 拳头攻击的逻辑
 void Enemy::attackWithPunch()
 {
-    if (remainingCooldown > 0) {
+    if (remainingCooldown > 0 || !player->isAlive()) {
         return;
     }
 
@@ -564,7 +564,7 @@ void Enemy::updatePistol()
 // 手枪攻击的逻辑
 void Enemy::attackWithPistol(const Vec2& position)
 {
-    if (remainingCooldown > 0) {
+    if (remainingCooldown > 0 || !player->isAlive()) {
         return;
     }
 

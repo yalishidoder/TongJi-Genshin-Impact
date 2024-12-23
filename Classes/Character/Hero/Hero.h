@@ -72,6 +72,7 @@ public:
     cocos2d::Animation* Hero::createWalkDownAnimation();
     cocos2d::Animation* Hero::createWalkLeftAnimation();
     cocos2d::Animation* Hero::createWalkRightAnimation();
+    cocos2d::Animation* Hero::createDeathAnimation();
 
     // 角色属性相关方法，比如设置和获取生命值、攻击力等
     bool getGender();
@@ -84,8 +85,8 @@ public:
     int calculateExpToLevelUp()const;
 
     // 角色状态相关，例如是否存活等判断
-    bool isAlive()const;
-
+    bool isAlive() const;
+    void setDeath();
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(Hero* otherHero);
 
