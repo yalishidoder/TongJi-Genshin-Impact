@@ -3,6 +3,7 @@
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "Scene/MapManager.h"
+#include "AudioEngine.h"
 
 
 USING_NS_CC;
@@ -11,7 +12,7 @@ USING_NS_CC;
 //任务1是森林迷宫任务
 bool isTask1Completed = false;
 //任务2是沙漠寻宝任务
-bool isTask2Completed = false;
+bool isTask2Completed = 1;
 //任务3是城镇杀敌任务
 bool isTask3Completed = false;
 
@@ -190,7 +191,17 @@ bool MainScene::init()
                     demon->setPlayer(hero);  //设置玩家
                     demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
                     demon->setRadius(100.0f);
-                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                    int update_level = hero->getLevel() - 5;
+                    //敌人最高15级
+                    if (update_level <= 0) {
+                        demon->setInitData(hero->getLevel()); //根据敌人等级初始化数据 (别太大，会溢出)
+                    }
+                    else if (update_level >= 15) {
+                        demon->setInitData(15); //根据敌人等级初始化数据 (别太大，会溢出)
+                    }
+                    else {
+                        demon->setInitData(update_level);
+                    }
                     if (i ==0) {
                         demon->setElement(CharacterElement::WATER);   // 水
                         demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
@@ -427,6 +438,7 @@ void MainScene::update(float dt)
             // 判断是否有弹窗正在显示&&判断地图传送点和人物是否碰撞
             if (!isDialogActive && hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 2.5, switchPoint.position.y - 2.5, 10, 10))) {
                 isDialogActive = true;
+                cocos2d::experimental::AudioEngine::play2d("Audio/level_up.mp3", false, 0.1f);
 
                 auto dialog = LayerColor::create(Color4B(0, 0, 0, 128));
                 this->addChild(dialog, 10);
@@ -497,6 +509,8 @@ void MainScene::update(float dt)
                 // 如果传送点未解锁，解锁该传送点
                 if (!spot.isActive) {
                     spot.isActive = true;  // 解锁
+                    cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
+
                     // 更新 MapManager 中的传送点状态
                     MapManager::getInstance()->saveMainSceneSwitchPoints(positionSwitchPoints);
                 }
@@ -509,15 +523,15 @@ void MainScene::update(float dt)
             if (!isPopupVisible) {
                 // 如果弹窗未显示，则显示弹窗
                 showSelectionPopup();
-                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
-               
+                cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
+
                 isPopupVisible = true;  // 设置弹窗为可见
             }
         }
         else if (isPopupVisible && !isKeyPressedE) {
             // 如果弹窗已显示且玩家没有按下E键，则继续监听E键关闭弹窗
             if (isKeyPressedE) {
-                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+                cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
                 hidePopup();  // 隐藏弹窗
                 isPopupVisible = false;  // 设置弹窗为不可见
             }
@@ -689,7 +703,7 @@ void MainScene::showSelectionPopup()
                 "Transfer_switch/Transfer_normal.png",  // 普通状态的按钮图片
                 "Transfer_switch/Transfer_selected.png",  // 按下状态的按钮图片
                 [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
-                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+                    cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
                     player->setPosition(spot.position);  // 传送角色
                     popupLayer->removeFromParent();  // 隐藏弹窗
                     isPopupVisible = false;  // 设置弹窗为不可见

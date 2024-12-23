@@ -154,8 +154,6 @@ bool MainMenuScene::init()
         });
 
     if (musicToggleButton) {
-        // 大小缩放
-        musicToggleButton->setScale(0.05);
         // 设置位置
         musicToggleButton->setPosition(Vec2(
             origin.x + visibleSize.width - 150,  // 距右侧宽度-150像素

@@ -8,6 +8,8 @@
 
 #include "TreasureHunt.h"
 #include "SimpleAudioEngine.h"
+#include "AudioEngine.h"
+
 extern bool isTask2Completed;
 
  // 构造函数
@@ -128,8 +130,7 @@ void TreasureHunt::StartTask()
                 if (IsHeroOnGemLayer())
                 {
                     //采集矿石音效
-                    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/get_gem.mp3");
-
+                    cocos2d::experimental::AudioEngine::play2d("Audio/get_gem.mp3", false, 0.5f);
                     CollectGem(hero_->getPosition());  // 执行采集矿石
                 }
             }

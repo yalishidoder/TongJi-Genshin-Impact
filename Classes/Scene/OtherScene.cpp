@@ -61,8 +61,8 @@ bool OtherScene::init(const std::string& mapFile)
     // 检查按钮是否加载成功
     if (pauseButton)
     {
-        float x = Director::getInstance()->getVisibleSize().width - pauseButton->getContentSize().width / 2 -16-40;
-        float y = pauseButton->getContentSize().height / 2 + 16;  // 视图右下角位置
+        float x = Director::getInstance()->getVisibleSize().width - pauseButton->getContentSize().width / 2 -20;
+        float y = pauseButton->getContentSize().height / 2 + 16+45;  // 视图右下角位置
         pauseButton->setPosition(Vec2(x, y));
 
         auto menu = Menu::create(pauseButton, nullptr);  // 创建菜单并将按钮添加进去
@@ -234,7 +234,17 @@ bool OtherScene::init(const std::string& mapFile)
                     demon->setPlayer(hero);  //设置玩家
                     demon->setPatrolRange(150.0f, 300.0f);   //设置巡逻范围
                     demon->setRadius(100.0f);
-                    demon->setInitData(10); //根据敌人等级初始化数据 (别太大，会溢出)
+                    int update_level = hero->getLevel()-5;
+                    //敌人最高15级
+                    if (update_level <= 0) {
+                        demon->setInitData(hero->getLevel()); //根据敌人等级初始化数据 (别太大，会溢出)
+                    }
+                    else if(update_level>=15){
+                        demon->setInitData(15); //根据敌人等级初始化数据 (别太大，会溢出)
+                    }
+                    else {
+                        demon->setInitData(update_level);
+                    }
                     if (i < initposition.size() / 2) {
                         demon->setElement(CharacterElement::WATER);   // 初始化属性
                         demon->setAttackMethods(Ranged_Enemy);         // 设置为远程
@@ -464,6 +474,7 @@ void OtherScene::update(float dt)
             // 判断是否有弹窗正在显示
             if (!isDialogActive && hero->getBoundingBox().intersectsRect(Rect(switchPoint.position.x - 10, switchPoint.position.y - 10, 20, 20))) {
                 isDialogActive = true;
+                cocos2d::experimental::AudioEngine::play2d("Audio/level_up.mp3", false, 0.1f);
 
                 auto dialog = LayerColor::create(Color4B(0, 0, 0, 128));
                 this->addChild(dialog, 10);
@@ -540,6 +551,7 @@ void OtherScene::update(float dt)
                 // 如果传送点未解锁，解锁该传送点
                 if (!spot.isActive) {
                     spot.isActive = true;  // 解锁
+                    cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
                     if (mapname == "forest.tmx") {
                         MapManager::getInstance()->saveforestSwitchPoints(positionSwitchPoints);
                     }
@@ -560,7 +572,7 @@ void OtherScene::update(float dt)
                 // 如果弹窗未显示，则显示弹窗
                 showSelectionPopup_positionSwitchPoints();
                 isPopupVisible = true;  // 设置弹窗为可见
-                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+                cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
 
             }
         }
@@ -841,7 +853,7 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     "Transfer_switch/Transfer_normal_forest.png",  // 普通状态的按钮图片
                     "Transfer_switch/Transfer_selected_forest.png",  // 按下状态的按钮图片
                     [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
-                        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+                        cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
 
                         player->setPosition(spot.position);  // 传送角色
                         popupLayer->removeFromParent();  // 隐藏弹窗
@@ -855,7 +867,7 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     "Transfer_switch/Transfer_normal_desert.png",  // 普通状态的按钮图片
                     "Transfer_switch/Transfer_select_desert.png",  // 按下状态的按钮图片
                     [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
-                        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+                        cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
 
                         player->setPosition(spot.position);  // 传送角色
                         popupLayer->removeFromParent();  // 隐藏弹窗
@@ -869,7 +881,7 @@ void OtherScene::showSelectionPopup_positionSwitchPoints()
                     "Transfer_switch/Transfer_normal_town.png",  // 普通状态的按钮图片
                     "Transfer_switch/Transfer_selected_town.png",  // 按下状态的按钮图片
                     [this, spot, popupLayer, player](cocos2d::Ref* sender) {  // 捕获 player
-                        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/transfer.mp3");
+                        cocos2d::experimental::AudioEngine::play2d("Audio/transfer.mp3", false, 0.5f);
 
                         player->setPosition(spot.position);  // 传送角色
                         popupLayer->removeFromParent();  // 隐藏弹窗
@@ -926,7 +938,8 @@ void OtherScene::showSelectionPopup_taskStartPosition()
     // Yes 按钮的回调
     yesButton->addClickEventListener([=](Ref* sender) {
         // 播放点击音效
-        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
+        cocos2d::experimental::AudioEngine::play2d("Audio/click_sl.mp3", false, 1.0f);
+
         CCLOG("User selected YES. Starting the task...");
         tasking = true;
         dialog->removeFromParent();  // 移除对话框
@@ -975,7 +988,7 @@ void OtherScene::showSelectionPopup_taskStartPosition()
     // No 按钮的回调
     noButton->addClickEventListener([=](Ref* sender) {
         // 播放点击音效
-        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("Audio/click_sl.mp3");
+        cocos2d::experimental::AudioEngine::play2d("Audio/click_sl.mp3", false, 1.0f);
         CCLOG("User selected NO. Dialog removed.");
         dialog->removeFromParent();  // 移除对话框
         isTaskVisible = false;  // 恢复标志位
@@ -1074,7 +1087,7 @@ void OtherScene::playBackgroundMusic()
     if (musicID == -1) {
         if (mapname == "forest.tmx") {
             // 播放背景音乐
-            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_forest.mp3", true, 0.5f);
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_forest.mp3", true, 0.3f);
         }
         if (mapname == "desert.tmx") {
             // 播放背景音乐
@@ -1082,7 +1095,7 @@ void OtherScene::playBackgroundMusic()
         }
         if (mapname == "town.tmx") {
             // 播放背景音乐
-            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_town.mp3", true, 0.5f);
+            musicID = cocos2d::experimental::AudioEngine::play2d("Audio/background_town.mp3", true, 0.2f);
         }
         if (musicID != -1) {
             CCLOG("Background music started playing with ID: %d", musicID);
