@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="win32">
+      <UniqueIdentifier>{84a8ebd7-7cf0-47f6-b75e-d441df67da40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{715254bc-d70b-4ec5-bf29-467dd3ace079}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\AppDelegate">
+      <UniqueIdentifier>{a868d4c9-9136-421e-97f5-03b4f16ad2e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Scene">
+      <UniqueIdentifier>{dbc96914-7f41-4bfc-b893-0280f2828a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Character">
+      <UniqueIdentifier>{3a1b022d-53c0-4aa8-a48c-e9ebb31a2d0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Character\Enemy">
+      <UniqueIdentifier>{adf40728-e30d-4a13-8037-5a9ab498964b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Character\Hero">
+      <UniqueIdentifier>{4f71e867-20df-4a4e-b366-23324a8fa582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Weapon">
+      <UniqueIdentifier>{2b74d730-09a2-4205-8800-f754455e4a99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Weapon\Melee">
+      <UniqueIdentifier>{1f7295f3-7e94-40d7-ae8f-ac300eba24b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Weapon\Ranged">
+      <UniqueIdentifier>{28b8b939-c87b-451f-b0af-a7b15163d3c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Weapon\Ranged\Ammunition">
+      <UniqueIdentifier>{1dc65749-524d-4d99-85f4-c635cc3b9a56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Item">
+      <UniqueIdentifier>{aafb7112-4826-4ab5-bf3e-230e04f8ebb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Inventory">
+      <UniqueIdentifier>{85df0e33-aee5-42f1-93fb-f67d72041872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Task">
+      <UniqueIdentifier>{53e92b34-1978-45b7-ab96-f0995b7f3c97}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AppDelegate\AppDelegate.cpp">
+      <Filter>src\AppDelegate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Scene\MainMenuScene.cpp">
+      <Filter>src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Scene\MainScene.cpp">
+      <Filter>src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Scene\OtherScene.cpp">
+      <Filter>src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Character\Hero\Hero.cpp">
+      <Filter>src\Character\Hero</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Weapon\Switcher.cpp">
+      <Filter>src\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Weapon\Weapon.cpp">
+      <Filter>src\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Scene\MiniMap.cpp">
+      <Filter>src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Character\CharacterBase.cpp">
+      <Filter>src\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Weapon\RangedWeapon\Ammunition\Bullet.cpp">
+      <Filter>src\Weapon\Ranged\Ammunition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Weapon\MeleeWeapon\Bayonet.cpp">
+      <Filter>src\Weapon\Melee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Item\Item.cpp">
+      <Filter>src\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Inventory\Inventory.cpp">
+      <Filter>src\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Character\PlayerPanel.cpp">
+      <Filter>src\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Scene\MapManager.cpp">
+      <Filter>src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Task\Maze.cpp">
+      <Filter>src\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Task\TreasureHunt.cpp">
+      <Filter>src\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Task\EnemyHunt.cpp">
+      <Filter>src\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Character\Enemy\EnemyManager.cpp">
+      <Filter>src\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Character\Enemy\Enemy.cpp">
+      <Filter>src\Character\Enemy</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AppDelegate\AppDelegate.h">
+      <Filter>src\AppDelegate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Scene\MainMenuScene.h">
+      <Filter>src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Scene\MainScene.h">
+      <Filter>src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Scene\OtherScene.h">
+      <Filter>src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Character\Hero\Hero.h">
+      <Filter>src\Character\Hero</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Weapon\Switcher.h">
+      <Filter>src\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Weapon\Weapon.h">
+      <Filter>src\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Scene\MiniMap.h">
+      <Filter>src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Character\CharacterBase.h">
+      <Filter>src\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Weapon\RangedWeapon\Ammunition\Bullet.h">
+      <Filter>src\Weapon\Ranged\Ammunition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Weapon\MeleeWeapon\Bayonet.h">
+      <Filter>src\Weapon\Melee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Item\item.h">
+      <Filter>src\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Inventory\Inventory.h">
+      <Filter>src\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Character\PlayerPanel.h">
+      <Filter>src\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Scene\MapManager.h">
+      <Filter>src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Task\Maze.h">
+      <Filter>src\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Task\TreasureHunt.h">
+      <Filter>src\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Task\EnemyHunt.h">
+      <Filter>src\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Character\Enemy\Enemy.h">
+      <Filter>src\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Character\Enemy\EnemyManager.h">
+      <Filter>src\Character\Enemy</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="game.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
