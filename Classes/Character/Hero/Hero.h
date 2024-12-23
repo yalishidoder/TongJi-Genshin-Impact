@@ -48,6 +48,13 @@ public:
 
     // 回到出生点恢复生命值 
     virtual void Recover(float delta)override;
+
+    // 角色复活
+    void respawnHero(int audioId);
+
+    // 结束游戏
+    void endGame();
+    
     // 背包相关
     void setInventory(Inventory* inventory);
     Inventory* getInventory() const;
@@ -84,9 +91,14 @@ public:
     void LevelUp();
     int calculateExpToLevelUp()const;
 
+    // 设置和获取金币数量
+    void setGoldCoin(int value);
+    int getGoldCoin()const;
+
     // 角色状态相关，例如是否存活等判断
     bool isAlive() const;
     void setDeath();
+
     // 碰撞检测相关（可根据具体碰撞逻辑扩展）
     bool checkCollision(Hero* otherHero);
 
@@ -134,7 +146,6 @@ public:
 private:
     bool m_isAlive;
     bool Upgrading;
-
     float m_speed;
 
     int MaxLevel;
@@ -142,6 +153,7 @@ private:
     int m_heroism;
     int m_exp;
     int m_expToLevelUp;
+    int m_gold_coin;
     bool m_ismale;
 
     

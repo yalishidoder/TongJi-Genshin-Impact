@@ -198,6 +198,8 @@ void Enemy::Recover(float delta)
 
 void Enemy::update(float delta) 
 {
+    playAnimation("walk_right_enemy");
+
     updateHealthFill();
 
     if (isControlled)
@@ -538,11 +540,15 @@ void Enemy::attackWithPunch()
 void Enemy::updatePistol()
 {
     if (enemyPistol) {
-        enemyPistol->setAnchorPoint(Vec2(-0.1f, 0.5f));
-        Vec2 handpos = getPosition();
-        handpos.x -= 250;
-        handpos.y -= 275;
-        enemyPistol->setPosition(handpos);
+        enemyPistol->setAnchorPoint(Vec2(-0.1f, 0.5f));  // 设置手枪的锚点为手部位置  
+        Vec2 origin =this->getSpawnPoint();
+        cocos2d::Vec2 res;
+        auto map = dynamic_cast<TMXTiledMap*>(getParent()->getChildByName("map"));
+        float mapOriginX = map->getPositionX() - (map->getContentSize().width * map->getScale() * map->getAnchorPoint().x);
+        float mapOriginY = map->getPositionY() - (map->getContentSize().height * map->getScale() * map->getAnchorPoint().y);
+        res.x = -mapOriginX + origin.x; // 地图左下角 x 偏移修正
+        res.y = -origin.y + 668;           // 地图左下角 y 偏移修正
+        enemyPistol->setPosition(res);
         enemyPistol->setVisible(0);
     }
 
@@ -556,7 +562,6 @@ void Enemy::updatePistol()
             // 设置手枪的旋转角度
             if (currentState == EnemyState::CHASE)
                 enemyPistol->setRotation(-angle);
-
         }
     }
 }
@@ -783,6 +788,7 @@ void Enemy::returnToSpawnLogic(float& dt, cocos2d::Vec2& enemyPos, float& distan
     if (distanceToPlayer <= radius)
     {
         currentState = EnemyState::CHASE;
+        updatePistol();
     }
 }
 
@@ -843,12 +849,14 @@ void Enemy::handleChasingMovement(float& dt, cocos2d::Vec2& directionToPlayer)
     if (!collision)
     {
         this->setPosition(this->getPosition() + movement);
+        updatePistol();
         CCLOG("Enemy moved to new position: (%.2f, %.2f)", targetPosition.x, targetPosition.y);
     }
     else
     {
         currentState = EnemyState::RETURN;
         CCLOG("Enemy touched the wall");
+        updatePistol();
     }
 
     float angle = std::atan2(directionToPlayer.y, directionToPlayer.x) * (180.0f / M_PI);
@@ -865,7 +873,7 @@ void Enemy::handleReturnToSpawnMovement(float& dt, cocos2d::Vec2& enemyPos)
         directionToSpawn.normalize();
         cocos2d::Vec2 movement = directionToSpawn * m_moveSpeed * dt;
         this->setPosition(this->getPosition() + movement);
-
+        updatePistol();
         float angle = std::atan2(directionToSpawn.y, directionToSpawn.x) * (180.0f / M_PI);
         //this->setRotation(angle);
     }
@@ -874,6 +882,7 @@ void Enemy::handleReturnToSpawnMovement(float& dt, cocos2d::Vec2& enemyPos)
         currentState = EnemyState::PATROL;
         setRotation(0.0f);
         dirX = 1;
+        updatePistol();
     }
 }
 
@@ -904,8 +913,7 @@ void Enemy::patrol(float delta)
 
     cocos2d::Vec2 moveDirection = cocos2d::Vec2(dirX * m_moveSpeed * delta, 0);
     cocos2d::Vec2 targetPosition = getPosition() + moveDirection;
-    playAnimation("walk_right_enemy");
-
+    
     // 获取当前场景进行碰撞检测
     bool collision = checkCollisionWithScene(targetPosition);
 
@@ -916,13 +924,11 @@ void Enemy::patrol(float delta)
     if (this->getPositionX() >= spawnPoint.x + rangedX)
     {
         dirX = -1;
-        playAnimation("walk_left_enemy");
     }
     //小于左边界，则规定向右移动
     else if (this->getPositionX() <= spawnPoint.x - rangedX)
     {
         dirX = 1;
-        playAnimation("walk_right_enemy");
     }
 
     // 如果没有碰撞，执行移动
@@ -937,15 +943,38 @@ void Enemy::patrol(float delta)
         if (dirX == 1)
         {
             dirX = -1;
-            playAnimation("walk_left_enemy");
         }
         // 向左移动碰到墙壁，反向向右
         else if (dirX == -1)
         {
             dirX = 1;
+        }
+    }
+
+    // 播放向右走的动画
+    if (dirX) {
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_right_enemy") != m_currentAnimate->getAnimation()) {
             playAnimation("walk_right_enemy");
         }
     }
+    else {
+        if (m_currentAnimate && m_animationCache->getAnimation("walk_right_enemy") == m_currentAnimate->getAnimation()) {
+            stopAnimation();
+        }
+    }
+
+    // 播放向左走的动画
+    if (!dirX) {
+        if (!m_currentAnimate || m_animationCache->getAnimation("walk_left_enemy") != m_currentAnimate->getAnimation()) {
+            playAnimation("walk_left_enemy");
+        }
+    }
+    else {
+        if (m_currentAnimate && m_animationCache->getAnimation("walk_left_enemy") == m_currentAnimate->getAnimation()) {
+            stopAnimation();
+        }
+    }
+    updatePistol();
 }
 
 void Enemy::moveLogic(float dt) {

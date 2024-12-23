@@ -148,6 +148,8 @@ void EnemyHunt::CompleteTask()
     else {
         hero_->setLevel(target_level);
     }
+
+    hero_->setGoldCoin(hero_->getGoldCoin() + 50000);
 }
 
 // хннЯй╖╟э

@@ -167,6 +167,24 @@ void PlayerPanel::initUi()
             this->addChild(levelLabelinPanel);
         }
 
+        // 显示角色金钱
+        auto moneySprite = cocos2d::Sprite::create("Character/Hero/test.png");
+        if (moneySprite)
+        {
+            moneySprite->setName("moneySprite");
+            moneySprite->setPosition(cocos2d::Vec2(60, 300));
+            this->addChild(moneySprite);
+        }
+
+        // 显示金钱数量
+        auto moneyLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
+        if (moneyLabel)
+        {
+            moneyLabel->setName("moneyLabel");
+            moneyLabel->setPosition(cocos2d::Vec2(150, 300));
+            this->addChild(moneyLabel);
+        }
+
         // 显示角色性别
         auto genderLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
         if (genderLabel) {
@@ -264,6 +282,20 @@ void PlayerPanel::updateInfo()
         auto levelLabelinPanel = dynamic_cast<Label*>(this->getChildByName("levelLabelinPanel"));
         if (levelLabelinPanel) {
             levelLabelinPanel->setString(StringUtils::format("Lv %d", m_hero->CharacterBase::getLevel()));
+        }
+
+        // 显示人物金币
+        auto moneySprite = dynamic_cast<Sprite*>(this->getChildByName("moneySprite"));
+        if (moneySprite)
+        {
+            moneySprite->setTexture("Character/panel/Coin_Icon.png");
+            //moneySprite->setScale(4.0f);
+        }
+
+        auto moneyLabel= dynamic_cast<Label*>(this->getChildByName("moneyLabel"));
+        if (moneyLabel)
+        {
+            moneyLabel->setString(StringUtils::format("%d", m_hero->getGoldCoin()));
         }
 
         // 显示角色性别

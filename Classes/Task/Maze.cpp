@@ -174,6 +174,8 @@ void Maze::CompleteTask()
     else {
         hero_->setLevel(target_level);
     }
+
+    hero_->setGoldCoin(hero_->getGoldCoin() + 10000);
 }
 
 // 任务失败处理

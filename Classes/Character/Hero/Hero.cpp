@@ -19,6 +19,7 @@ Hero::Hero()
     , MaxLevel(100)         // 等级上限
     , m_exp(0)              // 初始经验值
     , m_expToLevelUp(100)   // 初始升级所需要的经验
+    , m_gold_coin(100)
     , m_isAlive(true)
     , Upgrading(false)
     , m_animationCache(cocos2d::AnimationCache::getInstance())
@@ -32,7 +33,6 @@ Hero::Hero()
     , m_moveDown(false)
     , m_moveLeft(false)
     , m_moveRight(false)
-
     , m_bayonet(nullptr)
     , m_inventory(new Inventory())
 {
@@ -577,6 +577,16 @@ void Hero::updateLevelUpLabel()
     CCLOG("updateLevelUpLabel called");
 }
 
+void Hero::setGoldCoin(int value)
+{
+    m_gold_coin = value;
+}
+
+int Hero::getGoldCoin()const
+{
+    return m_gold_coin;
+}
+
 void Hero::takeDamage(float damage, Enemy* enemy)
 {
     if (!m_isAlive)
@@ -686,7 +696,8 @@ void Hero::takeDamage(float damage, Enemy* enemy)
 
 void Hero::setDeath()
 {
-    if (!m_isAlive) return;
+    if (!m_isAlive) 
+        return;
     stopAllActions();
     remove("hero.txt");
     m_isAlive = false;
@@ -703,23 +714,128 @@ void Hero::setDeath()
         cocos2d::experimental::AudioEngine::play2d("Audio/hero_female_death.mp3", false, 0.5f);
     // 播放死亡动画
     playAnimation("death_hero");
+
+    // 播放背景音乐
+    int audioId = cocos2d::experimental::AudioEngine::play2d("Audio/RIP.mp3", false, 0.5f);
+
     // 创建一个全屏的黑色矩形
     cocos2d::LayerColor* fadeLayer = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 0));
-    cocos2d::Director::getInstance()->getRunningScene()->addChild(fadeLayer,100);
-    // 创建一个渐暗的动作序列
-    cocos2d::FadeTo* fadeToAction = cocos2d::FadeTo::create(6.0f, 244); // 6秒内将透明度从0渐变为244
+    fadeLayer->setName("fadeLayer");
+    cocos2d::Director::getInstance()->getRunningScene()->addChild(fadeLayer, 100);
+
+    // 创建游戏结束图标
+    cocos2d::Sprite* gameoverSprite = cocos2d::Sprite::create("Character/hero/game_over.png");
+    gameoverSprite->setName("gameoverSprite");
+    gameoverSprite->setPosition(Vec2(500, 500));
+    gameoverSprite->setScale(2.0f);
+    gameoverSprite->setOpacity(0);
+    cocos2d::Director::getInstance()->getRunningScene()->addChild(gameoverSprite, 100);
+
+    // 创建重生按钮
+    auto respawnButton = ui::Button::create("Character/panel/Restart_icon.png");
+    respawnButton->setPosition(Vec2(250, 100));
+    respawnButton->setName("respawnButton");
+    respawnButton->setOpacity(0);
+    respawnButton->addClickEventListener([=](cocos2d::Ref* sender) {
+        this->respawnHero(audioId);
+        });
+    cocos2d::Director::getInstance()->getRunningScene()->addChild(respawnButton, 101);
+
+    // 创建结束游戏按钮
+    auto endButton = ui::Button::create("Character/panel/Close_Icon.png");
+    endButton->setScale(1.5f);
+    endButton->setPosition(Vec2(750, 100));
+    endButton->setName("endButton");
+    endButton->setOpacity(0);
+    endButton->addClickEventListener([=](cocos2d::Ref* sender) {
+        this->endGame();
+        });
+    cocos2d::Director::getInstance()->getRunningScene()->addChild(endButton, 101);
+
+    // 创建一个渐暗的动作序列1
+    cocos2d::FadeTo* fadeToAction1 = cocos2d::FadeTo::create(3.0f, 244); // 3秒内将透明度从0渐变为244
     // 运行动作
-    fadeLayer->runAction(fadeToAction);
-    // 播放背景音乐
-    cocos2d::experimental::AudioEngine::play2d("Audio/RIP.mp3", false, 0.5f);
+    fadeLayer->runAction(fadeToAction1);
+
+    // 创建一个渐暗的动作序列2
+    cocos2d::FadeTo* fadeToAction2 = cocos2d::FadeTo::create(6.0f, 244); // 6秒内将透明度从0渐变为244
+    gameoverSprite->runAction(fadeToAction2);
+
+    // 创建一个渐暗的动作序列3
+    cocos2d::FadeTo* fadeToAction3 = cocos2d::FadeTo::create(6.0f, 244); // 6秒内将透明度从0渐变为244
+    respawnButton->runAction(fadeToAction3);
+
+    // 创建一个渐暗的动作序列4
+    cocos2d::FadeTo* fadeToAction4 = cocos2d::FadeTo::create(6.0f, 244); // 6秒内将透明度从0渐变为244
+    endButton->runAction(fadeToAction4);
+}
+
+void Hero::respawnHero(int audioId)
+{
+    // 删去死亡界面
+    /*auto respawnButton = cocos2d::Director::getInstance()->getRunningScene()->getChildByName("respawnButton");
+    if (respawnButton)
+        respawnButton->setVisible(false);*/
+    cocos2d::Director::getInstance()->getRunningScene()->removeChildByName("respawnButton");
+    cocos2d::Director::getInstance()->getRunningScene()->removeChildByName("endButton");
+    cocos2d::Director::getInstance()->getRunningScene()->removeChildByName("gameoverSprite");
+    cocos2d::Director::getInstance()->getRunningScene()->removeChildByName("fadeLayer");
+    cocos2d::experimental::AudioEngine::stop(audioId);
+
+
+    // 重置玩家位置到出生点
+    setPosition(spawnPoint);
+
+    // 恢复生命值
+    setHealth(m_full_health);
+
+    // 恢复其他属性
+    m_isAlive = true;
+    isControlled = false;
+
+    m_moveDirection = cocos2d::Vec2::ZERO;
+
+    // 显示玩家
+    setVisible(true);
+
+    // 停止死亡动画
+    //stopAllActions();
+    if (m_currentAnimate && m_animationCache->getAnimation("death_hero") == m_currentAnimate->getAnimation()) {
+        stopAnimation();
+    }
+    // 恢复武器和装备
+    if (m_bayonet) {
+        m_bayonet->setVisible(m_isBayonetChosen);
+    }
+    weaponLabel->setVisible(true);
+
+    // 播放重生音效
+    //cocos2d::experimental::AudioEngine::play2d("Audio/respawn.mp3", false, 0.5f);
+
+    // 隐藏死亡相关显示
+    if (freezeSprite) {
+        freezeSprite->setVisible(false);
+    }
+    if (recoverLabel) {
+        recoverLabel->setVisible(false);
+    }
+    if (damageLabel) {
+        damageLabel->setVisible(false);
+    }
+    if (ERLabel) {
+        ERLabel->setVisible(false);
+    }
+}
+
+void Hero::endGame()
+{
     // 延时退出
-    cocos2d::DelayTime* delay = cocos2d::DelayTime::create(33.0f);
+    cocos2d::DelayTime* delay = cocos2d::DelayTime::create(2.0f);
     cocos2d::CallFunc* endGame = cocos2d::CallFunc::create([]() {
         cocos2d::Director::getInstance()->end();
         });
     cocos2d::Sequence* sequence = cocos2d::Sequence::create(delay, endGame, nullptr);
     cocos2d::Director::getInstance()->getRunningScene()->runAction(sequence);
-    
 }
 
 void Hero::updateDamageLabel(int damage)
@@ -1419,6 +1535,7 @@ void Hero::saveProfile(const std::string& filename) {
         file << m_level << std::endl;
         file << m_exp << std::endl;
         file << m_expToLevelUp << std::endl;
+        file << m_gold_coin << std::endl;
         file << m_isAlive << std::endl;
         file << Upgrading << std::endl;
         file << m_moveDirection.x << " " << m_moveDirection.y << std::endl;
@@ -1447,6 +1564,7 @@ void Hero::loadProfile(const std::string& filename) {
         file >> m_level;
         file >> m_exp;
         file >> m_expToLevelUp;
+        file >> m_gold_coin;
         file >> m_isAlive;
         file >> Upgrading;
         file >> m_moveDirection.x >> m_moveDirection.y;

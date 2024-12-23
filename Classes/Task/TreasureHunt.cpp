@@ -227,6 +227,8 @@ void TreasureHunt::CompleteTask()
     else {
         hero_->setLevel(target_level);
     }
+
+    hero_->setGoldCoin(hero_->getGoldCoin() + 25000);
 }
 
 // хннЯй╖╟э
