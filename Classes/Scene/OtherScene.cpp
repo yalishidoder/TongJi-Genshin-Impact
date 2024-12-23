@@ -159,6 +159,7 @@ bool OtherScene::init(const std::string& mapFile)
                 float adjustedY = othermapOriginY + y * othermap->getScale(); // 地图左下角 + 出生点的 y 偏移
                 initspot_smallmap = Vec2(adjustedX, adjustedY);
                 hero->setPosition(Vec2(adjustedX, adjustedY));
+                hero->setSpawnPoint(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
 
                 // 创建玩家面板

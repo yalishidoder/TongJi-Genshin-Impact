@@ -954,7 +954,7 @@ void Hero::updateRecoverLabel()
 {
     if (!recoverLabel)
         return;
-    recoverLabel->setString("Level UP!");
+    recoverLabel->setString("Recover!");
     recoverLabel->setVisible(true);
     // ³õÊ¼ÑÕÉ«
     cocos2d::Color4B initialColor = cocos2d::Color4B::WHITE;
