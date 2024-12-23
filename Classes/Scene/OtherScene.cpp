@@ -421,7 +421,9 @@ void OtherScene::update(float dt)
 #endif
     Node::update(dt);
 
-    EnemyManager::getInstance()->update(dt);
+    // 在城镇中不再刷新敌人
+    if (mapname != "town.tmx")
+        EnemyManager::getInstance()->update(dt);
 
     auto children = getChildren();
     for (auto child : children) {
