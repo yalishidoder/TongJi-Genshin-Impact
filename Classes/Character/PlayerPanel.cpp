@@ -171,7 +171,7 @@ void PlayerPanel::initUi()
         auto genderLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
         if (genderLabel) {
             genderLabel->setName("genderLabel");
-            genderLabel->setPosition(cocos2d::Vec2(110, 300));
+            genderLabel->setPosition(cocos2d::Vec2(110, 200));
             this->addChild(genderLabel);
         }
 
@@ -179,7 +179,7 @@ void PlayerPanel::initUi()
         auto fullHealthLabel = cocos2d::Label::createWithTTF("", "fonts/MedievalSharp.ttf", 35);
         if (fullHealthLabel) {
             fullHealthLabel->setName("fullHealthLabel");
-            fullHealthLabel->setPosition(cocos2d::Vec2(110, 200));
+            fullHealthLabel->setPosition(cocos2d::Vec2(110, 100));
             this->addChild(fullHealthLabel);
         }
 
@@ -194,7 +194,7 @@ void PlayerPanel::initUi()
         // 创建修改按钮
         auto changeButton = cocos2d::ui::Button::create("Character/panel/Change_icon.png");
         if (changeButton) {
-            changeButton->setPosition(cocos2d::Vec2(300, 300));
+            changeButton->setPosition(cocos2d::Vec2(300, 200));
             changeButton->addClickEventListener([=](Ref* sender)
                 {
                     this->changeHeroGender();
