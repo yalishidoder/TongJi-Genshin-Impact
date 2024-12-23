@@ -713,7 +713,7 @@ void Hero::setDeath()
     // ²¥·Å±³¾°ÒôÀÖ
     cocos2d::experimental::AudioEngine::play2d("Audio/RIP.mp3", false, 0.5f);
     // ÑÓÊ±ÍË³ö
-    cocos2d::DelayTime* delay = cocos2d::DelayTime::create(27.0f);
+    cocos2d::DelayTime* delay = cocos2d::DelayTime::create(33.0f);
     cocos2d::CallFunc* endGame = cocos2d::CallFunc::create([]() {
         cocos2d::Director::getInstance()->end();
         });
