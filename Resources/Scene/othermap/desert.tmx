@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="13">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="23" nextobjectid="16">
  <tileset firstgid="1" name="summer_beach.fr-FR" tilewidth="16" tileheight="16" tilecount="527" columns="17">
   <image source="summer_beach.fr-FR.png" width="272" height="496"/>
  </tileset>
@@ -34,12 +34,22 @@
  </layer>
  <layer id="3" name="gem" width="64" height="48">
   <data encoding="base64" compression="zlib">
-   eJzt1lsKAjEMBdBB6frchz/+uLNp6/Y0TENDaMcBFUxyDxQfFeG2STvLAgBg2+302TwA+IO+Bwn14AftJfYTAAAA/tU19RER8sfODwBxPdI2IuLsUdfg1/nL6z9z2l5rG2v7zrvSso7ktgZ15zfWlZbrXT6P+avKtDre56P0mlzO/SyIsj7cEzX19yyLtdBz1lRx7vOrzM7zM55qgXJSrbOiPkcg7/wId7/cX9nrRdS+pxqf0X0uz4HRcyA/D+m7whq9z0Vl4pw85+k8kGe/rnE+Cz3WfhY9TiinrmO++yzd7/fUx8wok/UeZpx7Lz+pouZzGue32OdH9h++7wlhE1Y0
+   eJztlt0OgjAMRo245/Pnymfw9dj2fLpsDbUOWTCKa7+TNETgwtN2Lbsd+AcuhxxWgb9t/0+57nOsfd47LX6a/cEr1us9dyaQl63/wXZo2gNrXKz7AwAAAAD8ipubwiLwt+0PALDJeXgOa8D/u/7hsVO9y9dYYiz3tBOKaw1fchDfvNM7oXgt+Wn0j8JpVFznVmROjkMO7+zkh85EygX5EzQTRje91yuRzX26cve4sAM09YIXtQ6V2muC3Lgf/y3zoQ3pH1nvB9b7mnqcw/3lOedzoPYdSN9Dclf0hqxzEE7kSc80nQc++2WP09mX9zX4e3bGEzUn2vs97ffTMMUcfMYRGmqaaPFPRNbzfmaG9ZiTVv8WevTfijuckVvn
   </data>
  </layer>
  <layer id="6" name="npc" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJztz0kNACAMAMF+8G+H0xsVAQ/CjIBNNuKsWiJaORx9SM/38fH/zPf18T8AAAAAAAAAAAAAwC0btxEEfg==
+  </data>
+ </layer>
+ <layer id="22" name="SceneSwitchPoints_spot_1" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztzzENAAAIBDEW/COZEQ3k2+QEXBUAAAAAAAAAAAAAKaavRP6z/+G7BRMKBT4=
+  </data>
+ </layer>
+ <layer id="21" name="dcrtion" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz0ENAlEQRMF/GqGAC8DFggvABYusbQMjgElV8pK+9loAAAAAAAAAAAAAMNep1jqnS/V7smv+3dK9+j3Zln+P9Kx+T/bKv3f6VL8n++bfnn7V739yAFWYG0A=
   </data>
  </layer>
  <objectgroup id="13" name="task_start">
@@ -83,10 +93,22 @@
    </properties>
    <point/>
   </object>
+  <object id="15" name="MainScene" x="261" y="695">
+   <properties>
+    <property name="no_position" value="267 124"/>
+    <property name="targetMap" value="mainmap.tmx"/>
+   </properties>
+   <point/>
+  </object>
  </objectgroup>
  <layer id="11" name="flag2_PositionSwitchPoints" width="64" height="48">
   <data encoding="base64" compression="zlib">
    eJzt2KENADAMA8GQ8u4/bVXQDSoZ+E4yz9PMAPyzV/qCnNv+1qq5HQAAAACS/Cb1N/cDAAAAQJMDDt0A6A==
+  </data>
+ </layer>
+ <layer id="19" name="flag2_PositionSwitchPoints_1" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJztz7EJADAMA0E37rP/tMFFZjBBd6BeXwUAAAAAAAAkOr39YM+0v6VKbgcAAAD41QXpRABq
   </data>
  </layer>
  <objectgroup id="12" name="PositionSwitchPoints">
@@ -96,5 +118,13 @@
   <object id="5" name="spot" x="968" y="420">
    <point/>
   </object>
+  <object id="14" name="spot" x="182.33" y="472">
+   <point/>
+  </object>
  </objectgroup>
+ <layer id="20" name="skillbooks" width="64" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt08EJgFAMRMEQrMYO7Eqs/Jeg8FsQctgZ2HveIVX84ezpC2al9wMAAAAATLiOqrv3EqX3Q7L1/f/Te4nS+wEAAACSvYf6BlM=
+  </data>
+ </layer>
 </map>

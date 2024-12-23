@@ -12,7 +12,7 @@ USING_NS_CC;
 //任务1是森林迷宫任务
 bool isTask1Completed = false;
 //任务2是沙漠寻宝任务
-bool isTask2Completed = 1;
+bool isTask2Completed = false;
 //任务3是城镇杀敌任务
 bool isTask3Completed = false;
 

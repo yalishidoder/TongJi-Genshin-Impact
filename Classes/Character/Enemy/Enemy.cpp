@@ -543,7 +543,9 @@ void Enemy::updatePistol()
         enemyPistol->setAnchorPoint(Vec2(-0.1f, 0.5f));  // 设置手枪的锚点为手部位置  
         Vec2 origin =this->getSpawnPoint();
         cocos2d::Vec2 res;
-        auto map = dynamic_cast<TMXTiledMap*>(getParent()->getChildByName("map"));
+        
+        //auto map = dynamic_cast<TMXTiledMap*>(getParent()->getChildByName("map"));
+        cocos2d::Scene* map = cocos2d::Director::getInstance()->getRunningScene();
         float mapOriginX = map->getPositionX() - (map->getContentSize().width * map->getScale() * map->getAnchorPoint().x);
         float mapOriginY = map->getPositionY() - (map->getContentSize().height * map->getScale() * map->getAnchorPoint().y);
         res.x = -mapOriginX + origin.x; // 地图左下角 x 偏移修正
