@@ -157,7 +157,7 @@ bool OtherScene::init(const std::string& mapFile)
                 // 计算出firstflag的屏幕坐标
                 float adjustedX = othermapOriginX + x * othermap->getScale(); // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = othermapOriginY + y * othermap->getScale(); // 地图左下角 + 出生点的 y 偏移
-
+                initspot_smallmap = Vec2(adjustedX, adjustedY);
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 this->addChild(hero);  // 将角色添加到场景中
 
@@ -429,6 +429,10 @@ void OtherScene::update(float dt)
         return;
     }
 #endif
+    auto hero_main = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (isKeyPressedU) {
+        hero_main->setPosition(initspot_smallmap);  // 传送角色
+    }
     Node::update(dt);
 
     // 在城镇中不再刷新敌人
@@ -714,6 +718,10 @@ void OtherScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
         case cocos2d::EventKeyboard::KeyCode::KEY_B:
             isKeyPressedB = true;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_U:
+        case cocos2d::EventKeyboard::KeyCode::KEY_U:
+            isKeyPressedU = true;
+            break;
     }
 }
 
@@ -740,6 +748,10 @@ void OtherScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
             case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_D:
             case cocos2d::EventKeyboard::KeyCode::KEY_D:
                 hero->m_moveRight = false;
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_U:
+            case cocos2d::EventKeyboard::KeyCode::KEY_U:
+                isKeyPressedU = false;
                 break;
             default:
                 break;

@@ -131,7 +131,7 @@ bool MainScene::init()
                 // 计算出生点的屏幕坐标
                 float adjustedX = mapOriginX + x * map->getScale(); // 地图左下角 + 出生点的 x 偏移
                 float adjustedY = mapOriginY + y * map->getScale(); // 地图左下角 + 出生点的 y 偏移
-
+                initspot_main = Vec2(adjustedX, adjustedY);
                 // 设置人物位置
                 hero->setPosition(Vec2(adjustedX, adjustedY));
                 hero->setSpawnPoint(Vec2(adjustedX, adjustedY)); 
@@ -381,6 +381,10 @@ void MainScene::update(float dt)
         hero->m_moveRight = false;
         return;
     }
+    auto hero_main = dynamic_cast<Hero*>(this->getChildByName("hero"));
+    if (isKeyPressedU) {
+        hero_main->setPosition(initspot_main);  // 传送角色
+    }
     Node::update(dt);
 
     // 更新敌人管理器
@@ -605,6 +609,10 @@ void MainScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
         case cocos2d::EventKeyboard::KeyCode::KEY_B:
             isKeyPressedB = true;
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_U:
+        case cocos2d::EventKeyboard::KeyCode::KEY_U:
+            isKeyPressedU = true;
+            break;
     }
 }
 
@@ -631,6 +639,10 @@ void MainScene::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::
             case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_D:
             case cocos2d::EventKeyboard::KeyCode::KEY_D:
                 hero->m_moveRight = false;
+                break;
+            case cocos2d::EventKeyboard::KeyCode::KEY_CAPITAL_U:
+            case cocos2d::EventKeyboard::KeyCode::KEY_U:
+                isKeyPressedU = false;
                 break;
             default:
                 break;

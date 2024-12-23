@@ -46,6 +46,8 @@ public:
 	void hidemyPanel();
 private:
 	cocos2d::TMXTiledMap* othermap;
+	cocos2d::Vec2 initspot_smallmap;
+
 	std::string mapname;
 	//地图切换点的信息储存
 	std::vector<SceneSwitchPoint> sceneSwitchPoints;
@@ -74,6 +76,8 @@ private:
 	bool tasking = false;
 	//记录 B 键是否被按下（背包）
 	bool isKeyPressedB = false;
+	//记录 U 键是否被按下（人物位置重置）
+	bool isKeyPressedU = false;
 	PlayerPanel* m_playerPanel = nullptr;
 	std::vector<Enemy*> enemies;  // 存储town敌人的容器
 	int enmies_num;

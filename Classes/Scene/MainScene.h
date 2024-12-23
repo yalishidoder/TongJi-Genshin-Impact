@@ -59,7 +59,7 @@ public:
 
 private:
     cocos2d::TMXTiledMap* map;
-
+    cocos2d::Vec2 initspot_main;
     //地图切换点的信息储存
     std::vector<SceneSwitchPoint> sceneSwitchPoints;
     //位置传送点的信息储存
@@ -76,7 +76,8 @@ private:
     bool isKeyPressedP = false;
     //记录 B 键是否被按下（背包）
     bool isKeyPressedB = false;
-
+    //记录 U 键是否被按下（人物位置重置）
+    bool isKeyPressedU = false;
     // 面板
     PlayerPanel* m_playerPanel = nullptr;
 
